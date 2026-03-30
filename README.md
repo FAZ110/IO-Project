@@ -21,8 +21,8 @@ This project is developed as part of the Software Engineering course. The applic
 
 To keep our repository synchronized with Jira, please follow these naming conventions:
 
-- **Branch names:** Include the Jira issue key (e.g., `feature/PROJ-123-add-login`)
-- **Commit messages:** Always prefix the commit message with the Jira issue key (e.g., `PROJ-123: Add login component`)
+- **Branch names:** Include the Jira issue key (e.g., `feature/IP-1-add-login`)
+- **Commit messages:** Always prefix the commit message with the Jira issue key (e.g., `IP-1: Add login component`)
 
 ## Initial Setup (Run Once)
 
