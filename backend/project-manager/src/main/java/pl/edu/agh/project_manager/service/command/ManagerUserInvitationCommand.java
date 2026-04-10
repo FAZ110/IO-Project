@@ -1,6 +1,10 @@
 package pl.edu.agh.project_manager.service.command;
 
+import java.util.UUID;
+
 public record ManagerUserInvitationCommand(
-        String email
+        String email,
+
+        UUID supervisorId
 ) {
 }

@@ -10,6 +10,6 @@ public record AdminUserInvitationRequest(
         String email,
 
         @NotNull(message = "Rola musi zostać określona")
-        AssignableRole role
+        AdminAssignableRole role
 ) {
 }

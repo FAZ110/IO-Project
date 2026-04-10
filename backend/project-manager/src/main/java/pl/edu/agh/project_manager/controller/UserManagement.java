@@ -2,36 +2,60 @@ package pl.edu.agh.project_manager.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import pl.edu.agh.project_manager.controller.dto.AdminUserInvitationRequest;
 import pl.edu.agh.project_manager.controller.dto.ManagerUserInvitationRequest;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
+import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.UserInvitationService;
 import pl.edu.agh.project_manager.service.command.AdminUserInvitationCommand;
 import pl.edu.agh.project_manager.service.command.ManagerUserInvitationCommand;
 
-@Controller
-@RequestMapping("/")
+
+@RestController
+@RequestMapping("/api")
 @RequiredArgsConstructor
 class UserManagement {
     private final UserInvitationService invitationService;
 
-    @PostMapping("/api/admin/invitations")
-    public void adminInvite(@Valid @RequestBody AdminUserInvitationRequest request) {
+    @PostMapping("/admin/invitations")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> adminInvite(
+            @Valid @RequestBody AdminUserInvitationRequest request,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
         var command = new AdminUserInvitationCommand(
                 request.email(),
-                UserRole.valueOf(request.role().name())
+                UserRole.valueOf(request.role().name()),
+                principal.userId()
         );
 
         invitationService.inviteUser(command);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PostMapping("/api/manager/invitations")
-    public void managerInvite(@Valid @RequestBody ManagerUserInvitationRequest request) {
-        var command = new ManagerUserInvitationCommand(request.email());
+
+    @PostMapping("/manager/invitations")
+    @PreAuthorize("hasRole('LINEAR_MANAGER')")
+    public ResponseEntity<Void> managerInvite(
+            @Valid @RequestBody ManagerUserInvitationRequest request,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        var command = new ManagerUserInvitationCommand(
+                request.email(),
+                principal.userId()
+        );
+
         invitationService.inviteUser(command);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
