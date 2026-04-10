@@ -1,0 +1,41 @@
+package pl.edu.agh.project_manager.domain.entity;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import pl.edu.agh.project_manager.domain.enums.UserRole;
+import pl.edu.agh.project_manager.domain.enums.UserStatus;
+
+import java.util.UUID;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "user")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
+    private UUID id;
+
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "surname")
+    private String surname;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_role", nullable = false)
+    private UserRole userRole;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_status", nullable = false)
+    private UserStatus userStatus;
+
+    @ManyToOne
+    @JoinColumn(name = "supervisor_id")
+    private User supervisor;
+}
