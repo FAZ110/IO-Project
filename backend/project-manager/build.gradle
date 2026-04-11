@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '4.0.5'
 	id 'io.spring.dependency-management' version '1.1.7'
+    id 'checkstyle'
 }
 
 group = 'pl.edu.agh'
@@ -17,6 +18,13 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+}
+
+checkstyle {
+    toolVersion = '10.12.1'
+    configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
+    ignoreFailures = true  //errors in console, build will not fail
+    showViolations = true
 }
 
 repositories {
