@@ -7,10 +7,12 @@ import pl.edu.agh.project_manager.domain.entity.ActivationToken;
 import pl.edu.agh.project_manager.domain.entity.User;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
-import pl.edu.agh.project_manager.service.command.AdminUserInvitationCommand;
+import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
+import pl.edu.agh.project_manager.domain.exception.ApplicationException;
+import pl.edu.agh.project_manager.service.command.AdminInviteUserCommand;
 import pl.edu.agh.project_manager.repository.ActivationTokenRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
-import pl.edu.agh.project_manager.service.command.ManagerUserInvitationCommand;
+import pl.edu.agh.project_manager.service.command.ManagerInviteUserCommand;
 import pl.edu.agh.project_manager.service.command.SendInvitationCommand;
 
 import java.util.UUID;
@@ -23,39 +25,35 @@ public class UserInvitationService {
     private final EmailService emailService;
 
     @Transactional
-    public void inviteUser(AdminUserInvitationCommand command) {
-// TODO:
-//        if (userRepository.existsByEmail(command.email())) {
-//            throw new UserAlreadyExistsException(command.email());
-//        }
-
-        var supervisor = fetchUser(command.supervisorId());
-
-        var newUser = createInvitedUser(command.email(), command.role(), supervisor);
-        userRepository.save(newUser);
-
-        var activationToken = createTokenForUser(newUser);
-
-        sendInvitationEmail(command.email(), activationToken);
+    public void inviteUser(AdminInviteUserCommand command) {
+        processInvitation(command.email(), command.role(), command.supervisorId());
     }
 
     @Transactional
-    public void inviteUser(ManagerUserInvitationCommand command) {
-        var supervisor = fetchUser(command.supervisorId());
+    public void inviteUser(ManagerInviteUserCommand command) {
+        processInvitation(command.email(), UserRole.COMMON, command.supervisorId());
+    }
 
-        var newUser = createInvitedUser(command.email(), UserRole.COMMON, supervisor);
+    private void processInvitation(String email, UserRole role, UUID supervisorId) {
+        if (userRepository.existsByEmail(email)) {
+            throw new ApplicationException(ApiErrorCode.INVITATION_USER_ALREADY_EXISTS);
+        }
+
+        var supervisor = fetchUser(supervisorId);
+
+        var newUser = createInvitedUser(email, role, supervisor);
         userRepository.save(newUser);
 
         var activationToken = createTokenForUser(newUser);
 
-        sendInvitationEmail(command.email(), activationToken);
+        sendInvitationEmail(email, activationToken);
     }
 
     private String createTokenForUser(User user) {
         var activationToken = new ActivationToken();
         activationToken.setUser(user);
-        tokenRepository.save(activationToken);
-        return activationToken.getToken();
+        var newToken = tokenRepository.save(activationToken);
+        return newToken.getToken();
     }
 
     private void sendInvitationEmail(String email, String activationToken) {
@@ -65,9 +63,7 @@ public class UserInvitationService {
 
     private User fetchUser(UUID id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Nie znaleziono supervisora o ID: " + id));
-// TODO:
-//                .orElseThrow(() -> new EntityNotFoundException("Supervisor not found"));
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.INVITATION_SUPERVISOR_NOT_FOUND));
     }
 
     private User createInvitedUser(String email, UserRole role, User supervisor) {
