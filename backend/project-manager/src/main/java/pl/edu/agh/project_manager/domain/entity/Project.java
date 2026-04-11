@@ -45,4 +45,9 @@ public class Project {
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private List<Risk> risks = new ArrayList<>();
+
+    public void addRisk(Risk risk) {
+        this.risks.add(risk);
+        risk.setProject(this);
+    }
 }
