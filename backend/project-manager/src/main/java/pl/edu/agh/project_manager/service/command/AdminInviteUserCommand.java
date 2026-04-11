@@ -4,7 +4,7 @@ import pl.edu.agh.project_manager.domain.enums.UserRole;
 
 import java.util.UUID;
 
-public record AdminUserInvitationCommand(
+public record AdminInviteUserCommand(
         String email,
 
         UserRole role,

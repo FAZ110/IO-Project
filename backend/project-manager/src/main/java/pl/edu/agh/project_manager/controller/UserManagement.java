@@ -15,8 +15,8 @@ import pl.edu.agh.project_manager.controller.dto.ManagerUserInvitationRequest;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.UserInvitationService;
-import pl.edu.agh.project_manager.service.command.AdminUserInvitationCommand;
-import pl.edu.agh.project_manager.service.command.ManagerUserInvitationCommand;
+import pl.edu.agh.project_manager.service.command.AdminInviteUserCommand;
+import pl.edu.agh.project_manager.service.command.ManagerInviteUserCommand;
 
 
 @RestController
@@ -31,7 +31,7 @@ class UserManagement {
             @Valid @RequestBody AdminUserInvitationRequest request,
             @AuthenticationPrincipal UserPrincipal principal
     ) {
-        var command = new AdminUserInvitationCommand(
+        var command = new AdminInviteUserCommand(
                 request.email(),
                 UserRole.valueOf(request.role().name()),
                 principal.userId()
@@ -49,7 +49,7 @@ class UserManagement {
             @Valid @RequestBody ManagerUserInvitationRequest request,
             @AuthenticationPrincipal UserPrincipal principal
     ) {
-        var command = new ManagerUserInvitationCommand(
+        var command = new ManagerInviteUserCommand(
                 request.email(),
                 principal.userId()
         );
