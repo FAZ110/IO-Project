@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import pl.edu.agh.project_manager.domain.entity.User;
-import pl.edu.agh.project_manager.repository.UserRepository; // Podmień na swój właściwy import
+import pl.edu.agh.project_manager.repository.UserRepository;
 
 import java.util.List;
 
