@@ -3,7 +3,7 @@ import LoginForm from './components/LoginForm';
 function App() {
     return (
         <div>
-            {/* Tutaj renderujemy nasz formularz logowania */}
+            {/* Tutaj renderujemy formularz logowania */}
             <LoginForm />   
         </div>
     );
