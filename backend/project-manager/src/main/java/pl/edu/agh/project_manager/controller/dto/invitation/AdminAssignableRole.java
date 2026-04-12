@@ -1,4 +1,4 @@
-package pl.edu.agh.project_manager.controller.dto.user;
+package pl.edu.agh.project_manager.controller.dto.invitation;
 
 public enum AdminAssignableRole {
     AUTHORITY,
