@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.agh.project_manager.controller.dto.ProjectCreationRequest;
-import pl.edu.agh.project_manager.exception.CannotCreateProjectException;
+import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
+import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.ProjectService;
 import pl.edu.agh.project_manager.service.command.ProjectCreationCommand;
@@ -41,7 +42,7 @@ public class ProjectManagement {
         Optional<UUID> newProjectId = projectService.newProjectCreation(command);
 
         // Zwrócenie ID projektu
-        if (newProjectId.isEmpty()) throw new CannotCreateProjectException("Nie można stworzyć projektu!");
+        if (newProjectId.isEmpty()) throw new ApplicationException(ApiErrorCode.CANNOT_CREATE_PROJECT);
         return ResponseEntity.status(HttpStatus.CREATED).body(newProjectId.get());
     }
 }

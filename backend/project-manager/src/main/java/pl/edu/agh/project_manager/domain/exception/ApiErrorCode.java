@@ -13,7 +13,9 @@ public enum ApiErrorCode {
 
     VALIDATION_ERROR("GEN_001", HttpStatus.BAD_REQUEST, "Validation failed"),
     ACCESS_DENIED("GEN_002", HttpStatus.FORBIDDEN, "Access denied"),
-    INTERNAL_SERVER_ERROR("GEN_999", HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected internal server error");
+    INTERNAL_SERVER_ERROR("GEN_999", HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected internal server error"),
+
+    CANNOT_CREATE_PROJECT("PROJ_001", HttpStatus.BAD_REQUEST, "Cannot create new project!");
 
     private final String code;
     private final HttpStatus httpStatus;
