@@ -76,11 +76,15 @@ public class AuthService {
         var user = userRepository.findByEmail(command.email())
                 .orElseThrow();
 
+        if (user.getUserStatus() != UserStatus.ACTIVE) {
+            throw new ApplicationException(ApiErrorCode.ACCESS_DENIED, "User account is not active.");
+        }
+
         UserDetails userDetails = new UserPrincipal(
                 user.getId(),
                 user.getEmail(),
                 user.getPassword(),
-                List.of(new SimpleGrantedAuthority(user.getUserRole().name()))
+                List.of(new SimpleGrantedAuthority("ROLE_" + user.getUserRole().name()))
         );
 
         return jwtService.generateToken(userDetails);
