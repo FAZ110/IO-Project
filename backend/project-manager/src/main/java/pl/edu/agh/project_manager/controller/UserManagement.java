@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.edu.agh.project_manager.controller.dto.AdminUserInvitationRequest;
-import pl.edu.agh.project_manager.controller.dto.ManagerUserInvitationRequest;
+import pl.edu.agh.project_manager.controller.dto.invitation.AdminUserInvitationRequest;
+import pl.edu.agh.project_manager.controller.dto.invitation.ManagerUserInvitationRequest;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.UserInvitationService;
-import pl.edu.agh.project_manager.service.command.AdminInviteUserCommand;
-import pl.edu.agh.project_manager.service.command.ManagerInviteUserCommand;
+import pl.edu.agh.project_manager.service.command.invitation.AdminInviteUserCommand;
+import pl.edu.agh.project_manager.service.command.invitation.ManagerInviteUserCommand;
 
 
 @RestController

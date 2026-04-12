@@ -1,4 +1,4 @@
-package pl.edu.agh.project_manager.service.command;
+package pl.edu.agh.project_manager.service.command.invitation;
 
 import pl.edu.agh.project_manager.domain.enums.UserRole;
 
