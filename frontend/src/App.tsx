@@ -1,12 +1,12 @@
+import LoginForm from './components/LoginForm';
 
 function App() {
-
-  return (
-    <>
-    <h1 className="text-7xl">hello</h1>
-      
-    </>
-  )
+    return (
+        <div>
+            {/* Tutaj renderujemy nasz formularz logowania */}
+            <LoginForm />   
+        </div>
+    );
 }
 
-export default App
+export default App;
