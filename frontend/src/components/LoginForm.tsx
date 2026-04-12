@@ -1,9 +1,7 @@
 import React, { useState, FormEvent } from 'react';
 
-// Interfejs określający strukturę odpowiedzi z Twojego backendu (Spring)
 interface LoginResponse {
     token: string;
-    // Jeśli Twój backend zwraca coś jeszcze (np. rolę, id użytkownika), dodaj to tutaj
 }
 
 const LoginForm: React.FC = () => {
