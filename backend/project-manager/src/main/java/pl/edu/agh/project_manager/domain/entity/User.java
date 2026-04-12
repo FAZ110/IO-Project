@@ -47,6 +47,6 @@ public class User {
     @JoinColumn(name = "supervisor_id")
     private User supervisor;
 
-    @OneToMany(mappedBy = "projectManagerId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "projectManagerUser", cascade = CascadeType.ALL)
     private List<Project> projects = new ArrayList<>();
 }
