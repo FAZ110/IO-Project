@@ -1,10 +1,14 @@
 FROM gradle:9.4.1-jdk25 AS builder
 WORKDIR /app
-COPY . .
-RUN ./gradlew build -x test
+COPY build.gradle settings.gradle ./
+COPY gradle gradle
+COPY gradlew .
+RUN ./gradlew dependencies --no-daemon
+COPY src src
+RUN ./gradlew build -x test --no-daemon
 
 FROM eclipse-temurin:25-jre
 WORKDIR /app
-COPY --from=builder /app/build/libs/project-manager-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=builder /app/build/libs/project-manager-*.jar app.jar
 EXPOSE 8080
 CMD ["java", "-jar", "app.jar"]
