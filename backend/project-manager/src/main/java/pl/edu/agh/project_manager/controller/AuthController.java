@@ -19,14 +19,14 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
         String accessToken = authService.register(registerRequest.toCommand());
         return ResponseEntity.ok(new AuthResponse(accessToken));
 
     }
 
-    @PostMapping
+    @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         String accessToken = authService.login(loginRequest.toCommand());
         return ResponseEntity.ok(new AuthResponse(accessToken));
