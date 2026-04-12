@@ -2,7 +2,7 @@ package pl.edu.agh.project_manager.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pl.edu.agh.project_manager.service.command.SendInvitationCommand;
+import pl.edu.agh.project_manager.service.command.user.SendInvitationCommand;
 
 @Slf4j
 @Service
