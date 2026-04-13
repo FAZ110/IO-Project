@@ -42,6 +42,10 @@ public class ActivationToken {
     }
 
     public boolean isExpired() {
-        return LocalDateTime.now().isAfter(this.expiryDate);
+        return isExpired(LocalDateTime.now());
+    }
+
+    public boolean isExpired(LocalDateTime referenceTime) {
+        return referenceTime.isAfter(this.expiryDate);
     }
 }
