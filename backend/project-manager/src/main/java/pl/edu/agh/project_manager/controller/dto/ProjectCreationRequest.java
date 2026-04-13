@@ -11,17 +11,17 @@ import java.util.List;
 import java.util.UUID;
 
 public record ProjectCreationRequest(
-        @NotBlank(message = "Tytuł projektu nie może być pusty!")
+        @NotBlank(message = "Tytuł projektu nie może być pusty")
         String title,
 
-        @NotBlank(message = "Opis projektu nie może być pusty!")
+        @NotBlank(message = "Opis projektu nie może być pusty")
         String description,
 
-        @NotNull(message = "Data początkowa nie może być pusta!")
-        @FutureOrPresent(message = "Data początkowa musi być z przyszłości!")
+        @NotNull(message = "Data początkowa nie może być pusta")
+        @FutureOrPresent(message = "Data początkowa musi być z przyszłości")
         LocalDate startDate,
 
-        @NotNull(message = "Aktywność projektu nie może być pusta!")
+        @NotNull(message = "Aktywność projektu nie może być pusta")
         Boolean isActive,
 
         Integer walletId,
@@ -30,7 +30,7 @@ public record ProjectCreationRequest(
         @Valid
         List<RiskRequest> risks
 ) {
-    // Domyślnie projekt jest aktywny i lista jest pusta
+    // By default, project is active and list with risks is empty
     public ProjectCreationRequest {
         if (isActive == null) isActive = true;
 

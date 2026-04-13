@@ -2,11 +2,12 @@ package pl.edu.agh.project_manager.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import pl.edu.agh.project_manager.domain.entity.Project;
 import pl.edu.agh.project_manager.domain.entity.Risk;
 import pl.edu.agh.project_manager.domain.entity.User;
+import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
+import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
 import pl.edu.agh.project_manager.service.command.ProjectCreationCommand;
@@ -23,25 +24,25 @@ public class ProjectService {
 
     @Transactional
     public UUID createProject(ProjectCreationCommand command) {
-        // Znalezienie projekt menadżera
+        // Find project manager
         User projectManager = userRepository.findById(command.projectManagerId())
-                .orElseThrow(() -> new UsernameNotFoundException("Nie znaleziono managera o ID - " + command.projectManagerId()));
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_MANAGER_NOT_FOUND, "Cannot found provided project manager - " + command.projectManagerId()));
 
-        Project project = projectBuilder(command, projectManager);
+        Project project = buildProject(command, projectManager);
+        projectManager.getProjects().add(project);
 
         addRisksToProject(project, command.risks());
 
         Project savedProject = projectRepository.save(project);
 
-        // Zwrócenie ID nowego projektu
         return savedProject.getId();
     }
 
-    private Project projectBuilder(ProjectCreationCommand command, User projectManager) {
+    private Project buildProject(ProjectCreationCommand command, User projectManager) {
         return Project.builder()
                 .title(command.title())
                 .description(command.description())
-                .projectManagerUser(projectManager)
+                .projectManager(projectManager)
                 .startDate(command.startDate())
                 .isActive(command.isActive())
                 .walletId(command.walletId())
@@ -53,7 +54,6 @@ public class ProjectService {
         if (risks == null) return;
 
         risks.forEach(riskRequest -> {
-            // Tworzenie modelu ryzyka
             Risk risk = Risk.builder()
                     .name(riskRequest.name())
                     .description(riskRequest.description())
