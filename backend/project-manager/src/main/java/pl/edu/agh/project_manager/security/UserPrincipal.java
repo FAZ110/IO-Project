@@ -10,21 +10,24 @@ import java.util.List;
 import java.util.UUID;
 
 public record UserPrincipal(
-        UUID userId
+        UUID userId,
+        String email,
+        String password,
+        Collection<? extends GrantedAuthority> authorities
 ) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        throw new UnsupportedOperationException();
+        return authorities;
     }
 
     @Override
-    public @Nullable String getPassword() {
-        throw new UnsupportedOperationException();
+    public String getPassword() {
+        return password;
     }
 
     @Override
     public String getUsername() {
-        throw new UnsupportedOperationException();
+        return email;
     }
 }

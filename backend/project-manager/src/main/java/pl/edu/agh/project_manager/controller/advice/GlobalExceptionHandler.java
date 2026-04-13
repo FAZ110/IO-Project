@@ -2,6 +2,8 @@ package pl.edu.agh.project_manager.controller.advice;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
@@ -21,6 +23,18 @@ public class GlobalExceptionHandler {
 
         var body = new ApiErrorResponse(errorCode.getCode(), message);
         return ResponseEntity.status(errorCode.getHttpStatus()).body(body);
+    }
+
+    @ExceptionHandler({BadCredentialsException.class, UsernameNotFoundException.class})
+    public ResponseEntity<ApiErrorResponse> handleAuthenticationException(RuntimeException ex) {
+        log.warn("Authentication failed: {}", ex.getMessage());
+
+        var error = ApiErrorCode.BAD_CREDENTIALS;
+        var body = new ApiErrorResponse(error.getCode(), error.getMessage());
+
+        return ResponseEntity
+                .status(error.getHttpStatus())
+                .body(body);
     }
 
     @ExceptionHandler(Exception.class)

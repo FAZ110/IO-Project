@@ -9,11 +9,11 @@ import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
-import pl.edu.agh.project_manager.service.command.user.AdminInviteUserCommand;
+import pl.edu.agh.project_manager.service.command.invitation.AdminInviteUserCommand;
 import pl.edu.agh.project_manager.repository.ActivationTokenRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
-import pl.edu.agh.project_manager.service.command.user.ManagerInviteUserCommand;
-import pl.edu.agh.project_manager.service.command.user.SendInvitationCommand;
+import pl.edu.agh.project_manager.service.command.invitation.ManagerInviteUserCommand;
+import pl.edu.agh.project_manager.service.command.invitation.SendInvitationCommand;
 
 import java.util.UUID;
 
