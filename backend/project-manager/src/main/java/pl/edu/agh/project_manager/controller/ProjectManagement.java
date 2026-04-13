@@ -21,7 +21,6 @@ import java.util.UUID;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class ProjectManagement {
-    // Serwis do zarządzania projektami
     private final ProjectService projectService;
 
     @PostMapping("/project")
@@ -30,10 +29,7 @@ public class ProjectManagement {
             @Valid @RequestBody ProjectCreationRequest projectCreationRequest,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        // Stworzenie komendy
         ProjectCreationCommand command = projectCreationRequest.toCommand(userPrincipal.userId());
-
-        // Tworzenie nowego projektu
         UUID newProjectId = projectService.createProject(command);
 
         // Zwrócenie ID projektu

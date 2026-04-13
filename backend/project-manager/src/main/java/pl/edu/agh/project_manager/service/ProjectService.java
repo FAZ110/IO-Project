@@ -4,8 +4,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import pl.edu.agh.project_manager.controller.dto.ProjectCreationRequest;
-import pl.edu.agh.project_manager.controller.dto.RiskRequest;
 import pl.edu.agh.project_manager.domain.entity.Project;
 import pl.edu.agh.project_manager.domain.entity.Risk;
 import pl.edu.agh.project_manager.domain.entity.User;
@@ -15,32 +13,24 @@ import pl.edu.agh.project_manager.service.command.ProjectCreationCommand;
 import pl.edu.agh.project_manager.service.command.RiskCommand;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
-    // User repozytorium
     private final UserRepository userRepository;
-
-    // Projekt repozytorium
     private final ProjectRepository projectRepository;
 
-    // Stworzenie nowego projektu
     @Transactional
     public UUID createProject(ProjectCreationCommand command) {
         // Znalezienie projekt menadżera
         User projectManager = userRepository.findById(command.projectManagerId())
                 .orElseThrow(() -> new UsernameNotFoundException("Nie znaleziono managera o ID - " + command.projectManagerId()));
 
-        // Stworzenie obiektu projektu
         Project project = projectBuilder(command, projectManager);
 
-        // Dodanie ryzyk
         addRisksToProject(project, command.risks());
 
-        // Zapisanie projektu wraz z ryzykami
         Project savedProject = projectRepository.save(project);
 
         // Zwrócenie ID nowego projektu
@@ -70,7 +60,6 @@ public class ProjectService {
                     .probability(riskRequest.probability())
                     .build();
 
-            // Dodanie ryzyka do projektu
             project.addRisk(risk);
         });
     }
