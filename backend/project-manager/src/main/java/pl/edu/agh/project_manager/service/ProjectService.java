@@ -12,6 +12,7 @@ import pl.edu.agh.project_manager.domain.entity.User;
 import pl.edu.agh.project_manager.repository.ProjectRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
 import pl.edu.agh.project_manager.service.command.ProjectCreationCommand;
+import pl.edu.agh.project_manager.service.command.RiskCommand;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,37 +29,37 @@ public class ProjectService {
 
     // Stworzenie nowego projektu
     @Transactional
-    public Optional<UUID> newProjectCreation(ProjectCreationCommand command) {
+    public UUID createProject(ProjectCreationCommand command) {
         // Znalezienie projekt menadżera
         User projectManager = userRepository.findById(command.projectManagerId())
                 .orElseThrow(() -> new UsernameNotFoundException("Nie znaleziono managera o ID - " + command.projectManagerId()));
 
         // Stworzenie obiektu projektu
-        Project project = projectBuilder(command.projectCreationRequest(), projectManager);
+        Project project = projectBuilder(command, projectManager);
 
         // Dodanie ryzyk
-        addRisksToProject(project, command.projectCreationRequest().risks());
+        addRisksToProject(project, command.risks());
 
         // Zapisanie projektu wraz z ryzykami
         Project savedProject = projectRepository.save(project);
 
         // Zwrócenie ID nowego projektu
-        return Optional.ofNullable(savedProject.getId());
+        return savedProject.getId();
     }
 
-    private Project projectBuilder(ProjectCreationRequest request, User projectManager) {
+    private Project projectBuilder(ProjectCreationCommand command, User projectManager) {
         return Project.builder()
-                .title(request.title())
-                .description(request.description())
+                .title(command.title())
+                .description(command.description())
                 .projectManagerUser(projectManager)
-                .startDate(request.startDate())
-                .isActive(request.isActive())
-                .walletId(request.walletId())
-                .programId(request.programId())
+                .startDate(command.startDate())
+                .isActive(command.isActive())
+                .walletId(command.walletId())
+                .programId(command.programId())
                 .build();
     }
 
-    private void addRisksToProject(Project project, List<RiskRequest> risks) {
+    private void addRisksToProject(Project project, List<RiskCommand> risks) {
         if (risks == null) return;
 
         risks.forEach(riskRequest -> {

@@ -11,13 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.agh.project_manager.controller.dto.ProjectCreationRequest;
-import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
-import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.ProjectService;
 import pl.edu.agh.project_manager.service.command.ProjectCreationCommand;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -34,15 +31,12 @@ public class ProjectManagement {
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         // Stworzenie komendy
-        ProjectCreationCommand command = new ProjectCreationCommand(
-                projectCreationRequest, userPrincipal.userId()
-        );
+        ProjectCreationCommand command = projectCreationRequest.toCommand(userPrincipal.userId());
 
         // Tworzenie nowego projektu
-        Optional<UUID> newProjectId = projectService.newProjectCreation(command);
+        UUID newProjectId = projectService.createProject(command);
 
         // Zwrócenie ID projektu
-        if (newProjectId.isEmpty()) throw new ApplicationException(ApiErrorCode.CANNOT_CREATE_PROJECT);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newProjectId.get());
+        return ResponseEntity.status(HttpStatus.CREATED).body(newProjectId);
     }
 }
