@@ -35,6 +35,9 @@ public class User {
     @Column(name = "surname")
     private String surname;
 
+    @Column(name = "password")
+    private String password;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "user_role", nullable = false)
     private UserRole userRole;

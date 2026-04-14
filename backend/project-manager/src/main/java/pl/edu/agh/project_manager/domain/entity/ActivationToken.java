@@ -40,4 +40,12 @@ public class ActivationToken {
         if (this.expiryDate == null)
             this.expiryDate = LocalDateTime.now().plusDays(DAYS_ACTIVE);
     }
+
+    public boolean isExpired() {
+        return isExpired(LocalDateTime.now());
+    }
+
+    public boolean isExpired(LocalDateTime referenceTime) {
+        return referenceTime.isAfter(this.expiryDate);
+    }
 }
