@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -48,4 +49,8 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "supervisor_id")
     private User supervisor;
+
+    @OneToMany(mappedBy = "projectManager")
+    @Builder.Default
+    private List<Project> projects = new ArrayList<>();
 }
