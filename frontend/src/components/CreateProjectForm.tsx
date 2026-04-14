@@ -1,5 +1,6 @@
 
-import React, {useState} from 'react'
+import { useState } from 'react';
+import type { ChangeEvent } from 'react';
 import type {ProjectCreationRequest, RiskRequest} from '../types'
 
 const CreateProjectForm = () => {
@@ -8,14 +9,14 @@ const CreateProjectForm = () => {
         description: '',
         startDate: '',
         isActive: true,
-        walletId: '',
-        programId: '',
+        walletId: undefined,
+        programId: undefined,
         risks: []
     })
 
     const [message, setMessage] = useState('');
 
-    const handleChange = (e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (e:ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const {name, value, type} = e.target;
       if (type === 'checkbox'){
         const checked = (e.target as HTMLInputElement).checked;

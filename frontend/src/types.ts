@@ -9,7 +9,7 @@ export interface ProjectCreationRequest{
     description: string;
     startDate: string;
     isActive: boolean;
-    walletId?: number | string | null;
-    programId?: number | string | null;
+    walletId?: number;
+    programId?: number;
     risks?: RiskRequest[];
 }
