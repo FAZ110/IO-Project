@@ -17,7 +17,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Builder
-@Table(name = "user")
+@Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -34,6 +34,9 @@ public class User {
 
     @Column(name = "surname")
     private String surname;
+
+    @Column(name = "password")
+    private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_role", nullable = false)
