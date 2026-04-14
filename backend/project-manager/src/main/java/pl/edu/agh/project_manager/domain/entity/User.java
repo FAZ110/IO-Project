@@ -50,6 +50,7 @@ public class User {
     @JoinColumn(name = "supervisor_id")
     private User supervisor;
 
-    @OneToMany(mappedBy = "projectManagerId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "projectManager")
+    @Builder.Default
     private List<Project> projects = new ArrayList<>();
 }

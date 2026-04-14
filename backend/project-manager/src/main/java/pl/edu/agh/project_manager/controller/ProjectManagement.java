@@ -11,19 +11,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.agh.project_manager.controller.dto.ProjectCreationRequest;
-import pl.edu.agh.project_manager.exception.CannotCreateProjectException;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.ProjectService;
 import pl.edu.agh.project_manager.service.command.ProjectCreationCommand;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class ProjectManagement {
-    // Serwis do zarządzania projektami
     private final ProjectService projectService;
 
     @PostMapping("/project")
@@ -32,16 +29,10 @@ public class ProjectManagement {
             @Valid @RequestBody ProjectCreationRequest projectCreationRequest,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        // Stworzenie komendy
-        ProjectCreationCommand command = new ProjectCreationCommand(
-                projectCreationRequest, userPrincipal.userId()
-        );
+        ProjectCreationCommand command = projectCreationRequest.toCommand(userPrincipal.userId());
+        UUID newProjectId = projectService.createProject(command);
 
-        // Tworzenie nowego projektu
-        Optional<UUID> newProjectId = projectService.newProjectCreation(command);
-
-        // Zwrócenie ID projektu
-        if (newProjectId.isEmpty()) throw new CannotCreateProjectException("Nie można stworzyć projektu!");
-        return ResponseEntity.status(HttpStatus.CREATED).body(newProjectId.get());
+        // Return ID of procject
+        return ResponseEntity.status(HttpStatus.CREATED).body(newProjectId);
     }
 }

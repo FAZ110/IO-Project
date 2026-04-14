@@ -18,31 +18,37 @@ import java.util.UUID;
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "ID", nullable = false)
+    @Column(name = "id", nullable = false)
     private UUID id;
 
-    @Column(name = "Title", length = 100, nullable = false)
+    @Column(name = "title", length = 100, nullable = false)
     private String title;
 
-    @Column(name = "Description", length = 500, nullable = false)
+    @Column(name = "description", length = 500, nullable = false)
     private String description;
 
-    @Column(name = "Start_date", nullable = false)
+    @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
 
-    @Column(name = "Is_active", nullable = false)
+    @Column(name = "is_active", nullable = false)
     private Boolean isActive;
 
-    @Column(name = "Wallet_ID")
+    @Column(name = "wallet_id")
     private Integer walletId;
 
-    @Column(name = "Program_ID")
+    @Column(name = "program_ID")
     private Integer programId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Procjet_Manager_ID")
-    private User projectManagerUser;
+    @JoinColumn(name = "project_manager_id")
+    private User projectManager;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Risk> risks = new ArrayList<>();
+
+    public void addRisk(Risk risk) {
+        this.risks.add(risk);
+        risk.setProject(this);
+    }
 }

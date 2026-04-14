@@ -1,11 +1,18 @@
 package pl.edu.agh.project_manager.service.command;
 
-import pl.edu.agh.project_manager.controller.dto.ProjectCreationRequest;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 public record ProjectCreationCommand(
-        ProjectCreationRequest projectCreationRequest,
-        UUID projectManagerId
+        String title,
+        String description,
+        LocalDate startDate,
+        Boolean isActive,
+        Integer walletId,
+        Integer programId,
+        UUID projectManagerId,
+        List<RiskCommand> risks
 ) {
 }

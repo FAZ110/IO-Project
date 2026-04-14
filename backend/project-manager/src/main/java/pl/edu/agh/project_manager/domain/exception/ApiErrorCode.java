@@ -11,6 +11,7 @@ public enum ApiErrorCode {
     INVITATION_SUPERVISOR_NOT_FOUND("INV_002", HttpStatus.NOT_FOUND, "Supervisor not found"),
     INVITATION_EMAIL_SEND_FAILED("INV_003", HttpStatus.BAD_GATEWAY, "Invitation email could not be sent"),
 
+    PROJECT_MANAGER_NOT_FOUND("PROJ_001", HttpStatus.NOT_FOUND, "Cannot found provided project manager"),
     ACTIVATION_TOKEN_NOT_FOUND("AUTH_001", HttpStatus.NOT_FOUND, "Activation token is invalid or does not exist"),
     ACTIVATION_TOKEN_EXPIRED("AUTH_002", HttpStatus.BAD_REQUEST, "Activation token has expired"),
     BAD_CREDENTIALS("AUTH_003", HttpStatus.UNAUTHORIZED, "Invalid email or password"),

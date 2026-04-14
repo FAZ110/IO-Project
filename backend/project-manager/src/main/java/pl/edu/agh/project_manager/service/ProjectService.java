@@ -1,52 +1,66 @@
 package pl.edu.agh.project_manager.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import pl.edu.agh.project_manager.controller.dto.ProjectCreationRequest;
 import pl.edu.agh.project_manager.domain.entity.Project;
+import pl.edu.agh.project_manager.domain.entity.Risk;
 import pl.edu.agh.project_manager.domain.entity.User;
+import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
+import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
 import pl.edu.agh.project_manager.service.command.ProjectCreationCommand;
+import pl.edu.agh.project_manager.service.command.RiskCommand;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
-    // User repozytorium
     private final UserRepository userRepository;
-
-    // Projekt repozytorium
     private final ProjectRepository projectRepository;
 
-    // Stworzenie nowego projektu
-    public Optional<UUID> newProjectCreation(ProjectCreationCommand command) {
-        // Znalezienie projekt menadżera
+    @Transactional
+    public UUID createProject(ProjectCreationCommand command) {
+        // Find project manager
         User projectManager = userRepository.findById(command.projectManagerId())
-                .orElseThrow(() -> new UsernameNotFoundException("Nie znaleziono managera o ID - " + command.projectManagerId()));
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_MANAGER_NOT_FOUND, "Cannot found provided project manager - " + command.projectManagerId()));
 
-        // Stworzenie obiektu projektu
-        Project project = projectBuilder(command.projectCreationRequest(), projectManager);
+        Project project = buildProject(command, projectManager);
+        projectManager.getProjects().add(project);
 
-        // Zapisanie projektu
+        addRisksToProject(project, command.risks());
+
         Project savedProject = projectRepository.save(project);
 
-        // Zwrócenie ID nowego projektu
-        return Optional.ofNullable(savedProject.getId());
+        return savedProject.getId();
     }
 
-    private Project projectBuilder(ProjectCreationRequest request, User projectManager) {
+    private Project buildProject(ProjectCreationCommand command, User projectManager) {
         return Project.builder()
-                .title(request.title())
-                .description(request.description())
-                .projectManagerUser(projectManager)
-                .startDate(request.startDate())
-                .isActive(request.isActive())
-                .walletId(request.walletId())
-                .programId(request.programId())
+                .title(command.title())
+                .description(command.description())
+                .projectManager(projectManager)
+                .startDate(command.startDate())
+                .isActive(command.isActive())
+                .walletId(command.walletId())
+                .programId(command.programId())
                 .build();
+    }
+
+    private void addRisksToProject(Project project, List<RiskCommand> risks) {
+        if (risks == null) return;
+
+        risks.forEach(riskRequest -> {
+            Risk risk = Risk.builder()
+                    .name(riskRequest.name())
+                    .description(riskRequest.description())
+                    .probability(riskRequest.probability())
+                    .build();
+
+            project.addRisk(risk);
+        });
     }
 }
