@@ -1,4 +1,4 @@
-package pl.edu.agh.project_manager.config; //konfiguracja CORSa żeby backend nie krzyczał na frontend
+package pl.edu.agh.project_manager.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
