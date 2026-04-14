@@ -1,3 +1,64 @@
-.env
+# =========================
+# Java / Spring Boot
+# =========================
+target/
+*.log
+*.class
+.jar
+.war
+.ear
+
+# Maven
+.mvn/
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle/
+build/
+
+# IntelliJ IDEA
 .idea/
+.iml
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# VS Code
+.vscode/
+
+# =========================
+# Node / React
+# =========================
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# build folder (React)
+build/
+dist/
+
+# environment variables
+.env
+.env.local
+.env..local
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+# =========================
+# Misc
+# =========================
+coverage/
 
