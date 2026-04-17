@@ -31,7 +31,7 @@ public class ProjectRisk {
     @Max(value = 100, message = "Prawdopodobieństwo musi być mniejsze bądź równe 100")
     private Integer probability;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 }
