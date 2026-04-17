@@ -26,5 +26,5 @@ public class ProjectRole {
     private Project project;
 
     @OneToMany(mappedBy = "projectRole", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ScheduleInterval> intervals = new ArrayList<>();
+    private List<ProjectRoleSegmentAllocation> segmentAllocations = new ArrayList<>();
 }

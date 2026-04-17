@@ -54,6 +54,10 @@ public class Project {
     @Builder.Default
     private List<ProjectRole> roles = new ArrayList<>();
 
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProjectSegment> segments = new ArrayList<>();
+
     public void addRisk(ProjectRisk risk) {
         this.risks.add(risk);
         risk.setProject(this);

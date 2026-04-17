@@ -1,9 +1,9 @@
-package pl.edu.agh.project_manager.controller.dto;
+package pl.edu.agh.project_manager.controller.dto.project;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Range;
-import pl.edu.agh.project_manager.service.command.RiskCommand;
+import pl.edu.agh.project_manager.service.command.project.RiskCommand;
 
 public record RiskRequest(
         @NotBlank(message = "Nazwa ryzyka nie może być pusta!")
