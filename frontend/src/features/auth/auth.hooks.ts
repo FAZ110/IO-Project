@@ -1,4 +1,4 @@
-import {useMutation, UseMutationOptions} from '@tanstack/react-query';
+import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
 import { authService } from './auth.service';
 import type {AuthResponse, RegisterRequest} from "@/features/auth/auth.types.ts";
 
