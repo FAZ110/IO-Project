@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.edu.agh.project_manager.domain.entity.Project;
-import pl.edu.agh.project_manager.domain.entity.Risk;
+import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.User;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
@@ -54,7 +54,7 @@ public class ProjectService {
         if (risks == null) return;
 
         risks.forEach(riskRequest -> {
-            Risk risk = Risk.builder()
+            ProjectRisk risk = ProjectRisk.builder()
                     .name(riskRequest.name())
                     .description(riskRequest.description())
                     .probability(riskRequest.probability())

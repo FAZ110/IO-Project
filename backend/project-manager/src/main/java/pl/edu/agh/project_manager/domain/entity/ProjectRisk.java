@@ -8,18 +8,17 @@ import lombok.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "risks")
+@Table(name = "project_risks")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Risk {
-
+public class ProjectRisk {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
-    private UUID ID;
+    private UUID id;
 
     @Column(name = "name", nullable = false, length = 100)
     private String name;
@@ -27,7 +26,7 @@ public class Risk {
     @Column(name = "description", nullable = false, length = 500)
     private String description;
 
-    @Column(name = "probability", nullable = false, columnDefinition = "integer check (Probability >= 0 and Probability <= 100)")
+    @Column(name = "probability", nullable = false, columnDefinition = "integer check (probability >= 0 and probability <= 100)")
     @Min(value = 0, message = "Prawdopodobieństwo musi być większe bądź równe 0")
     @Max(value = 100, message = "Prawdopodobieństwo musi być mniejsze bądź równe 100")
     private Integer probability;

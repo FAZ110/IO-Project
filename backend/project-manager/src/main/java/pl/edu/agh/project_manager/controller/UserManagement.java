@@ -27,7 +27,7 @@ class UserManagement {
 
     @PostMapping("/admin/invitations")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> adminInvite(
+    public ResponseEntity<Void> createInviteAsAdmin(
             @Valid @RequestBody AdminUserInvitationRequest request,
             @AuthenticationPrincipal UserPrincipal principal
     ) {
@@ -45,7 +45,7 @@ class UserManagement {
 
     @PostMapping("/manager/invitations")
     @PreAuthorize("hasRole('LINEAR_MANAGER')")
-    public ResponseEntity<Void> managerInvite(
+    public ResponseEntity<Void> createInviteAsManager(
             @Valid @RequestBody ManagerUserInvitationRequest request,
             @AuthenticationPrincipal UserPrincipal principal
     ) {

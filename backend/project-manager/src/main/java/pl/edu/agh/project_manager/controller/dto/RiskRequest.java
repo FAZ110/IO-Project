@@ -3,7 +3,6 @@ package pl.edu.agh.project_manager.controller.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Range;
-import pl.edu.agh.project_manager.domain.entity.Risk;
 import pl.edu.agh.project_manager.service.command.RiskCommand;
 
 public record RiskRequest(

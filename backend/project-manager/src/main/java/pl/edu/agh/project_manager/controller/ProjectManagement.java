@@ -25,14 +25,13 @@ public class ProjectManagement {
 
     @PostMapping("/project")
     @PreAuthorize("hasRole('PROJECT_MANAGER')")
-    public ResponseEntity<UUID> projectCreation(
+    public ResponseEntity<UUID> createProject(
             @Valid @RequestBody ProjectCreationRequest projectCreationRequest,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         ProjectCreationCommand command = projectCreationRequest.toCommand(userPrincipal.userId());
         UUID newProjectId = projectService.createProject(command);
 
-        // Return ID of procject
         return ResponseEntity.status(HttpStatus.CREATED).body(newProjectId);
     }
 }

@@ -2,11 +2,10 @@ package pl.edu.agh.project_manager.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import pl.edu.agh.project_manager.domain.enums.MembershipStatus;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "projects")
@@ -36,19 +35,36 @@ public class Project {
     @Column(name = "wallet_id")
     private Integer walletId;
 
-    @Column(name = "program_ID")
+    @Column(name = "program_id")
     private Integer programId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_manager_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "project_manager_id", nullable = false)
     private User projectManager;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Risk> risks = new ArrayList<>();
+    private List<ProjectRisk> risks = new ArrayList<>();
 
-    public void addRisk(Risk risk) {
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProjectMember> members = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProjectRole> roles = new ArrayList<>();
+
+    public void addRisk(ProjectRisk risk) {
         this.risks.add(risk);
         risk.setProject(this);
+    }
+
+    public void addMember(User user, ProjectRole role) {
+        ProjectMember member = new ProjectMember();
+        member.setProject(this);
+        member.setUser(user);
+        member.setRole(role);
+        member.setMembershipStatus(MembershipStatus.PENDING);
+        this.members.add(member);
     }
 }
