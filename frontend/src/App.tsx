@@ -1,12 +1,14 @@
-import CreateProjectFrom from "./components/CreateProjectForm"
-import LoginForm from './components/LoginForm';
+import { BrowserRouter } from 'react-router-dom';
+import { AppProvider } from './providers/AppProvider';
+import { AppRoutes } from './routes/AppRoutes';
 
 function App() {
     return (
-        <div>
-            // <CreateProjectFrom/>
-            <LoginForm />   
-        </div>
+      <BrowserRouter>
+        <AppProvider>
+          <AppRoutes />
+        </AppProvider>
+      </BrowserRouter>
     );
 }
 
