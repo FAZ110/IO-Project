@@ -4,6 +4,7 @@ import { GuestRoute } from './GuestRoute';
 import { PATHS } from './paths';
 import { RegisterPage } from '../pages/RegisterPage';
 import { LoginPage } from '../pages/LoginPage';
+import CreateProjectForm from '@/components/CreateProjectForm';
 
 export const AppRoutes = () => {
   return (
@@ -21,6 +22,8 @@ export const AppRoutes = () => {
 
       {/* FALLBACK - 404 */}
       <Route path="*" element={<Navigate to={PATHS.ROOT} replace />} />
+
+      <Route path="/create-project" element={<CreateProjectForm />} />
     </Routes>
   );
 };

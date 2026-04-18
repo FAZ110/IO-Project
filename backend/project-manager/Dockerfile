@@ -5,6 +5,7 @@ COPY gradle gradle
 COPY gradlew .
 RUN ./gradlew dependencies --no-daemon
 COPY src src
+COPY config config
 RUN ./gradlew build -x test --no-daemon
 
 FROM eclipse-temurin:25-jre
