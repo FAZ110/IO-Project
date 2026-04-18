@@ -12,6 +12,7 @@ import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
 import pl.edu.agh.project_manager.repository.ProjectRepository;
+import pl.edu.agh.project_manager.repository.RiskRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
@@ -25,6 +26,7 @@ public class ProjectService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final ProjectGroupsRepository projectGroupRepository;
+    private final RiskRepository riskRepository;
 
     @Transactional
     public UUID createProject(ProjectCreationCommand command) {
@@ -74,7 +76,7 @@ public class ProjectService {
             throw new ApplicationException(ApiErrorCode.ACCESS_DENIED, "Only project manager can update project risks");
         }
 
-        Risk risk = project.getRisks()
+        ProjectRisk risk = project.getRisks()
                 .stream()
                 .filter(r -> r.getId().equals(riskId))
                 .findFirst()
@@ -100,10 +102,10 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot found provided project - " + projectId));
 
-        Risk risk = buildRisk(command, projectManager);
+        ProjectRisk risk = buildRisk(command, projectManager);
         project.addRisk(risk);
 
-        Risk savedRisk = riskRepository.save(risk);
+        ProjectRisk savedRisk = riskRepository.save(risk);
 
         return new RiskResponse(
                 savedRisk.getId(),
@@ -120,13 +122,11 @@ public class ProjectService {
                 .projectManager(projectManager)
                 .startDate(command.startDate())
                 .isActive(command.isActive())
-                .walletId(command.walletId())
-                .programId(command.programId())
                 .build();
     }
 
-    private Risk buildRisk(RiskCommand command, User projectManager) {
-        return Risk.builder()
+    private ProjectRisk buildRisk(RiskCommand command, User projectManager) {
+        return ProjectRisk.builder()
                 .name(command.name())
                 .description(command.description())
                 .probability(command.probability())
@@ -137,7 +137,7 @@ public class ProjectService {
         if (risks == null) return;
 
         risks.forEach(riskRequest -> {
-            ProjectRisk risk = ProjectRisk.builder()
+            ProjectRisk  risk = ProjectRisk.builder()
                     .name(riskRequest.name())
                     .description(riskRequest.description())
                     .probability(riskRequest.probability())

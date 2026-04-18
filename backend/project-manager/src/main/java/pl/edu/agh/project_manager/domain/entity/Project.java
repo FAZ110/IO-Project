@@ -61,7 +61,7 @@ public class Project {
         risk.setProject(this);
     }
 
-    public void removeRisk(Risk risk) {
+    public void removeRisk(ProjectRisk risk) {
         this.risks.remove(risk);
         risk.setProject(null);
     }
