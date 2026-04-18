@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { AuthContext } from "./AuthContext";
 import {useEffect, useState} from "react";
-import api, {setAccessToken} from "@/api/client.ts";
-import {ENDPOINTS} from "@/api/endpoints.ts";
+import {setAccessToken} from "@/api/client.ts";
+import {authService} from "@/features/auth/auth.service.ts";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -11,8 +11,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await api.post(ENDPOINTS.AUTH.REFRESH);
-        setAccessToken(res.data.accessToken);
+        const accessToken = await authService.refresh();
+        setAccessToken(accessToken);
         setIsAuthenticated(true);
       } catch {
         setIsAuthenticated(false);
@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
-      await api.post(ENDPOINTS.AUTH.LOGOUT);
+      await authService.logout()
     } catch (e) {
       console.error('Błąd podczas wylogowywania', e);
     } finally {

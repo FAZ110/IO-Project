@@ -1,10 +1,25 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { authService } from './auth.service';
-import type {AuthResponse, RegisterRequest} from "@/features/auth/auth.types.ts";
+import { useAuth } from '@/providers/AuthContext';
 
-export const useRegister = (options?: UseMutationOptions<AuthResponse, Error, RegisterRequest>) => {
+export const useRegister = () => {
+  const { login } = useAuth();
+
   return useMutation({
     mutationFn: authService.register,
-    ...options
+    onSuccess: (data) => {
+      login(data.accessToken);
+    }
+  });
+};
+
+export const useLogin = () => {
+  const { login } = useAuth();
+
+  return useMutation({
+    mutationFn: authService.login,
+    onSuccess: (data) => {
+      login(data.accessToken);
+    }
   });
 };

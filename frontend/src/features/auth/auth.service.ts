@@ -11,5 +11,14 @@ export const authService = {
   register: async (data: RegisterRequest): Promise<AuthResponse> => {
     const res = await api.post<AuthResponse>(ENDPOINTS.AUTH.REGISTER, data);
     return res.data;
+  },
+
+  refresh: async () => {
+    const res = await api.post(ENDPOINTS.AUTH.REFRESH);
+    return res.data.accessToken
+  },
+
+  logout: async () => {
+    await api.post(ENDPOINTS.AUTH.LOGOUT);
   }
 };

@@ -5,5 +5,5 @@ export const ROUTE_PARAMS = {
 export const PATHS = {
   ROOT: '/',
   LOGIN: '/login',
-  REGISTER: `/register/:${ROUTE_PARAMS.ACTIVATION_TOKEN}`,
+  REGISTER: `/register`,
 } as const;

@@ -9,10 +9,12 @@ class ActivationTokenTest {
     @Test
     void isExpired_ShouldReturnTrue_WhenReferenceTimeIsAfterExpiryDate() {
         // given
-        var token = new ActivationToken();
-        token.setExpiryDate(LocalDateTime.of(2024, 1, 1, 12, 0));
+        LocalDateTime expiryDate = LocalDateTime.of(2024, 1, 1, 12, 0);
 
-        var referenceTime = LocalDateTime.of(2024, 1, 2, 12, 0); // Dzień później
+        var token = new ActivationToken();
+        token.setExpiryDate(expiryDate);
+
+        var referenceTime = expiryDate.plusDays(1);
 
         // when
         boolean result = token.isExpired(referenceTime);
@@ -24,10 +26,12 @@ class ActivationTokenTest {
     @Test
     void isExpired_ShouldReturnFalse_WhenReferenceTimeIsBeforeExpiryDate() {
         // given
-        var token = new ActivationToken();
-        token.setExpiryDate(LocalDateTime.of(2024, 1, 10, 12, 0));
+        LocalDateTime expiryDate = LocalDateTime.of(2024, 1, 10, 12, 0);
 
-        var referenceTime = LocalDateTime.of(2024, 1, 1, 12, 0); // 9 dni wcześniej
+        var token = new ActivationToken();
+        token.setExpiryDate(expiryDate);
+
+        var referenceTime = expiryDate.minusMinutes(1);
 
         // when
         boolean result = token.isExpired(referenceTime);

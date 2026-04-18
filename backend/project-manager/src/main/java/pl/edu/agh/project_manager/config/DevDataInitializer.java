@@ -29,19 +29,20 @@ public class DevDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (userRepository.findByEmail(adminUsername).isEmpty()) {
+        if (!userRepository.existsByEmail(adminUsername)) {
             log.info("Creating default admin account...");
 
-            User admin = new User();
-            admin.setEmail(adminUsername);
-            admin.setPassword(passwordEncoder.encode(adminPassword));
-            admin.setName("Admin");
-            admin.setSurname("Admin");
-            admin.setUserRole(UserRole.ADMINISTRATOR);
-            admin.setUserStatus(UserStatus.ACTIVE);
+            User admin = User.builder()
+                    .email(adminUsername)
+                    .password(passwordEncoder.encode(adminPassword))
+                    .name("Admin")
+                    .surname("Admin")
+                    .userRole(UserRole.ADMINISTRATOR)
+                    .userStatus(UserStatus.ACTIVE)
+                    .build();
 
             userRepository.save(admin);
-            log.info("Admin created with email: {} and password: {}", adminUsername, adminPassword);
+            log.info("Admin created with email: {}", adminUsername);
         } else {
             log.info("Admin account already exists. Skipping initialization.");
         }

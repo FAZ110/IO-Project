@@ -30,6 +30,9 @@ public class AuthController {
     @Value("${application.security.jwt.refresh-expiration}")
     private long refreshExpiration;
 
+    @Value("${application.security.cookie.secure}")
+    private boolean secureCookie;
+
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
         TokenPair tokens = authService.register(registerRequest.toCommand());
@@ -88,6 +91,7 @@ public class AuthController {
                 .path("/api/auth/refresh")
                 .maxAge(refreshExpiration / 1000)
                 .sameSite("Strict")
+                .secure(secureCookie)
                 .build();
     }
 }
