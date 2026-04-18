@@ -1,19 +1,18 @@
 import { useForm } from 'react-hook-form';
 import type { RegisterRequest } from '../auth.types';
 import { RegisterView } from './RegisterForm.view';
-import { useRegister } from '../auth.hooks';
-import { useSearchParams } from 'react-router-dom';
+import { useAuthActions } from '../auth.hooks';
+import { useParams } from 'react-router-dom';
+import { ROUTE_PARAMS } from '@/routes/paths';
 
 export const RegisterForm = () => {
-  const [searchParams] = useSearchParams();
-  const activationToken = searchParams.get('token');
-
+  const { [ROUTE_PARAMS.ACTIVATION_TOKEN]: activationToken } = useParams();
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterRequest>();
-  const { mutate, isPending } = useRegister();
+  const { registerUser, isRegistering } = useAuthActions();
 
   const onSubmit = handleSubmit((data) => {
     if (activationToken) {
-      mutate({ ...data, activationToken });
+      registerUser({ ...data, activationToken });
     } else {
       alert("Brak tokena aktywacyjnego w linku!");
     }
@@ -23,7 +22,7 @@ export const RegisterForm = () => {
     <RegisterView
       register={register}
       onSubmit={onSubmit}
-      isPending={isPending}
+      isPending={isRegistering}
       errors={errors}
     />
   );

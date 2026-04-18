@@ -13,12 +13,12 @@ export const authService = {
     return res.data;
   },
 
-  refresh: async () => {
-    const res = await api.post(ENDPOINTS.AUTH.REFRESH);
-    return res.data.accessToken
+  refresh: async (): Promise<AuthResponse> => {
+    const res = await api.post<AuthResponse>(ENDPOINTS.AUTH.REFRESH);
+    return res.data;
   },
 
-  logout: async () => {
+  logout: async (): Promise<void> => {
     await api.post(ENDPOINTS.AUTH.LOGOUT);
   }
 };
