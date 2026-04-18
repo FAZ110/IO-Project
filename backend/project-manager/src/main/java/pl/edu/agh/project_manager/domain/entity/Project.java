@@ -32,11 +32,9 @@ public class Project {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
 
-    @Column(name = "wallet_id")
-    private Integer walletId;
-
-    @Column(name = "program_id")
-    private Integer programId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id")
+    private ProjectGroups projectGroup;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "project_manager_id", nullable = false)

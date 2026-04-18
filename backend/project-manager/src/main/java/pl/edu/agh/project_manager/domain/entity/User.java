@@ -51,6 +51,10 @@ public class User {
     @Builder.Default
     private List<Project> projects = new ArrayList<>();
 
+    @OneToMany(mappedBy = "owner")
+    @Builder.Default
+    private List<ProjectGroups> projectGroups = new ArrayList<>();
+
     public void addProject(Project project) {
         this.projects.add(project);
         project.setProjectManager(this);
