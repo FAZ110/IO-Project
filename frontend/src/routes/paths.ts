@@ -1,5 +1,9 @@
 export const ROUTE_PARAMS = {
-  ACTIVATION_TOKEN: 'activationToken',
+  
+} as const;
+
+export const QUERY_PARAMS = {
+  ACTIVATION_TOKEN: 'token',
 } as const;
 
 export const PATHS = {

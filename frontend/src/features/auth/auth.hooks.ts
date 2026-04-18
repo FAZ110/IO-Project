@@ -1,25 +1,35 @@
 import { useMutation } from '@tanstack/react-query';
 import { authService } from './auth.service';
 import { useAuth } from '@/providers/AuthContext';
+import type { AuthResponse } from './auth.types';
 
-export const useRegister = () => {
-  const { login } = useAuth();
+export const useAuthActions = () => {
+  const { login, logout } = useAuth();
 
-  return useMutation({
+  const handleAuthSuccess = (data: AuthResponse) => login(data.accessToken);
+
+  const registerMutation = useMutation({
     mutationFn: authService.register,
-    onSuccess: (data) => {
-      login(data.accessToken);
-    }
+    onSuccess: handleAuthSuccess
   });
-};
 
-export const useLogin = () => {
-  const { login } = useAuth();
-
-  return useMutation({
+  const loginMutation = useMutation({
     mutationFn: authService.login,
-    onSuccess: (data) => {
-      login(data.accessToken);
-    }
+    onSuccess: handleAuthSuccess
   });
+
+  const logoutMutation = useMutation({
+    mutationFn: authService.logout,
+    onSettled: () => logout()
+  });
+
+  return {
+    registerUser: registerMutation.mutate,
+    loginUser: loginMutation.mutate,
+    logoutUser: logoutMutation.mutate,
+
+    isLoggingIn: loginMutation.isPending,
+    isRegistering: registerMutation.isPending,
+    isLoggingOut: logoutMutation.isPending
+  };
 };

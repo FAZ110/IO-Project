@@ -1,53 +1,35 @@
 import type { ReactNode } from "react";
 import { AuthContext } from "./AuthContext";
-import {useEffect, useState} from "react";
-import {setAccessToken} from "@/api/client.ts";
-import {authService} from "@/features/auth/auth.service.ts";
+import { useCallback, useEffect, useState } from "react";
+import { setAccessToken } from "@/api/client.ts";
+import { authService } from "@/features/auth/auth.service.ts";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const queryClient = useQueryClient();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const accessToken = await authService.refresh();
-        setAccessToken(accessToken);
-        setIsAuthenticated(true);
-      } catch {
-        setIsAuthenticated(false);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    checkAuth();
-
-    const handleUnauthorized = async () => {
-      setAccessToken(null);
-      setIsAuthenticated(false);
-    };
-
-    window.addEventListener('auth-logout', handleUnauthorized);
-    return () => window.removeEventListener('auth-logout', handleUnauthorized);
-  }, [])
-
-  const login = (token: string) => {
+  const login = useCallback((token: string) => {
     setAccessToken(token);
     setIsAuthenticated(true);
-  };
+  }, []);
 
-  const logout = async () => {
-    try {
-      await authService.logout()
-    } catch (e) {
-      console.error('Błąd podczas wylogowywania', e);
-    } finally {
-      setAccessToken(null);
-      setIsAuthenticated(false);
-    }
-  };
+  const logout = useCallback(() => {
+    setAccessToken(null);
+    setIsAuthenticated(false);
+    queryClient.clear();
+  }, [queryClient]);
 
+  useEffect(() => {
+    authService.refresh()
+      .then(({ accessToken }) => login(accessToken))
+      .catch(() => logout())
+      .finally(() => setIsLoading(false));
+
+    window.addEventListener('auth-logout', logout);
+    return () => window.removeEventListener('auth-logout', logout);
+  }, [login, logout]);
 
   if (isLoading) {
     return <div className="flex h-screen items-center justify-center">Ładowanie aplikacji...</div>;
