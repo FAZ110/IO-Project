@@ -1,11 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
 import { authService } from './auth.service';
 import { useAuth } from '@/providers/AuthContext';
+import type { AuthResponse } from './auth.types';
 
 export const useAuthActions = () => {
   const { login, logout } = useAuth();
 
-  const handleAuthSuccess = (data: { accessToken: string; }) => login(data.accessToken);
+  const handleAuthSuccess = (data: AuthResponse) => login(data.accessToken);
 
   const registerMutation = useMutation({
     mutationFn: authService.register,
@@ -19,7 +20,7 @@ export const useAuthActions = () => {
 
   const logoutMutation = useMutation({
     mutationFn: authService.logout,
-    onSuccess: () => logout()
+    onSettled: () => logout()
   });
 
   return {
