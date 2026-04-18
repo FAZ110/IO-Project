@@ -2,11 +2,12 @@ import { useForm } from 'react-hook-form';
 import type { RegisterRequest } from '../auth.types';
 import { RegisterView } from './RegisterForm.view';
 import { useAuthActions } from '../auth.hooks';
-import { useParams } from 'react-router-dom';
-import { ROUTE_PARAMS } from '@/routes/paths';
+import { QUERY_PARAMS } from '@/routes/paths';
+import { useSearchParams } from 'react-router-dom';
 
 export const RegisterForm = () => {
-  const { [ROUTE_PARAMS.ACTIVATION_TOKEN]: activationToken } = useParams();
+  const [searchParams] = useSearchParams();
+  const activationToken = searchParams.get(QUERY_PARAMS.ACTIVATION_TOKEN);
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterRequest>();
   const { registerUser, isRegistering } = useAuthActions();
 
