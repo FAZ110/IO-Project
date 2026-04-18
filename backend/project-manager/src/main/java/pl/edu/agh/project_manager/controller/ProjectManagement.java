@@ -32,6 +32,50 @@ public class ProjectManagement {
         ProjectCreationCommand command = projectCreationRequest.toCommand(userPrincipal.userId());
         UUID newProjectId = projectService.createProject(command);
 
+        // Return ID of project
         return ResponseEntity.status(HttpStatus.CREATED).body(newProjectId);
+    }
+
+    @DeleteMapping("/project/{projectId}/risk/{riskId}")
+    @PreAuthorize("hasRole('PROJECT_MANAGER')")
+    public ResponseEntity<Void> deleteProjectRisk(
+            @PathVariable UUID riskId,
+            @PathVariable UUID projectId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        projectService.deleteProjectRisk(projectId, riskId, userPrincipal.userId());
+        return  ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/project/{projectId}/risk/{riskId}")
+    @PreAuthorize("hasRole('PROJECT_MANAGER')")
+    public ResponseEntity<RiskResponse> updateProjectRisk(
+            @PathVariable UUID projectId,
+            @PathVariable UUID riskId,
+            @Valid @RequestBody RiskRequest riskRequest,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        RiskResponse updatedRisk = projectService.updateProjectRisk(
+                projectId,
+                riskId,
+                userPrincipal.userId(),
+                riskRequest.toCommand()
+        );
+
+        return ResponseEntity.ok(updatedRisk);
+    }
+
+    @PostMapping("/project/{projectId}/risk")
+    @PreAuthorize("hasRole('PROJECT_MANAGER')")
+    public ResponseEntity<RiskResponse> createProjectRisk(
+            @PathVariable UUID projectId,
+            @Valid @RequestBody RiskRequest riskRequest,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        RiskResponse createdRisk = projectService.createProjectRisk(
+                riskRequest.toCommand(), userPrincipal.userId(), projectId
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdRisk);
     }
 }
