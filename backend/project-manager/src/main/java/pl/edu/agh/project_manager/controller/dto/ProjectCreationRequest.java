@@ -24,8 +24,7 @@ public record ProjectCreationRequest(
         @NotNull(message = "Aktywność projektu nie może być pusta")
         Boolean isActive,
 
-        Integer walletId,
-        Integer programId,
+        UUID projectGroupId,
 
         @Valid
         List<RiskRequest> risks
@@ -43,8 +42,7 @@ public record ProjectCreationRequest(
                 this.description,
                 this.startDate,
                 this.isActive,
-                this.walletId,
-                this.programId,
+                this.projectGroupId,
                 projectManagerId,
                 this.risks.stream().map(RiskRequest::toCommand).toList()
         );

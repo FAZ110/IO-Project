@@ -53,4 +53,8 @@ public class User {
     @OneToMany(mappedBy = "projectManager")
     @Builder.Default
     private List<Project> projects = new ArrayList<>();
+
+    @OneToMany(mappedBy = "owner")
+    @Builder.Default
+    private List<ProjectGroups> projectGroups = new ArrayList<>();
 }
