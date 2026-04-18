@@ -19,7 +19,7 @@ public class Risk {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
-    private UUID ID;
+    private UUID id;
 
     @Column(name = "name", nullable = false, length = 100)
     private String name;

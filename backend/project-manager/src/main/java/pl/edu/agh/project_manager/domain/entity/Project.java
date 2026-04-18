@@ -43,12 +43,17 @@ public class Project {
     @JoinColumn(name = "project_manager_id")
     private User projectManager;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Risk> risks = new ArrayList<>();
 
     public void addRisk(Risk risk) {
         this.risks.add(risk);
         risk.setProject(this);
+    }
+
+    public void removeRisk(Risk risk) {
+        this.risks.remove(risk);
+        risk.setProject(null);
     }
 }

@@ -3,12 +3,14 @@ package pl.edu.agh.project_manager.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import pl.edu.agh.project_manager.controller.dto.RiskResponse;
 import pl.edu.agh.project_manager.domain.entity.Project;
 import pl.edu.agh.project_manager.domain.entity.Risk;
 import pl.edu.agh.project_manager.domain.entity.User;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectRepository;
+import pl.edu.agh.project_manager.repository.RiskRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
 import pl.edu.agh.project_manager.service.command.ProjectCreationCommand;
 import pl.edu.agh.project_manager.service.command.RiskCommand;
@@ -21,6 +23,7 @@ import java.util.UUID;
 public class ProjectService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
+    private final RiskRepository riskRepository;
 
     @Transactional
     public UUID createProject(ProjectCreationCommand command) {
@@ -38,6 +41,71 @@ public class ProjectService {
         return savedProject.getId();
     }
 
+    @Transactional
+    public void deleteProjectRisk(UUID projectId, UUID riskId, UUID projectManagerId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot found provided project - " + projectId));
+
+        if (!project.getProjectManager().getId().equals(projectManagerId)) {
+            throw new ApplicationException(ApiErrorCode.ACCESS_DENIED, "Only project manager can delete project");
+        }
+
+        Risk removedRisk = project.getRisks().stream()
+                .filter(risk -> risk.getId().equals(riskId))
+                .findFirst()
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.RISK_NOT_FOUND, "Cannot found provided risk - " + riskId));
+
+        project.removeRisk(removedRisk);
+    }
+
+    @Transactional
+    public RiskResponse updateProjectRisk(UUID projectId, UUID riskId, UUID projectManagerId, RiskCommand command) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot found provided project - " + projectId));
+
+        if (!project.getProjectManager().getId().equals(projectManagerId)) {
+            throw new ApplicationException(ApiErrorCode.ACCESS_DENIED, "Only project manager can update project risks");
+        }
+
+        Risk risk = project.getRisks()
+                .stream()
+                .filter(r -> r.getId().equals(riskId))
+                .findFirst()
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.RISK_NOT_FOUND, "Cannot found provided risk - " + riskId));
+
+        risk.setName(command.name());
+        risk.setDescription(command.description());
+        risk.setProbability(command.probability());
+
+        return new RiskResponse(
+                risk.getId(),
+                risk.getName(),
+                risk.getDescription(),
+                risk.getProbability()
+        );
+    }
+
+    @Transactional
+    public RiskResponse createProjectRisk(RiskCommand command,  UUID projectManagerId, UUID projectId) {
+        User projectManager = userRepository.findById(projectManagerId)
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_MANAGER_NOT_FOUND, "Cannot found provided project manager - " + projectManagerId));
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot found provided project - " + projectId));
+
+        Risk risk = buildRisk(command, projectManager);
+        project.addRisk(risk);
+
+        Risk savedRisk = riskRepository.save(risk);
+
+        return new RiskResponse(
+                savedRisk.getId(),
+                savedRisk.getName(),
+                savedRisk.getDescription(),
+                savedRisk.getProbability()
+        );
+    }
+
     private Project buildProject(ProjectCreationCommand command, User projectManager) {
         return Project.builder()
                 .title(command.title())
@@ -47,6 +115,14 @@ public class ProjectService {
                 .isActive(command.isActive())
                 .walletId(command.walletId())
                 .programId(command.programId())
+                .build();
+    }
+
+    private Risk buildRisk(RiskCommand command, User projectManager) {
+        return Risk.builder()
+                .name(command.name())
+                .description(command.description())
+                .probability(command.probability())
                 .build();
     }
 
