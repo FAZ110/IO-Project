@@ -8,6 +8,7 @@ interface RegisterViewProps {
   errors: FieldErrors<RegisterRequest>;
 }
 
+// FIXME: Formularz nie wysyła imienia i nazwiska, przez co backend wyrzuca 400 Bad Request
 export const RegisterView = ({ register, onSubmit, isPending, errors }: RegisterViewProps) => (
   <form onSubmit={onSubmit} className="space-y-5">
     <div>
