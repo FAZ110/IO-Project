@@ -10,15 +10,15 @@ import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.project_manager.controller.dto.PagedResponse;
 import pl.edu.agh.project_manager.controller.dto.invitation.AdminUserInvitationRequest;
 import pl.edu.agh.project_manager.controller.dto.invitation.ManagerUserInvitationRequest;
+import pl.edu.agh.project_manager.controller.dto.invitation.ResendInvitationRequest;
 import pl.edu.agh.project_manager.controller.dto.user.UserResponse;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
+import pl.edu.agh.project_manager.domain.enums.UserStatus;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.UserInvitationService;
 import pl.edu.agh.project_manager.service.UserService;
 import pl.edu.agh.project_manager.service.command.invitation.AdminInviteUserCommand;
 import pl.edu.agh.project_manager.service.command.invitation.ManagerInviteUserCommand;
-
-import java.util.UUID;
 
 
 @RestController
@@ -28,26 +28,29 @@ class UserManagement {
     private final UserInvitationService invitationService;
     private final UserService userService;
 
-    @GetMapping("/admin/users")
+    @GetMapping("/users")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     public ResponseEntity<PagedResponse<UserResponse>> getUsers(
             @RequestParam(defaultValue = "0") int pageNumber,
-            @RequestParam(defaultValue = "20") int pageSize
+            @RequestParam(defaultValue = "20") int pageSize,
+            @RequestParam(required = false) UserRole userRole,
+            @RequestParam(required = false) UserStatus status,
+            @RequestParam(required = false) String search
     ) {
-        return ResponseEntity.ok(userService.getUsers(pageNumber, pageSize));
+        return ResponseEntity.ok(userService.getUsers(pageNumber, pageSize, userRole, status, search));
     }
 
-    @DeleteMapping("/admin/users/{userId}")
+    @DeleteMapping("/users/{userId}")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/admin/users/{userId}/invitation")
+    @PostMapping("/users/invitation")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
-    public ResponseEntity<Void> resendInvitation(@PathVariable UUID userId) {
-        invitationService.resendInvitation(userId);
+    public ResponseEntity<Void> resendInvitation(@Valid @RequestBody ResendInvitationRequest request) {
+        invitationService.resendInvitation(request.userId());
         return ResponseEntity.noContent().build();
     }
 

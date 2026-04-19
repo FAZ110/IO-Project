@@ -1,13 +1,37 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDeleteUserMutation, useResendInvitationMutation, useUsersQuery } from '../user-management.hooks';
+import type { UserListParams, UserStatus } from '../user-management.types';
+import type { UserRole } from '@/features/auth/auth.types';
 import { UserTableView } from './UserTable.view';
+import { UserFiltersBar } from './UserFiltersBar';
 import { Pagination } from '@/components/ui';
 
 const PAGE_SIZE = 20;
 
 export const UserTable = () => {
   const [page, setPage] = useState(0);
-  const { data, isLoading, isError } = useUsersQuery(page, PAGE_SIZE);
+  const [filters, setFilters] = useState<UserListParams>({});
+  const [searchInput, setSearchInput] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFilters(prev => ({ ...prev, search: searchInput || undefined }));
+      setPage(0);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  const handleRoleChange = (userRole: UserRole | undefined) => {
+    setFilters(prev => ({ ...prev, userRole }));
+    setPage(0);
+  };
+
+  const handleStatusChange = (status: UserStatus | undefined) => {
+    setFilters(prev => ({ ...prev, status }));
+    setPage(0);
+  };
+
+  const { data, isLoading, isError } = useUsersQuery(page, PAGE_SIZE, filters);
   const deleteMutation = useDeleteUserMutation();
   const resendMutation = useResendInvitationMutation();
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -29,6 +53,13 @@ export const UserTable = () => {
 
   return (
     <div className="space-y-4">
+      <UserFiltersBar
+        filters={filters}
+        searchInput={searchInput}
+        onSearchChange={setSearchInput}
+        onRoleChange={handleRoleChange}
+        onStatusChange={handleStatusChange}
+      />
       <UserTableView
         users={data?.items ?? []}
         onDelete={handleDelete}

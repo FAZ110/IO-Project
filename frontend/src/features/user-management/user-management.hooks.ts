@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { userManagementService } from './user-management.service';
-import type { InviteUserRequest } from './user-management.types';
+import type { InviteUserRequest, UserListParams } from './user-management.types';
 import { USERS_QUERY_KEY } from './query-keys';
 
-export const useUsersQuery = (page: number, size: number) =>
+export const useUsersQuery = (page: number, size: number, filters: UserListParams = {}) =>
   useQuery({
-    queryKey: [...USERS_QUERY_KEY, page, size],
-    queryFn: () => userManagementService.getUsers({ pageNumber: page, pageSize: size }),
+    queryKey: [...USERS_QUERY_KEY, page, size, filters],
+    queryFn: () => userManagementService.getUsers({ pageNumber: page, pageSize: size, ...filters }),
   });
 
 export const useInviteUserMutation = () => {

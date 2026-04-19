@@ -18,3 +18,9 @@ export interface InviteUserRequest {
   email: string;
   role: AdminAssignableRole;
 }
+
+export interface UserListParams {
+  userRole?: UserRole;
+  status?: UserStatus;
+  search?: string;
+}
