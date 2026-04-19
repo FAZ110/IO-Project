@@ -23,8 +23,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
 
-    public PagedResponse<UserResponse> getUsers(int page, int size) {
-        PageRequest pageable = PageRequest.of(page, size, Sort.by("email").ascending());
+    public PagedResponse<UserResponse> getUsers(int pageNumber, int pageSize) {
+        PageRequest pageable = PageRequest.of(pageNumber, pageSize, Sort.by("email").ascending());
         Page<User> users = userRepository.findAll(pageable);
         return PagedResponse.from(users, UserResponse::from);
     }

@@ -31,10 +31,10 @@ class UserManagement {
     @GetMapping("/admin/users")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     public ResponseEntity<PagedResponse<UserResponse>> getUsers(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "20") int pageSize
     ) {
-        return ResponseEntity.ok(userService.getUsers(page, size));
+        return ResponseEntity.ok(userService.getUsers(pageNumber, pageSize));
     }
 
     @DeleteMapping("/admin/users/{userId}")
