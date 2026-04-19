@@ -1,9 +1,11 @@
 package pl.edu.agh.project_manager.service;
 
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.project_manager.controller.dto.PagedResponse;
@@ -16,6 +18,8 @@ import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,8 +31,31 @@ public class UserService {
 
     public PagedResponse<UserResponse> getUsers(int pageNumber, int pageSize, UserRole userRole, UserStatus status, String search) {
         PageRequest pageable = PageRequest.of(pageNumber, pageSize, Sort.by("email").ascending());
-        String searchTrimmed = (search != null && search.isBlank()) ? null : search;
-        Page<User> users = userRepository.findUsersWithFilters(userRole, status, searchTrimmed, pageable);
+        String searchPattern = (search != null && !search.isBlank())
+                ? "%" + search.toLowerCase() + "%"
+                : null;
+
+        Specification<User> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (userRole != null) {
+                predicates.add(cb.equal(root.get("userRole"), userRole));
+            }
+            if (status != null) {
+                predicates.add(cb.equal(root.get("userStatus"), status));
+            }
+            if (searchPattern != null) {
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("email")), searchPattern),
+                        cb.like(cb.lower(root.<String>get("name")), searchPattern),
+                        cb.like(cb.lower(root.<String>get("surname")), searchPattern)
+                ));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Page<User> users = userRepository.findAll(spec, pageable);
         return PagedResponse.from(users, UserResponse::from);
     }
 
