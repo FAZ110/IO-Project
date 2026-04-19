@@ -4,5 +4,10 @@ export const ENDPOINTS = {
     REGISTER: `/auth/register`,
     REFRESH: `/auth/refresh`,
     LOGOUT: `/auth/logout`
+  },
+  ADMIN: {
+    USERS: '/admin/users',
+    USER: (id: string) => `/admin/users/${id}`,
+    INVITATIONS: '/admin/invitations',
   }
 } as const;
