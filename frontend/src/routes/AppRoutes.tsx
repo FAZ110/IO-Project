@@ -4,6 +4,7 @@ import { GuestRoute } from './GuestRoute';
 import { PATHS } from './paths';
 import { RegisterPage } from '../pages/RegisterPage';
 import { LoginPage } from '../pages/LoginPage';
+import { CreateProjectPage } from '@/pages/CreateProjectPage';
 
 export const AppRoutes = () => {
   return (
@@ -17,10 +18,13 @@ export const AppRoutes = () => {
       {/* PROTECTED ROUTES */}
       <Route element={<ProtectedRoute redirectTo={PATHS.LOGIN} />}>
         <Route path={PATHS.ROOT} element={<div>DASHBOARD</div>} />
+        <Route path={PATHS.CREATEPROJECT} element={<CreateProjectPage/>} />
       </Route>
 
       {/* FALLBACK - 404 */}
       <Route path="*" element={<Navigate to={PATHS.ROOT} replace />} />
+
+      
     </Routes>
   );
 };

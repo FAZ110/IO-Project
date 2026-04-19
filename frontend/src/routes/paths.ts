@@ -10,4 +10,5 @@ export const PATHS = {
   ROOT: '/',
   LOGIN: '/login',
   REGISTER: `/register`,
+  CREATEPROJECT: `/create-project`
 } as const;
