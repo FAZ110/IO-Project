@@ -16,6 +16,7 @@ import pl.edu.agh.project_manager.service.command.invitation.ManagerInviteUserCo
 import pl.edu.agh.project_manager.service.command.invitation.SendInvitationCommand;
 
 import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -64,6 +65,27 @@ public class UserInvitationService {
     private User fetchUser(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.INVITATION_SUPERVISOR_NOT_FOUND));
+    }
+
+    @Transactional
+    public void resendInvitation(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.USER_NOT_FOUND));
+
+        if (user.getUserStatus() != UserStatus.PENDING) {
+            throw new ApplicationException(ApiErrorCode.USER_NOT_PENDING);
+        }
+
+        Optional<ActivationToken> existing = tokenRepository.findByUserId(userId);
+        String token;
+        if (existing.isPresent() && !existing.get().isExpired()) {
+            token = existing.get().getToken();
+        } else {
+            existing.ifPresent(tokenRepository::delete);
+            token = createTokenForUser(user);
+        }
+
+        sendInvitationEmail(user.getEmail(), token);
     }
 
     private User createInvitedUser(String email, UserRole role, User supervisor) {

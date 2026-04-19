@@ -5,6 +5,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ActivationTokenRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
 import pl.edu.agh.project_manager.security.JwtService;
+import pl.edu.agh.project_manager.security.TokenPair;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.command.auth.LoginCommand;
 import pl.edu.agh.project_manager.service.command.auth.RegisterCommand;
@@ -31,9 +33,10 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
 
     @Transactional
-    public String register(RegisterCommand command) {
+    public TokenPair register(RegisterCommand command) {
         ActivationToken activationToken = tokenRepository.findByToken(command.activationToken())
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.ACTIVATION_TOKEN_NOT_FOUND));
 
@@ -60,11 +63,11 @@ public class AuthService {
                 List.of(new SimpleGrantedAuthority("ROLE_" + user.getUserRole().name()))
         );
 
-        return jwtService.generateToken(userDetails);
+        return jwtService.generateTokenPair(userDetails);
     }
 
     @Transactional
-    public String login(LoginCommand command) {
+    public TokenPair login(LoginCommand command) {
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -87,6 +90,20 @@ public class AuthService {
                 List.of(new SimpleGrantedAuthority("ROLE_" + user.getUserRole().name()))
         );
 
-        return jwtService.generateToken(userDetails);
+        return jwtService.generateTokenPair(userDetails);
+    }
+
+    public String refreshAccessToken(String refreshToken) {
+        final String userEmail = jwtService.extractUsername(refreshToken);
+
+        if (userEmail != null) {
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+
+            if (jwtService.isTokenValid(refreshToken, userDetails)) {
+                return jwtService.generateToken(userDetails);
+            }
+        }
+
+        throw new ApplicationException(ApiErrorCode.INVALID_REFRESH_TOKEN);
     }
 }
