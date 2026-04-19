@@ -20,6 +20,8 @@ import pl.edu.agh.project_manager.service.UserService;
 import pl.edu.agh.project_manager.service.command.invitation.AdminInviteUserCommand;
 import pl.edu.agh.project_manager.service.command.invitation.ManagerInviteUserCommand;
 
+import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api")
