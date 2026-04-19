@@ -1,4 +1,12 @@
-export type UserRole = 'COMMON' | 'AUTHORITY' | 'LINEAR_MANAGER' | 'PROJECT_MANAGER' | 'ADMINISTRATOR';
+export const UserRole = {
+  COMMON: 'COMMON',
+  AUTHORITY: 'AUTHORITY',
+  LINEAR_MANAGER: 'LINEAR_MANAGER',
+  PROJECT_MANAGER: 'PROJECT_MANAGER',
+  ADMINISTRATOR: 'ADMINISTRATOR',
+} as const;
+
+export type UserRole = typeof UserRole[keyof typeof UserRole];
 
 export interface JwtPayload {
     sub: string;

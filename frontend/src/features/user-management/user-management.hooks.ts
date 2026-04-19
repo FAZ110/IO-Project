@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { userManagementService } from './user-management.service';
 import type { InviteUserRequest } from './user-management.types';
-
-const USERS_QUERY_KEY = ['admin', 'users'] as const;
+import { USERS_QUERY_KEY } from './query-keys';
 
 export const useUsersQuery = (page: number, size: number) =>
   useQuery({
