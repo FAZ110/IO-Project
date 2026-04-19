@@ -1,4 +1,4 @@
-package pl.edu.agh.project_manager.service.command;
+package pl.edu.agh.project_manager.service.command.project;
 
 
 import java.time.LocalDate;

@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.edu.agh.project_manager.controller.dto.ProjectCreationRequest;
+import pl.edu.agh.project_manager.controller.dto.project.ProjectCreationRequest;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.ProjectService;
-import pl.edu.agh.project_manager.service.command.ProjectCreationCommand;
+import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 
 import java.util.UUID;
 
@@ -25,14 +25,13 @@ public class ProjectManagement {
 
     @PostMapping("/project")
     @PreAuthorize("hasRole('PROJECT_MANAGER')")
-    public ResponseEntity<UUID> projectCreation(
+    public ResponseEntity<UUID> createProject(
             @Valid @RequestBody ProjectCreationRequest projectCreationRequest,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         ProjectCreationCommand command = projectCreationRequest.toCommand(userPrincipal.userId());
         UUID newProjectId = projectService.createProject(command);
 
-        // Return ID of procject
         return ResponseEntity.status(HttpStatus.CREATED).body(newProjectId);
     }
 }

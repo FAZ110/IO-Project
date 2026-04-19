@@ -1,10 +1,10 @@
-package pl.edu.agh.project_manager.controller.dto;
+package pl.edu.agh.project_manager.controller.dto.project;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import pl.edu.agh.project_manager.service.command.ProjectCreationCommand;
+import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 
 import java.time.LocalDate;
 import java.util.List;
