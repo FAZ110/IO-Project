@@ -5,6 +5,14 @@ export const ENDPOINTS = {
     REFRESH: `/auth/refresh`,
     LOGOUT: `/auth/logout`
   },
+  USERS: {
+    LIST: '/users',
+    DETAIL: (id: string) => `/users/${id}`,
+    RESEND_INVITATION: '/users/invitation',
+  },
+  ADMIN: {
+    INVITATIONS: '/admin/invitations',
+  },
   PROJECT: {
     CREATE: '/project'
   }
