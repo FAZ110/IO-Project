@@ -10,4 +10,6 @@ import java.util.UUID;
 public interface ActivationTokenRepository extends JpaRepository<ActivationToken, UUID>, JpaSpecificationExecutor<ActivationToken> {
 
     Optional<ActivationToken> findByToken(String token);
+
+    Optional<ActivationToken> findByUserId(UUID userId);
 }
