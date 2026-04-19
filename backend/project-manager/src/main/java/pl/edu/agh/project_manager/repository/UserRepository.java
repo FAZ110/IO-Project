@@ -11,4 +11,8 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
     boolean existsByEmail(String email);
 
     Optional<User> findByEmail(String email);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.data.jpa.repository.Query("UPDATE User u SET u.supervisor = null WHERE u.supervisor.id = :supervisorId")
+    void clearSupervisor(@org.springframework.data.repository.query.Param("supervisorId") UUID supervisorId);
 }

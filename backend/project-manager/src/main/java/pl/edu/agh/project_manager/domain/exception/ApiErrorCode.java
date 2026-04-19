@@ -18,6 +18,9 @@ public enum ApiErrorCode {
     MISSING_REFRESH_TOKEN("AUTH_004", HttpStatus.UNAUTHORIZED, "Refresh token is missing or cookie expired"),
     INVALID_REFRESH_TOKEN("AUTH_005", HttpStatus.UNAUTHORIZED, "Refresh token is invalid"),
 
+    USER_NOT_FOUND("USR_001", HttpStatus.NOT_FOUND, "User not found"),
+    USER_NOT_PENDING("USR_002", HttpStatus.BAD_REQUEST, "Cannot resend invitation — user is not in PENDING status"),
+
     VALIDATION_ERROR("GEN_001", HttpStatus.BAD_REQUEST, "Validation failed"),
     ACCESS_DENIED("GEN_002", HttpStatus.FORBIDDEN, "Access denied"),
     INTERNAL_SERVER_ERROR("GEN_999", HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected internal server error");
