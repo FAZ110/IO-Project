@@ -4,6 +4,7 @@ import { GuestRoute } from './GuestRoute';
 import { PATHS } from './paths';
 import { RegisterPage } from '../pages/RegisterPage';
 import { LoginPage } from '../pages/LoginPage';
+import { CreateProjectPage } from '@/pages/CreateProjectPage';
 import { AdminUsersPage } from '../pages/AdminUsersPage';
 import { AdminUserDetailsPage } from '../pages/AdminUserDetailsPage';
 import { ROUTE_PARAMS } from './paths';
@@ -20,6 +21,7 @@ export const AppRoutes = () => {
       {/* PROTECTED ROUTES */}
       <Route element={<ProtectedRoute redirectTo={PATHS.LOGIN} />}>
         <Route path={PATHS.ROOT} element={<div>DASHBOARD</div>} />
+        <Route path={PATHS.CREATEPROJECT} element={<CreateProjectPage/>} />
       </Route>
 
       {/* ADMIN ROUTES */}
@@ -30,6 +32,8 @@ export const AppRoutes = () => {
 
       {/* FALLBACK - 404 */}
       <Route path="*" element={<Navigate to={PATHS.ROOT} replace />} />
+
+      
     </Routes>
   );
 };

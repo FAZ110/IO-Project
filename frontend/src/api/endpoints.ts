@@ -9,5 +9,8 @@ export const ENDPOINTS = {
     USERS: '/admin/users',
     USER: (id: string) => `/admin/users/${id}`,
     INVITATIONS: '/admin/invitations',
+  },
+  PROJECT: {
+    CREATE: '/project'
   }
 } as const;
