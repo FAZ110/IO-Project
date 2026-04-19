@@ -5,6 +5,9 @@ export const ENDPOINTS = {
     REFRESH: `/auth/refresh`,
     LOGOUT: `/auth/logout`
   },
+  PROJECT: {
+    CREATE: '/project'
+  },
   ADMIN: {
     USERS: '/admin/users',
     USER: (id: string) => `/admin/users/${id}`,
