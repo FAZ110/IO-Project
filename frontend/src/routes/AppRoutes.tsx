@@ -8,6 +8,7 @@ import { CreateProjectPage } from '@/pages/CreateProjectPage';
 import { AdminUsersPage } from '../pages/AdminUsersPage';
 import { AdminUserDetailsPage } from '../pages/AdminUserDetailsPage';
 import { ROUTE_PARAMS } from './paths';
+import { UserRole } from '@/features/auth/auth.types';
 
 export const AppRoutes = () => {
   return (
@@ -25,7 +26,7 @@ export const AppRoutes = () => {
       </Route>
 
       {/* ADMIN ROUTES */}
-      <Route element={<ProtectedRoute redirectTo={PATHS.LOGIN} allowedRoles={['ADMINISTRATOR']} />}>
+      <Route element={<ProtectedRoute redirectTo={PATHS.LOGIN} allowedRoles={[UserRole.ADMINISTRATOR]} />}>
         <Route path={PATHS.ADMIN_USERS} element={<AdminUsersPage />} />
         <Route path={`${PATHS.ADMIN_USERS}/:${ROUTE_PARAMS.USER_ID}`} element={<AdminUserDetailsPage />} />
       </Route>
