@@ -4,7 +4,7 @@ import { GuestRoute } from './GuestRoute';
 import { PATHS } from './paths';
 import { RegisterPage } from '../pages/RegisterPage';
 import { LoginPage } from '../pages/LoginPage';
-import CreateProjectForm from '@/components/CreateProjectForm';
+import { CreateProjectPage } from '@/pages/CreateProjectPage';
 
 export const AppRoutes = () => {
   return (
@@ -23,7 +23,7 @@ export const AppRoutes = () => {
       {/* FALLBACK - 404 */}
       <Route path="*" element={<Navigate to={PATHS.ROOT} replace />} />
 
-      <Route path="/create-project" element={<CreateProjectForm />} />
+      <Route path={PATHS.CREATEPROJECT} element={<CreateProjectPage/>} />
     </Routes>
   );
 };
