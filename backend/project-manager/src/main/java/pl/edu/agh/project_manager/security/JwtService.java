@@ -55,7 +55,12 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails, jwtExpiration);
+        Map<String, Object> claims = new HashMap<>();
+        userDetails.getAuthorities().stream()
+                .findFirst()
+                .map(a -> a.getAuthority().replace("ROLE_", ""))
+                .ifPresent(role -> claims.put("role", role));
+        return generateToken(claims, userDetails, jwtExpiration);
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
