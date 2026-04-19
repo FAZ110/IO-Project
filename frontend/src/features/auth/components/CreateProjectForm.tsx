@@ -1,12 +1,9 @@
-import { useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { useMutation } from '@tanstack/react-query';
 import { CreateProjectView } from './CreateProjectForm.view';
-import { createProject } from '../../project/project.service';
 import type { ProjectCreationRequest } from '../../project/project.types';
+import { useCreateProject } from '../project.hooks';
 
 export const CreateProjectForm = () => {
-  const [message, setMessage] = useState('');
 
   const { register, control, handleSubmit, formState: { errors }, reset } = useForm<ProjectCreationRequest>({
     mode: 'all',
@@ -26,20 +23,9 @@ export const CreateProjectForm = () => {
     name: "risks"
   });
 
-  const mutation = useMutation({
-    mutationFn: createProject,
-    onSuccess: (newProjectId) => {
-      setMessage(`Sukces! Projekt został utworzony. ID: ${newProjectId}`);
-      reset(); 
-    },
-    onError: (error) => {
-      console.error('Błąd podczas tworzenia projektu:', error);
-      setMessage('Błąd: Nie udało się utworzyć projektu.');
-    }
-  });
+  const mutation = useCreateProject(() => reset());
 
   const onSubmit = (data: ProjectCreationRequest) => {
-    setMessage(''); 
     
     const payload = {
       ...data,
@@ -59,7 +45,6 @@ export const CreateProjectForm = () => {
       riskFields={riskFields}
       appendRisk={appendRisk}
       removeRisk={removeRisk}
-      message={message}
     />
   );
 };

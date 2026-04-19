@@ -18,12 +18,13 @@ export const AppRoutes = () => {
       {/* PROTECTED ROUTES */}
       <Route element={<ProtectedRoute redirectTo={PATHS.LOGIN} />}>
         <Route path={PATHS.ROOT} element={<div>DASHBOARD</div>} />
+        <Route path={PATHS.CREATEPROJECT} element={<CreateProjectPage/>} />
       </Route>
 
       {/* FALLBACK - 404 */}
       <Route path="*" element={<Navigate to={PATHS.ROOT} replace />} />
 
-      <Route path={PATHS.CREATEPROJECT} element={<CreateProjectPage/>} />
+      
     </Routes>
   );
 };
