@@ -82,9 +82,15 @@ public class ProjectService {
                 .findFirst()
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.RISK_NOT_FOUND, "Cannot found provided risk - " + riskId));
 
-        risk.setName(command.name());
-        risk.setDescription(command.description());
-        risk.setProbability(command.probability());
+        if (command.name() != null) {
+            risk.setName(command.name());
+        }
+        if (command.description() != null) {
+            risk.setDescription(command.description());
+        }
+        if (command.probability() != null) {
+            risk.setProbability(command.probability());
+        }
 
         return new RiskResponse(
                 risk.getId(),

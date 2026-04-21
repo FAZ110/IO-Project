@@ -50,7 +50,7 @@ public class ProjectManagement {
         return  ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/project/{projectId}/risk/{riskId}")
+    @PatchMapping("/project/{projectId}/risk/{riskId}")
     @PreAuthorize("hasRole('PROJECT_MANAGER')")
     public ResponseEntity<RiskResponse> updateProjectRisk(
             @PathVariable UUID projectId,
