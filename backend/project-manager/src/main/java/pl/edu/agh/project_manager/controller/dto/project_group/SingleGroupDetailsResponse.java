@@ -1,4 +1,4 @@
-package pl.edu.agh.project_manager.controller.dto;
+package pl.edu.agh.project_manager.controller.dto.project_group;
 
 import pl.edu.agh.project_manager.domain.entity.User;
 import pl.edu.agh.project_manager.domain.enums.GroupType;
@@ -9,7 +9,7 @@ public record SingleGroupDetailsResponse(
         UUID id,
         String name,
         String description,
-        User owner,
+        GroupOwnerResponse owner,
         GroupType groupType
 ) {
 }

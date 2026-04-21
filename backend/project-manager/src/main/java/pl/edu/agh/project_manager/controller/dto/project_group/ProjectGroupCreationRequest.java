@@ -1,4 +1,4 @@
-package pl.edu.agh.project_manager.controller.dto;
+package pl.edu.agh.project_manager.controller.dto.project_group;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

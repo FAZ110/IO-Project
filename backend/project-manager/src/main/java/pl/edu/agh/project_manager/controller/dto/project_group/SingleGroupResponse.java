@@ -1,4 +1,4 @@
-package pl.edu.agh.project_manager.controller.dto;
+package pl.edu.agh.project_manager.controller.dto.project_group;
 
 import java.util.UUID;
 

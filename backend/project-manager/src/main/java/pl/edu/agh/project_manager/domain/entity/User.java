@@ -43,7 +43,7 @@ public class User {
     @Column(name = "user_status", nullable = false)
     private UserStatus userStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "supervisor_id")
     private User supervisor;
 

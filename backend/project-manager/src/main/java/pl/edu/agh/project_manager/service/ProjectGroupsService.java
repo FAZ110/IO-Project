@@ -3,6 +3,9 @@ package pl.edu.agh.project_manager.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.edu.agh.project_manager.controller.dto.*;
+import pl.edu.agh.project_manager.controller.dto.project_group.GroupOwnerResponse;
+import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupDetailsResponse;
+import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupResponse;
 import pl.edu.agh.project_manager.domain.entity.ProjectGroups;
 import pl.edu.agh.project_manager.domain.entity.User;
 import pl.edu.agh.project_manager.domain.enums.GroupType;
@@ -38,11 +41,17 @@ public class ProjectGroupsService {
         ProjectGroups projectGroups = projectGroupsRepository.findById(id)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_GROUP_NOT_FOUND, "Cannot find project group with id: " + id));
 
+        GroupOwnerResponse ownerResponse = new GroupOwnerResponse(
+                projectGroups.getOwner().getName(),
+                projectGroups.getOwner().getSurname(),
+                projectGroups.getOwner().getEmail()
+        );
+
         return new SingleGroupDetailsResponse(
                 projectGroups.getId(),
                 projectGroups.getName(),
                 projectGroups.getDescription(),
-                projectGroups.getOwner(),
+                ownerResponse,
                 projectGroups.getGroupType()
         );
     }
