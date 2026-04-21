@@ -7,14 +7,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.agh.project_manager.controller.dto.ProjectCreationRequest;
-import pl.edu.agh.project_manager.controller.dto.RiskRequest;
-import pl.edu.agh.project_manager.controller.dto.RiskResponse;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import pl.edu.agh.project_manager.controller.dto.project.ProjectCreationRequest;
+import pl.edu.agh.project_manager.controller.dto.project.RiskRequest;
+import pl.edu.agh.project_manager.controller.dto.RiskResponse;
+import org.springframework.web.bind.annotation.*;
+import pl.edu.agh.project_manager.controller.dto.RiskResponse;
+import pl.edu.agh.project_manager.controller.dto.project.ProjectCreationRequest;
+import pl.edu.agh.project_manager.controller.dto.project.RiskRequest;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.ProjectService;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
@@ -51,7 +50,7 @@ public class ProjectManagement {
         return  ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/project/{projectId}/risk/{riskId}")
+    @PatchMapping("/project/{projectId}/risk/{riskId}")
     @PreAuthorize("hasRole('PROJECT_MANAGER')")
     public ResponseEntity<RiskResponse> updateProjectRisk(
             @PathVariable UUID projectId,
