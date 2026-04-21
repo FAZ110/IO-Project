@@ -36,6 +36,10 @@ public class Project {
     @JoinColumn(name = "group_id")
     private ProjectGroups projectGroup;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id")
+    private ProjectGroups projectGroup;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "project_manager_id", nullable = false)
     private User projectManager;
