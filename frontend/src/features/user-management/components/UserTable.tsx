@@ -90,8 +90,7 @@ export const UserTable = () => {
               />
             </PaginationItem>
 
-            {/* Informacja o numerze strony (zamiast kropek) */}
-            <PaginationItem>
+ont            <PaginationItem>
               <span className="text-sm font-medium text-slate-600 px-4">
                 Strona {data.pageNumber + 1} z {data.totalPages}
               </span>

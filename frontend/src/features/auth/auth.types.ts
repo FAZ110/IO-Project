@@ -31,6 +31,8 @@ export interface LoginRequest {
 
 export interface RegisterRequest {
     activationToken: string;
+    name: string;
+    surname: string;
     password: string;
 }
 

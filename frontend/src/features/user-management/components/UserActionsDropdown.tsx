@@ -18,12 +18,12 @@ interface UserActionsDropdownProps {
 }
 
 export const UserActionsDropdown = ({
-                                      user,
-                                      onDelete,
-                                      onResend,
-                                      isDeleting,
-                                      isResending,
-                                    }: UserActionsDropdownProps) => {
+  user,
+  onDelete,
+  onResend,
+  isDeleting,
+  isResending,
+}: UserActionsDropdownProps) => {
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <DropdownMenu>

@@ -13,7 +13,7 @@ public class EmailService {
         log.info("SENDING INVITATION EMAIL");
         log.info("To: {}", command.email());
         log.info("Token: {}", command.activationToken());
-        log.info("Registration link: http://localhost:5173/register?token={}", command.activationToken());
+        log.info("Registration link: http://localhost:5173/register?token={}&email={}", command.activationToken(), command.email());
         log.info("--------------------------------------------------");
         // throw new UnsupportedOperationException(); rzuca błąd w tym momencie!
     }

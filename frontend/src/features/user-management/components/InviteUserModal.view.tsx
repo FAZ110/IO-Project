@@ -67,7 +67,7 @@ export const InviteUserModalView = ({ register, onSubmit, onClose, isPending, er
         </div>
 
         <div className="flex gap-3 pt-2">
-            <Button type="submit" disabled={isPending} className="w-full">
+            <Button type="submit" disabled={isPending} className="w-full py-6 cursor-pointer">
               {isPending ? 'Wysyłanie...' : 'Zatwierdź'}
             </Button>
         </div>

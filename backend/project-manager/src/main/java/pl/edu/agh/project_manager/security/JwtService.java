@@ -61,6 +61,11 @@ public class JwtService {
                 .map(a -> a.getAuthority().replace("ROLE_", ""))
                 .ifPresent(role -> claims.put("role", role));
 
+        if (userDetails instanceof UserPrincipal principal) {
+            claims.put("firstName", principal.firstName());
+            claims.put("lastName", principal.lastName());
+        }
+
         return generateToken(claims, userDetails, jwtExpiration);
     }
 

@@ -33,13 +33,6 @@ export const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleLogout = () => {
-    logoutUser(undefined, {
-      onSettled: () => {
-      }
-    });
-  };
-
   const isActive = (path: string) => location.pathname.startsWith(path);
 
   // TODO: powiadomienia
@@ -120,7 +113,7 @@ export const Navbar = () => {
 
         <div className="flex items-center gap-2">
 
-          <Button variant="ghost" size="icon" className="relative text-slate-500 hover:text-slate-900">
+          <Button variant="ghost" size="icon" className="relative text-slate-500 hover:text-slate-900 cursor-pointer">
             <Bell className="h-5 w-5" />
             {unreadNotifications > 0 && (
               <Badge variant="destructive" className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full p-0 text-[10px]">
@@ -131,7 +124,7 @@ export const Navbar = () => {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-9 w-9 rounded-full ring-2 ring-transparent hover:ring-slate-200 transition-all ml-2">
+              <Button variant="ghost" className="relative h-9 w-9 rounded-full ring-2 ring-transparent hover:ring-slate-200 transition-all ml-2 cursor-pointer">
                 <Avatar className="h-9 w-9">
                   <AvatarFallback className="bg-blue-600 text-white font-semibold">
                     {initials || 'U'}
@@ -157,7 +150,7 @@ export const Navbar = () => {
               <DropdownMenuSeparator />
 
               <DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer flex items-center gap-2 py-2">
+                <DropdownMenuItem onClick={() => navigate(PATHS.PROFILE)} className="cursor-pointer flex items-center gap-2 py-2">
                   <UserCircle className="h-4 w-4 text-slate-500" />
                   <span>Mój Profil</span>
                 </DropdownMenuItem>
@@ -167,7 +160,7 @@ export const Navbar = () => {
 
               <DropdownMenuItem
                 disabled={isLoggingOut}
-                onClick={handleLogout}
+                onClick={() => logoutUser()}
                 className="cursor-pointer flex items-center gap-2 py-2 text-slate-600 hover:text-slate-900"
               >
                 <LogOut className={cn("h-4 w-4", isLoggingOut && "animate-pulse")} />
