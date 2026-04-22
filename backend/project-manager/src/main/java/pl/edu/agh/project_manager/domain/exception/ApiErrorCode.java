@@ -14,7 +14,11 @@ public enum ApiErrorCode {
     USER_NOT_FOUND("USR_002", HttpStatus.NOT_FOUND, "Cannot found user"),
 
     PROJECT_MANAGER_NOT_FOUND("PROJ_001", HttpStatus.NOT_FOUND, "Cannot found provided project manager"),
+    PROJECT_NOT_FOUND("PROJ_002", HttpStatus.NOT_FOUND, "Cannot found provided project"),
+    RISK_NOT_FOUND("RISK_001", HttpStatus.NOT_FOUND, "Cannot found provided risk in provided project"),
+
     PROJECT_GROUP_NOT_FOUND("PROJ_002", HttpStatus.NOT_FOUND, "Cannot found project group"),
+
     ACTIVATION_TOKEN_NOT_FOUND("AUTH_001", HttpStatus.NOT_FOUND, "Activation token is invalid or does not exist"),
     ACTIVATION_TOKEN_EXPIRED("AUTH_002", HttpStatus.BAD_REQUEST, "Activation token has expired"),
     BAD_CREDENTIALS("AUTH_003", HttpStatus.UNAUTHORIZED, "Invalid email or password"),

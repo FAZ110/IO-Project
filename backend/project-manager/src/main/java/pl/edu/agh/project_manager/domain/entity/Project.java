@@ -61,6 +61,11 @@ public class Project {
         risk.setProject(this);
     }
 
+    public void removeRisk(ProjectRisk risk) {
+        this.risks.remove(risk);
+        risk.setProject(null);
+    }
+
     public void addMember(User user, ProjectRole role) {
         ProjectMember member = new ProjectMember();
         member.setProject(this);
