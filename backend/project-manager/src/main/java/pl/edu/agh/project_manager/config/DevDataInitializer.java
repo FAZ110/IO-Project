@@ -12,6 +12,7 @@ import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
 import pl.edu.agh.project_manager.repository.UserRepository;
 
+
 @Configuration
 @Profile("dev")
 @RequiredArgsConstructor
@@ -26,25 +27,73 @@ public class DevDataInitializer implements CommandLineRunner {
     @Value("${application.admin.password}")
     private String adminPassword;
 
-
     @Override
     public void run(String... args) {
-        if (!userRepository.existsByEmail(adminUsername)) {
-            log.info("Creating default admin account...");
+        log.info("Checking and initializing DEV users...");
 
-            User admin = User.builder()
-                    .email(adminUsername)
-                    .password(passwordEncoder.encode(adminPassword))
-                    .name("Admin")
-                    .surname("Admin")
-                    .userRole(UserRole.ADMINISTRATOR)
+        String defaultPassword = passwordEncoder.encode("password123");
+
+        // ADMIN
+        createUserIfNotExists(
+                adminUsername,
+                passwordEncoder.encode(adminPassword),
+                "Super",
+                "Admin",
+                UserRole.ADMINISTRATOR
+        );
+
+        // PROJECT MANAGER
+        createUserIfNotExists(
+                "pm@dev.com",
+                defaultPassword,
+                "Anna",
+                "Manager",
+                UserRole.PROJECT_MANAGER
+        );
+
+        // LINEAR MANAGER
+        createUserIfNotExists(
+                "linear@dev.com",
+                defaultPassword,
+                "Piotr",
+                "Liniowy",
+                UserRole.LINEAR_MANAGER
+        );
+
+        // AUTHORITY
+        createUserIfNotExists(
+                "authority@dev.com",
+                defaultPassword,
+                "Jan",
+                "Władza",
+                UserRole.AUTHORITY
+        );
+
+        // COMMON
+        createUserIfNotExists(
+                "common@dev.com",
+                defaultPassword,
+                "Maciej",
+                "Pracownik",
+                UserRole.COMMON
+        );
+
+        log.info("DEV users initialization completed.");
+    }
+
+    private void createUserIfNotExists(String email, String encodedPassword, String name, String surname, UserRole role) {
+        if (!userRepository.existsByEmail(email)) {
+            User user = User.builder()
+                    .email(email)
+                    .password(encodedPassword)
+                    .name(name)
+                    .surname(surname)
+                    .userRole(role)
                     .userStatus(UserStatus.ACTIVE)
                     .build();
 
-            userRepository.save(admin);
-            log.info("Admin created with email: {}", adminUsername);
-        } else {
-            log.info("Admin account already exists. Skipping initialization.");
+            userRepository.save(user);
+            log.info("Created user: {} with role: {}", email, role);
         }
     }
 }

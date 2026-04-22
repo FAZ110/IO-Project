@@ -13,6 +13,8 @@ public record UserPrincipal(
         UUID userId,
         String email,
         String password,
+        String firstName,
+        String lastName,
         Collection<? extends GrantedAuthority> authorities
 ) implements UserDetails {
 

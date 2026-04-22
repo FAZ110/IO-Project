@@ -1,6 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
 import { MoreVertical, Send, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
 import type { UserResponse } from '../user-management.types';
 
 interface UserActionsDropdownProps {
@@ -18,64 +24,45 @@ export const UserActionsDropdown = ({
   isDeleting,
   isResending,
 }: UserActionsDropdownProps) => {
-  const [open, setOpen] = useState(false);
-  const [coords, setCoords] = useState({ top: 0, right: 0 });
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const handleOpen = () => {
-    if (buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setCoords({ top: rect.bottom + 4, right: window.innerWidth - rect.right });
-    }
-    setOpen((o) => !o);
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        dropdownRef.current && !dropdownRef.current.contains(e.target as Node) &&
-        buttonRef.current && !buttonRef.current.contains(e.target as Node)
-      ) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <Button ref={buttonRef} variant="icon" onClick={handleOpen}>
-        <MoreVertical size={16} />
-      </Button>
+      <DropdownMenu>
 
-      {open && (
-        <div
-          ref={dropdownRef}
-          style={{ position: 'fixed', top: coords.top, right: coords.right }}
-          className="z-50 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1"
-        >
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+            <span className="sr-only">Otwórz menu</span>
+            <MoreVertical className="h-4 w-4 text-slate-500" />
+          </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent align="end" className="w-48">
+
           {user.status === 'PENDING' && (
-            <button
-              onClick={() => { onResend(user.id); setOpen(false); }}
-              disabled={isResending}
-              className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-            >
-              <Send size={14} className="text-blue-500" />
-              {isResending ? 'Wysyłanie...' : 'Wyślij ponownie'}
-            </button>
+            <>
+              <DropdownMenuItem
+                onClick={() => onResend(user.id)}
+                disabled={isResending}
+                className="cursor-pointer text-slate-700 focus:bg-slate-50"
+              >
+                <Send className="mr-2 h-4 w-4 text-blue-500" />
+                <span>{isResending ? 'Wysyłanie...' : 'Wyślij ponownie'}</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+            </>
           )}
-          <button
-            onClick={() => { onDelete(user.id); setOpen(false); }}
+
+          <DropdownMenuItem
+            onClick={() => onDelete(user.id)}
             disabled={isDeleting}
-            className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-50"
+            className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-700"
           >
-            <Trash2 size={14} />
-            {isDeleting ? 'Usuwanie...' : 'Usuń użytkownika'}
-          </button>
-        </div>
-      )}
+            <Trash2 className="mr-2 h-4 w-4" />
+            <span>{isDeleting ? 'Usuwanie...' : 'Usuń użytkownika'}</span>
+          </DropdownMenuItem>
+
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };

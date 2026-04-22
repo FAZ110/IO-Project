@@ -10,8 +10,7 @@ public record ProjectCreationCommand(
         String description,
         LocalDate startDate,
         Boolean isActive,
-        Integer walletId,
-        Integer programId,
+        UUID projectGroupId,
         UUID projectManagerId,
         List<RiskCommand> risks
 ) {

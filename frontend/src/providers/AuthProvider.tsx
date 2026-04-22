@@ -5,11 +5,17 @@ import { setAccessToken } from "@/api/client.ts";
 import { authService } from "@/features/auth/auth.service.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { jwtDecode } from "jwt-decode";
-import type { JwtPayload, UserRole } from "@/features/auth/auth.types";
+import type {JwtPayload, UserInfo} from "@/features/auth/auth.types";
 
-const decodeRole = (token: string): UserRole | null => {
+const decodeUser = (token: string): UserInfo | null => {
   try {
-    return jwtDecode<JwtPayload>(token).role ?? null;
+    const decoded = jwtDecode<JwtPayload>(token);
+    return {
+      email: decoded.sub,
+      role: decoded.role,
+      firstName: decoded.firstName || '',
+      lastName: decoded.lastName || '',
+    }
   } catch {
     return null;
   }
@@ -18,19 +24,19 @@ const decodeRole = (token: string): UserRole | null => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [user, setUser] = useState<UserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const login = useCallback((token: string) => {
     setAccessToken(token);
     setIsAuthenticated(true);
-    setUserRole(decodeRole(token));
+    setUser(decodeUser(token));
   }, []);
 
   const logout = useCallback(() => {
     setAccessToken(null);
     setIsAuthenticated(false);
-    setUserRole(null);
+    setUser(null);
     queryClient.clear();
   }, [queryClient]);
 
@@ -49,7 +55,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ login, logout, isAuthenticated, userRole }}>
+    <AuthContext.Provider value={{ login, logout, isAuthenticated, user }}>
       {children}
     </AuthContext.Provider>
   );

@@ -60,6 +60,8 @@ public class AuthService {
                 user.getId(),
                 user.getEmail(),
                 user.getPassword(),
+                user.getName(),
+                user.getSurname(),
                 List.of(new SimpleGrantedAuthority("ROLE_" + user.getUserRole().name()))
         );
 
@@ -87,6 +89,8 @@ public class AuthService {
                 user.getId(),
                 user.getEmail(),
                 user.getPassword(),
+                user.getName(),
+                user.getSurname(),
                 List.of(new SimpleGrantedAuthority("ROLE_" + user.getUserRole().name()))
         );
 

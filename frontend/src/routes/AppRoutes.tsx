@@ -9,6 +9,9 @@ import { AdminUsersPage } from '../pages/AdminUsersPage';
 import { AdminUserDetailsPage } from '../pages/AdminUserDetailsPage';
 import { ROUTE_PARAMS } from './paths';
 import { UserRole } from '@/features/auth/auth.types';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { ProfilePage } from "@/pages/ProfilePage";
+import { DashboardPage } from "@/pages/DashboardPage";
 
 export const AppRoutes = () => {
   return (
@@ -21,14 +24,17 @@ export const AppRoutes = () => {
 
       {/* PROTECTED ROUTES */}
       <Route element={<ProtectedRoute redirectTo={PATHS.LOGIN} />}>
-        <Route path={PATHS.ROOT} element={<div>DASHBOARD</div>} />
-        <Route path={PATHS.CREATEPROJECT} element={<CreateProjectPage/>} />
-      </Route>
+        <Route element={<MainLayout/>}>
+          <Route path={PATHS.ROOT} element={<DashboardPage/>} />
+          <Route path={PATHS.PROFILE} element={<ProfilePage/>} />
+          <Route path={PATHS.CREATEPROJECT} element={<CreateProjectPage/>} />
 
-      {/* ADMIN ROUTES */}
-      <Route element={<ProtectedRoute redirectTo={PATHS.LOGIN} allowedRoles={[UserRole.ADMINISTRATOR]} />}>
-        <Route path={PATHS.ADMIN_USERS} element={<AdminUsersPage />} />
-        <Route path={`${PATHS.ADMIN_USERS}/:${ROUTE_PARAMS.USER_ID}`} element={<AdminUserDetailsPage />} />
+          {/* ADMIN ROUTES */}
+          <Route element={<ProtectedRoute redirectTo={PATHS.LOGIN} allowedRoles={[UserRole.ADMINISTRATOR]} />}>
+            <Route path={PATHS.ADMIN_USERS} element={<AdminUsersPage />} />
+            <Route path={`${PATHS.ADMIN_USERS}/:${ROUTE_PARAMS.USER_ID}`} element={<AdminUserDetailsPage />} />
+          </Route>
+        </Route>
       </Route>
 
       {/* FALLBACK - 404 */}
