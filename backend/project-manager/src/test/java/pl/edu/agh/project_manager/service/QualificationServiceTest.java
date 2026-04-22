@@ -13,8 +13,8 @@ import pl.edu.agh.project_manager.repository.QualificationRepository;
 import pl.edu.agh.project_manager.repository.SkillRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,7 +38,7 @@ class QualificationServiceTest {
     void shouldAddQualificationsToUser_WhenSkillExists() {
         UUID userId = UUID.randomUUID();
         String skillName = "Java";
-        Set<String> skillsToAdd = Set.of(skillName);
+        List<String> skillsToAdd = List.of(skillName);
 
         User mockUser = User.builder().id(userId).build();
         Skill mockSkill = Skill.builder().id(UUID.randomUUID()).name(skillName).valid(true).build();

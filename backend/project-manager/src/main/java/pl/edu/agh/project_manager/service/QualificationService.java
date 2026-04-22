@@ -16,7 +16,6 @@ import pl.edu.agh.project_manager.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -27,7 +26,7 @@ public class QualificationService {
     private final UserRepository userRepository;
 
     @Transactional
-    public List<QualificationResponse> addQualificationsToUser(UUID userId, Set<String> skillNames) {
+    public List<QualificationResponse> addQualificationsToUser(UUID userId, List<String> skillNames) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.USER_NOT_FOUND));
 
