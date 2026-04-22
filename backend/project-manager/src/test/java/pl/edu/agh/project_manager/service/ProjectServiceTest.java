@@ -50,7 +50,6 @@ class ProjectServiceTest {
     void createProject_Success() {
         // Given
         UUID managerId = UUID.randomUUID();
-        UUID projectGroupId = UUID.randomUUID();
         ProjectCreationCommand command = new ProjectCreationCommand(
                 "Title", "Desc", LocalDate.now(), true, null, managerId, new ArrayList<>()
         );

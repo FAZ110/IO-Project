@@ -25,8 +25,8 @@ import java.util.UUID;
 public class ProjectService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
-    private final ProjectGroupsRepository projectGroupRepository;
     private final RiskRepository riskRepository;
+    private final ProjectGroupsRepository projectGroupRepository;
 
     @Transactional
     public UUID createProject(ProjectCreationCommand command) {
