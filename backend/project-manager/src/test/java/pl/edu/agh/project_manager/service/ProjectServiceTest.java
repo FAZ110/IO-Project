@@ -12,6 +12,7 @@ import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.User;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
+import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
 import pl.edu.agh.project_manager.repository.ProjectRepository;
 import pl.edu.agh.project_manager.repository.RiskRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
@@ -37,6 +38,8 @@ class ProjectServiceTest {
     private ProjectRepository projectRepository;
     @Mock
     private RiskRepository riskRepository;
+    @Mock
+    private ProjectGroupsRepository projectGroupsRepository;
 
     @InjectMocks
     private ProjectService projectService;
@@ -47,8 +50,9 @@ class ProjectServiceTest {
     void createProject_Success() {
         // Given
         UUID managerId = UUID.randomUUID();
+        UUID projectGroupId = UUID.randomUUID();
         ProjectCreationCommand command = new ProjectCreationCommand(
-                "Title", "Desc", LocalDate.now(), true, 1, null, managerId, new ArrayList<>()
+                "Title", "Desc", LocalDate.now(), true, null, managerId, new ArrayList<>()
         );
         User manager = User.builder().id(managerId).projects(new ArrayList<>()).build();
         Project savedProject = Project.builder().id(UUID.randomUUID()).build();
