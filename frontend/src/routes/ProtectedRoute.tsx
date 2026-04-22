@@ -8,10 +8,10 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ redirectTo, allowedRoles }: ProtectedRouteProps) => {
-    const { isAuthenticated, userRole } = useAuth();
+    const { isAuthenticated, user } = useAuth();
 
     if (!isAuthenticated) return <Navigate to={redirectTo} replace />;
-    if (allowedRoles && (!userRole || !allowedRoles.includes(userRole))) {
+    if (allowedRoles && (!user?.role || !allowedRoles.includes(user.role))) {
         return <Navigate to={redirectTo} replace />;
     }
 

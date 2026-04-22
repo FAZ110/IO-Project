@@ -20,6 +20,10 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-unused-vars': ['warn', { 
         argsIgnorePattern: '^_',

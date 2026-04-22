@@ -8,9 +8,18 @@ export const UserRole = {
 
 export type UserRole = typeof UserRole[keyof typeof UserRole];
 
+export interface UserInfo {
+  email: string;
+  role: UserRole;
+  firstName: string;
+  lastName: string;
+}
+
 export interface JwtPayload {
     sub: string;
     role: UserRole;
+    firstName: string;
+    lastName: string;
     iat: number;
     exp: number;
 }

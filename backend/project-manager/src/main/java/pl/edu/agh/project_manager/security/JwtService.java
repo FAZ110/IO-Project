@@ -60,6 +60,7 @@ public class JwtService {
                 .findFirst()
                 .map(a -> a.getAuthority().replace("ROLE_", ""))
                 .ifPresent(role -> claims.put("role", role));
+
         return generateToken(claims, userDetails, jwtExpiration);
     }
 

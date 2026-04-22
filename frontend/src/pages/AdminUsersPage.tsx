@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { UserTable, InviteUserModal } from '@/features/user-management';
-import { Button } from '@/components/ui';
+import { Button } from '@/components/ui/button';
 
 export const AdminUsersPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
