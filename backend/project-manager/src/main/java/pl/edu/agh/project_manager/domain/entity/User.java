@@ -43,13 +43,17 @@ public class User {
     @Column(name = "user_status", nullable = false)
     private UserStatus userStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "supervisor_id")
     private User supervisor;
 
     @OneToMany(mappedBy = "projectManager", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @Builder.Default
     private List<Project> projects = new ArrayList<>();
+
+    @OneToMany(mappedBy = "owner")
+    @Builder.Default
+    private List<ProjectGroups> projectGroups = new ArrayList<>();
 
     public void addProject(Project project) {
         this.projects.add(project);

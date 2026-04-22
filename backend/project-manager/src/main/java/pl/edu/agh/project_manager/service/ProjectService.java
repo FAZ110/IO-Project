@@ -5,9 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.edu.agh.project_manager.domain.entity.Project;
 import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
+import pl.edu.agh.project_manager.domain.entity.ProjectGroups;
 import pl.edu.agh.project_manager.domain.entity.User;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
+import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
 import pl.edu.agh.project_manager.repository.ProjectRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
@@ -21,13 +23,21 @@ import java.util.UUID;
 public class ProjectService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
+    private final ProjectGroupsRepository projectGroupRepository;
 
     @Transactional
     public UUID createProject(ProjectCreationCommand command) {
         User projectManager = userRepository.findById(command.projectManagerId())
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_MANAGER_NOT_FOUND, "Cannot found provided project manager - " + command.projectManagerId()));
 
+        ProjectGroups projectGroup = null;
+        if (command.projectGroupId() != null) {
+            projectGroup = projectGroupRepository.findById(command.projectGroupId())
+                    .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_GROUP_NOT_FOUND, "Cannot found provided project group - " + command.projectGroupId()));
+        }
+
         Project project = buildProject(command, projectManager);
+        project.setProjectGroup(projectGroup);
         projectManager.getProjects().add(project);
 
         addRisksToProject(project, command.risks());
@@ -44,8 +54,6 @@ public class ProjectService {
                 .projectManager(projectManager)
                 .startDate(command.startDate())
                 .isActive(command.isActive())
-                .walletId(command.walletId())
-                .programId(command.programId())
                 .build();
     }
 
