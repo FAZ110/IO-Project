@@ -8,15 +8,11 @@ import pl.edu.agh.project_manager.domain.entity.Qualification;
 import pl.edu.agh.project_manager.domain.entity.Skill;
 import pl.edu.agh.project_manager.domain.entity.User;
 import pl.edu.agh.project_manager.domain.enums.QualificationStatus;
-import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
-import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.QualificationRepository;
 import pl.edu.agh.project_manager.repository.SkillRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -27,43 +23,38 @@ public class QualificationService {
     private final UserRepository userRepository;
 
     @Transactional
-    public List<QualificationResponse> addQualificationsToUser(UUID userId, Set<String> skillNames) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ApplicationException(ApiErrorCode.USER_NOT_FOUND));
+    public QualificationResponse addQualificationToUser(UUID userId, String skillName) {
+        User user = userRepository.findById(userId).orElseThrow();
 
-        List<Qualification> savedQualifications = new ArrayList<>();
+        Skill skill = skillRepository.findByNameIgnoreCase(skillName)
+                .orElseGet(() -> {
+                    Skill newSkill = new Skill();
+                    newSkill.setName(skillName);
+                    newSkill.setIsValid(true);
+                    return skillRepository.save(newSkill);
+                });
 
-        for (String skillName : skillNames) {
-            Skill skill = skillRepository.findByNameIgnoreCase(skillName)
-                    .orElseGet(() -> {
-                        Skill newSkill = new Skill();
-                        newSkill.setName(skillName);
-                        newSkill.setValid(false);
-                        return skillRepository.save(newSkill);
-                    });
+        Qualification qualification = new Qualification();
+        qualification.setUser(user);
+        qualification.setSkill(skill);
+        qualification.setStatus(QualificationStatus.WAITING);
 
-            Qualification qualification = Qualification.builder()
-                    .user(user)
-                    .skill(skill)
-                    .status(QualificationStatus.WAITING)
-                    .build();
+        Qualification savedQualification = qualificationRepository.save(qualification);
 
-            user.addQualification(qualification);
-            savedQualifications.add(qualificationRepository.save(qualification));
-        }
-
-        return savedQualifications.stream()
-                .map(q -> new QualificationResponse(q.getId(), q.getSkill().getName(), q.getStatus()))
-                .toList();
+        return new QualificationResponse(
+                savedQualification.getId(),
+                savedQualification.getSkill().getName(),
+                savedQualification.getStatus()
+        );
     }
 
     @Transactional
-    public void deleteQualification(UUID qualificationId, UUID userId) {
+    public void deleteQualification(Long qualificationId, UUID userId) {
         Qualification qualification = qualificationRepository.findById(qualificationId)
-                .orElseThrow(() -> new ApplicationException(ApiErrorCode.QUALIFICATION_NOT_FOUND));
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono kwalifikacji"));
 
         if (!qualification.getUser().getId().equals(userId)) {
-            throw new ApplicationException(ApiErrorCode.ACCESS_DENIED);
+            throw new SecurityException("Brak uprawnień do usunięcia tego certyfikatu");
         }
 
         qualificationRepository.deleteById(qualificationId);
