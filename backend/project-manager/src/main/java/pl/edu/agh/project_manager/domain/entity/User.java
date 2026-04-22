@@ -2,10 +2,14 @@ package pl.edu.agh.project_manager.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.jspecify.annotations.Nullable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,4 +59,15 @@ public class User {
         this.projects.add(project);
         project.setProjectManager(this);
     }
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Qualification> qualifications = new ArrayList<>();
+
+    public void addQualification(Qualification qualification) {
+        qualifications.add(qualification);
+        qualification.setUser(this);
+    }
+}
+
 }
