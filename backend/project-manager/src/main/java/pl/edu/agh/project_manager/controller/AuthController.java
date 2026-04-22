@@ -78,6 +78,7 @@ public class AuthController {
                 .path("/api/auth/refresh")
                 .maxAge(0)
                 .sameSite("Strict")
+                .secure(secureCookie)
                 .build();
 
         return ResponseEntity.ok()

@@ -4,7 +4,13 @@ import type { UserListParams, UserStatus } from '../user-management.types';
 import type { UserRole } from '@/features/auth/auth.types';
 import { UserTableView } from './UserTable.view';
 import { UserFiltersBar } from './UserFiltersBar';
-import { Pagination } from '@/components/ui';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 
 const PAGE_SIZE = 20;
 
@@ -70,14 +76,39 @@ export const UserTable = () => {
         resendingId={resendingId}
       />
       {data && data.totalPages > 1 && (
-        <Pagination
-          page={data.pageNumber}
-          totalPages={data.totalPages}
-          hasNext={data.hasNextPage}
-          hasPrevious={data.hasPreviousPage}
-          onNext={() => setPage(p => p + 1)}
-          onPrevious={() => setPage(p => p - 1)}
-        />
+        <Pagination className="mt-4">
+          <PaginationContent>
+
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (data?.hasPreviousPage) setPage(p => p - 1);
+                }}
+                className={!data.hasPreviousPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+
+ont            <PaginationItem>
+              <span className="text-sm font-medium text-slate-600 px-4">
+                Strona {data.pageNumber + 1} z {data.totalPages}
+              </span>
+            </PaginationItem>
+
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (data?.hasNextPage) setPage(p => p + 1);
+                }}
+                className={!data.hasNextPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+
+          </PaginationContent>
+        </Pagination>
       )}
     </div>
   );

@@ -4,12 +4,14 @@ export const ROUTE_PARAMS = {
 
 export const QUERY_PARAMS = {
   ACTIVATION_TOKEN: 'token',
+  EMAIL: 'email'
 } as const;
 
 export const PATHS = {
   ROOT: '/',
   LOGIN: '/login',
   REGISTER: `/register`,
+  PROFILE: `/profile`,
   ADMIN_USERS: '/admin/users',
   ADMIN_USER_DETAILS: (userId: string) => `/admin/users/${userId}`,
   CREATEPROJECT: `/create-project`
