@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import pl.edu.agh.project_manager.domain.entity.Qualification;
+import pl.edu.agh.project_manager.domain.entity.Skill;
 import pl.edu.agh.project_manager.domain.entity.User;
+import pl.edu.agh.project_manager.domain.enums.QualificationStatus;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
 
@@ -21,6 +23,9 @@ class QualificationRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private SkillRepository skillRepository;
+
     @Test
     void shouldFindAllQualificationsByUserId() {
         User user = User.builder()
@@ -31,12 +36,20 @@ class QualificationRepositoryTest {
                 .userRole(UserRole.COMMON)
                 .userStatus(UserStatus.ACTIVE)
                 .build();
-
-        user = userRepository.save(user);
         user = userRepository.save(user);
 
-        Qualification q1 = new Qualification();
-        q1.setUser(user);
+        Skill skill = Skill.builder()
+                .name("Java")
+                .valid(true)
+                .build();
+        skill = skillRepository.save(skill);
+
+        Qualification q1 = Qualification.builder()
+                .skill(skill)
+                .status(QualificationStatus.ACCEPTED)
+                .build();
+
+        user.addQualification(q1);
         qualificationRepository.save(q1);
 
         List<Qualification> result = qualificationRepository.findAllByUserId(user.getId());

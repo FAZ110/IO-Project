@@ -55,4 +55,13 @@ public class User {
         this.projects.add(project);
         project.setProjectManager(this);
     }
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Qualification> qualifications = new ArrayList<>();
+
+    public void addQualification(Qualification qualification) {
+        qualifications.add(qualification);
+        qualification.setUser(this);
+    }
 }

@@ -23,7 +23,9 @@ public enum ApiErrorCode {
 
     VALIDATION_ERROR("GEN_001", HttpStatus.BAD_REQUEST, "Validation failed"),
     ACCESS_DENIED("GEN_002", HttpStatus.FORBIDDEN, "Access denied"),
-    INTERNAL_SERVER_ERROR("GEN_999", HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected internal server error");
+    INTERNAL_SERVER_ERROR("GEN_999", HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected internal server error"),
+
+    QUALIFICATION_NOT_FOUND("QUAL_001", HttpStatus.NOT_FOUND, "Qualification not found");
 
     private final String code;
     private final HttpStatus httpStatus;
