@@ -4,10 +4,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.edu.agh.project_manager.controller.dto.RiskResponse;
-import pl.edu.agh.project_manager.domain.entity.Project;
-import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
-import pl.edu.agh.project_manager.domain.entity.ProjectGroups;
-import pl.edu.agh.project_manager.domain.entity.User;
+import pl.edu.agh.project_manager.domain.entity.*;
+import pl.edu.agh.project_manager.domain.enums.MembershipStatus;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
@@ -15,6 +13,7 @@ import pl.edu.agh.project_manager.repository.ProjectRepository;
 import pl.edu.agh.project_manager.repository.RiskRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
+import pl.edu.agh.project_manager.service.command.project.ProjectSegmentCommand;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
 
 import java.util.List;
@@ -39,11 +38,26 @@ public class ProjectService {
                     .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_GROUP_NOT_FOUND, "Cannot found provided project group - " + command.projectGroupId()));
         }
 
+        System.out.println(command.committee());
+        System.out.println(command.sponsors());
+
         Project project = buildProject(command, projectManager);
         project.setProjectGroup(projectGroup);
         projectManager.getProjects().add(project);
-
         addRisksToProject(project, command.risks());
+
+        ProjectRole sponsorRole = new ProjectRole();
+        sponsorRole.setRoleName("Sponsor");
+        ProjectRole committeeRole = new ProjectRole();
+        committeeRole.setRoleName("Komitet sterujący");
+
+        project.addRole(sponsorRole);
+        project.addRole(committeeRole);
+
+        addSpecialMembersToProject(project, command.sponsors(), sponsorRole);
+        addSpecialMembersToProject(project, command.committee(), committeeRole);
+
+        addSegmentsToProject(project, command.milestones());
 
         Project savedProject = projectRepository.save(project);
 
@@ -108,7 +122,7 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot found provided project - " + projectId));
 
-        ProjectRisk risk = buildRisk(command, projectManager);
+        ProjectRisk risk = buildRisk(command);
         project.addRisk(risk);
 
         ProjectRisk savedRisk = riskRepository.save(risk);
@@ -127,11 +141,10 @@ public class ProjectService {
                 .description(command.description())
                 .projectManager(projectManager)
                 .startDate(command.startDate())
-                .isActive(command.isActive())
                 .build();
     }
 
-    private ProjectRisk buildRisk(RiskCommand command, User projectManager) {
+    private ProjectRisk buildRisk(RiskCommand command) {
         return ProjectRisk.builder()
                 .name(command.name())
                 .description(command.description())
@@ -150,6 +163,30 @@ public class ProjectService {
                     .build();
 
             project.addRisk(risk);
+        });
+    }
+
+    private void addSpecialMembersToProject(Project project, List<UUID> specialMembers, ProjectRole role) {
+        List<User> sponsorUsers = userRepository.findAllById(specialMembers);
+
+        sponsorUsers.forEach(user -> {
+            ProjectMember projectMember = new ProjectMember();
+            projectMember.setUser(user);
+            projectMember.setRole(role);
+            projectMember.setMembershipStatus(MembershipStatus.ACCEPTED);
+
+            project.addSpecialMember(projectMember);
+        });
+    }
+
+    private void addSegmentsToProject(Project project, List<ProjectSegmentCommand> segments) {
+        segments.forEach(segmentRequest -> {
+            ProjectSegment segment = new ProjectSegment();
+
+            segment.setStartDate(segmentRequest.startDate());
+            segment.setEndDate(segmentRequest.endDate());
+
+            project.addSegment(segment);
         });
     }
 }

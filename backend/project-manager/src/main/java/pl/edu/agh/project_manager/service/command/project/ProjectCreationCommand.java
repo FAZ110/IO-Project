@@ -9,9 +9,11 @@ public record ProjectCreationCommand(
         String title,
         String description,
         LocalDate startDate,
-        Boolean isActive,
         UUID projectGroupId,
         UUID projectManagerId,
+        List<UUID> sponsors,
+        List<UUID> committee,
+        List<ProjectSegmentCommand> milestones,
         List<RiskCommand> risks
 ) {
 }

@@ -9,11 +9,15 @@ export const ENDPOINTS = {
     LIST: '/users',
     DETAIL: (id: string) => `/users/${id}`,
     RESEND_INVITATION: '/users/invitation',
+    SEARCH_USERS: '/users/search'
   },
   ADMIN: {
     INVITATIONS: '/admin/invitations',
   },
   PROJECT: {
     CREATE: '/project'
+  },
+  PROJECT_GROUP: {
+    ALL_GROUPS: '/groups'
   }
 } as const;

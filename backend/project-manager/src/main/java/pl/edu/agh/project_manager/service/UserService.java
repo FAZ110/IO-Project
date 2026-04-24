@@ -9,6 +9,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.project_manager.controller.dto.PagedResponse;
+import pl.edu.agh.project_manager.controller.dto.user.SimpleUserResponse;
 import pl.edu.agh.project_manager.controller.dto.user.UserResponse;
 import pl.edu.agh.project_manager.domain.entity.User;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
@@ -68,5 +69,13 @@ public class UserService {
         userRepository.clearSupervisor(userId);
 
         userRepository.delete(user);
+    }
+
+    public List<SimpleUserResponse> searchUsers(String search) {
+        List<User> users = userRepository.searchUserByFullName(search);
+
+        return users.stream()
+                .map(SimpleUserResponse::fromUser)
+                .toList();
     }
 }
