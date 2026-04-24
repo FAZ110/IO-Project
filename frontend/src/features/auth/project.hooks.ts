@@ -1,4 +1,3 @@
-// project.hooks.ts
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { projectService } from '../project/project.service'; 

@@ -1,9 +1,8 @@
 // src/features/dashboard/components/ProjectCard/ProjectCard.view.tsx
 import type { Project } from '@/features/project/project.types';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays } from 'lucide-react'; // Upewnij się, że masz zainstalowane lucide-react
+import { CalendarDays } from 'lucide-react'; 
 
-// 1. Zdefiniuj propsy widoku, PAMIĘTAJ O onClick!
 interface ProjectCardViewProps {
   project: Project;
   onClick: () => void;
@@ -12,7 +11,7 @@ interface ProjectCardViewProps {
 export const ProjectCardView = ({ project, onClick }: ProjectCardViewProps) => {
   return (
     <div 
-      onClick={onClick} // <--- TO NAPRAWIA ONCLICK
+      onClick={onClick} 
       className="group bg-white hover:shadow-lg transition-all border border-gray-200 rounded-xl p-5 flex flex-col gap-4 cursor-pointer"
     >
       <div className="flex justify-between items-start gap-4">
@@ -20,7 +19,6 @@ export const ProjectCardView = ({ project, onClick }: ProjectCardViewProps) => {
           {project.title || "Nienazwany projekt"}
         </h3>
         
-        {/* Renderowanie statusu jako Badge */}
         <Badge 
           variant={project.isActive ? 'default' : 'secondary'}
           className={project.isActive ? 'bg-green-100 text-green-800 hover:bg-green-200 border-transparent' : ''}
@@ -34,7 +32,7 @@ export const ProjectCardView = ({ project, onClick }: ProjectCardViewProps) => {
       </p>
 
       {/* 2. Tymczasowo ukrywamy "members", bo nie wspiera tego backend. 
-          Możesz odkomentować poniższy kod, gdy backend doda pole members. */}
+          Możemy odkomentować poniższy kod, gdy backend doda pole members. */}
       {/* <div className="flex items-center gap-4 mt-2">
          Tu kiedyś będą awatary członków
       </div> 
@@ -43,7 +41,6 @@ export const ProjectCardView = ({ project, onClick }: ProjectCardViewProps) => {
       <div className="pt-4 border-t border-gray-100 flex justify-between items-center text-xs text-gray-400">
         <div className="flex items-center gap-1.5">
           <CalendarDays size={14} />
-          {/* Bezpieczne sprawdzenie daty (jeśli istnieje) */}
           <span>Utworzono: {project.startDate ? new Date(project.startDate).toLocaleDateString('pl-PL') : '-'}</span>
         </div>
       </div>

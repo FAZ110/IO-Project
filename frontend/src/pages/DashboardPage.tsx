@@ -37,9 +37,9 @@ export const DashboardPage = () => {
   }, [projects]);
 
   return (
-    <div className="p-6 md:p-8 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="p-6 md:p-8 max-w-400 mx-auto space-y-8 animate-in fade-in duration-500">
       
-      <div className="relative bg-gradient-to-br from-indigo-700 via-purple-700 to-pink-600 rounded-3xl p-8 text-white shadow-xl overflow-hidden">
+      <div className="relative bg-linear-to-br from-indigo-700 via-purple-700 to-pink-600 rounded-3xl p-8 text-white shadow-xl overflow-hidden">
         <div className="absolute top-0 right-0 -translate-y-12 translate-x-8 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
         
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
