@@ -42,7 +42,7 @@ dist/
 
 # environment variables
 .env
-backend/.env
+backend/project-manager/.env
 .env.local
 .env..local
 

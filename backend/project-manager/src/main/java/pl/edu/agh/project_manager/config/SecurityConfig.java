@@ -24,7 +24,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
-    @Value("${application.security.swagger.enabled:false}")
+    @Value("${application.security.swagger.enabled:true}")
     private boolean isSwaggerEnabled;
 
     @Bean
