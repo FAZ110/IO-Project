@@ -68,6 +68,7 @@ class ProjectServiceTest {
                 new ArrayList<>(),
                 new ArrayList<>(),
                 milestones
+                "Title", "Desc", LocalDate.now(), null, managerId, null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>()
         );
         User manager = User.builder().id(managerId).projects(new ArrayList<>()).build();
         Project savedProject = Project.builder().id(UUID.randomUUID()).build();
