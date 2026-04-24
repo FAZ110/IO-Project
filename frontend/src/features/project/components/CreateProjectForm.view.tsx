@@ -283,7 +283,7 @@ export const CreateProjectView = ({
                                                                 const currentEndDate = getValues(`milestones.${index}.endDate`);
 
                                                                 if (currentEndDate && value > currentEndDate) return "Data startu nie może być późniejsza niż data końca tego kamienia milowego";
-
+                                                                
                                                                 if (!previousEndDate) return "Uzupełnij datę końca poprzedniego kamienia milowego";
 
                                                                 if (value < previousEndDate) return "Data startu nie może być wcześniejsza niż data końca poprzedniego kamienia milowego";

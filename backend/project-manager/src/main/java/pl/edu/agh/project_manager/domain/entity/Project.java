@@ -81,13 +81,13 @@ public class Project {
         special.setProject(this);
     }
 
-    public void addSegment(ProjectSegment projectSegment) {
-        this.segments.add(projectSegment);
-        projectSegment.setProject(this);
-    }
-
     public void addRole(ProjectRole role) {
         this.roles.add(role);
         role.setProject(this);
+    }
+
+    public void addSegment(ProjectSegment projectSegment) {
+        this.segments.add(projectSegment);
+        projectSegment.setProject(this);
     }
 }

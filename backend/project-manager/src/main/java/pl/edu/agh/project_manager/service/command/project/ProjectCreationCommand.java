@@ -6,16 +6,14 @@ import java.util.List;
 import java.util.UUID;
 
 public record ProjectCreationCommand(
-        UUID creatorId,
         String title,
         String description,
         LocalDate startDate,
-        Boolean isActive,
         UUID projectGroupId,
-        List<RiskCommand> risks,
-        List<RoleCommand> roles,
-        List<MilestoneCommand> milestones,
+        UUID projectManagerId,
         List<UUID> sponsors,
-        List<UUID> committee
+        List<UUID> committee,
+        List<ProjectSegmentCommand> milestones,
+        List<RiskCommand> risks
 ) {
 }
