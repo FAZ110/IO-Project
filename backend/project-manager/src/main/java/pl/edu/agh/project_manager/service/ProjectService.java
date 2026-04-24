@@ -38,9 +38,6 @@ public class ProjectService {
                     .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_GROUP_NOT_FOUND, "Cannot found provided project group - " + command.projectGroupId()));
         }
 
-        System.out.println(command.committee());
-        System.out.println(command.sponsors());
-
         Project project = buildProject(command, projectManager);
         project.setProjectGroup(projectGroup);
         projectManager.getProjects().add(project);

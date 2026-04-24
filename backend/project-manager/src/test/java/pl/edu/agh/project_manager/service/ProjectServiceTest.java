@@ -51,7 +51,7 @@ class ProjectServiceTest {
         // Given
         UUID managerId = UUID.randomUUID();
         ProjectCreationCommand command = new ProjectCreationCommand(
-                "Title", "Desc", LocalDate.now(), true, null, managerId, new ArrayList<>()
+                "Title", "Desc", LocalDate.now(), null, managerId, null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>()
         );
         User manager = User.builder().id(managerId).projects(new ArrayList<>()).build();
         Project savedProject = Project.builder().id(UUID.randomUUID()).build();
