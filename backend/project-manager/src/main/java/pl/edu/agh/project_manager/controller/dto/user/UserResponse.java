@@ -1,9 +1,11 @@
 package pl.edu.agh.project_manager.controller.dto.user;
 
+import pl.edu.agh.project_manager.controller.dto.qualification.QualificationResponse;
 import pl.edu.agh.project_manager.domain.entity.User;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
 
+import java.util.List;
 import java.util.UUID;
 
 public record UserResponse(
@@ -13,7 +15,8 @@ public record UserResponse(
         String surname,
         UserRole role,
         UserStatus status,
-        String supervisorEmail
+        String supervisorEmail,
+        List<QualificationResponse> qualifications
 ) {
     public static UserResponse from(User user) {
         return new UserResponse(
@@ -23,7 +26,13 @@ public record UserResponse(
                 user.getSurname(),
                 user.getUserRole(),
                 user.getUserStatus(),
-                user.getSupervisor() != null ? user.getSupervisor().getEmail() : null
+                user.getSupervisor() != null ? user.getSupervisor().getEmail() : null,
+
+                user.getQualifications() != null ?
+                        user.getQualifications().stream()
+                                .map(QualificationResponse::from)
+                                .toList()
+                        : List.of()
         );
     }
 }

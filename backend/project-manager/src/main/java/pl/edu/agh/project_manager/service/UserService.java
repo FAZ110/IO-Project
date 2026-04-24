@@ -29,6 +29,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
 
+    @Transactional
     public PagedResponse<UserResponse> getUsers(int pageNumber, int pageSize, UserRole userRole, UserStatus status, String search) {
         PageRequest pageable = PageRequest.of(pageNumber, pageSize, Sort.by("email").ascending());
         String searchPattern = (search != null && !search.isBlank())
