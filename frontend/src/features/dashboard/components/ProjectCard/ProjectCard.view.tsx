@@ -22,10 +22,10 @@ export const ProjectCardView = ({ project, onClick }: ProjectCardViewProps) => {
         
         {/* Renderowanie statusu jako Badge */}
         <Badge 
-          variant={project.status === 'ACTIVE' ? 'default' : 'secondary'}
-          className={project.status === 'ACTIVE' ? 'bg-green-100 text-green-800 hover:bg-green-200 border-transparent' : ''}
+          variant={project.isActive ? 'default' : 'secondary'}
+          className={project.isActive ? 'bg-green-100 text-green-800 hover:bg-green-200 border-transparent' : ''}
         >
-          {project.status === 'ACTIVE' ? 'W toku' : project.status}
+          {project.isActive ? 'W toku' : project.isActive}
         </Badge>
       </div>
 
@@ -44,7 +44,7 @@ export const ProjectCardView = ({ project, onClick }: ProjectCardViewProps) => {
         <div className="flex items-center gap-1.5">
           <CalendarDays size={14} />
           {/* Bezpieczne sprawdzenie daty (jeśli istnieje) */}
-          <span>Utworzono: {project.start_date ? new Date(project.start_date).toLocaleDateString('pl-PL') : '-'}</span>
+          <span>Utworzono: {project.startDate ? new Date(project.startDate).toLocaleDateString('pl-PL') : '-'}</span>
         </div>
       </div>
     </div>

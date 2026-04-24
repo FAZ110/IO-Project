@@ -16,12 +16,12 @@ export interface Risk {
 
 
 export interface RiskResponse extends Risk {
-  id: string; // UUID
+  id: string; 
 }
 
 
 export interface SingleGroupResponse {
-  id: string; // UUID
+  id: string; 
   name: string;
 }
 
@@ -29,6 +29,6 @@ export interface Project {
   id: string;
   title: string;
   description: string;
-  status: 'ACTIVE' | 'COMPLETED' | 'ON_HOLD';
-  start_date: string;
+  isActive: boolean;
+  startDate: string;
 }
