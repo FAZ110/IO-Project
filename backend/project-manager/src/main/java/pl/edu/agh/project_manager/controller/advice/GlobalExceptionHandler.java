@@ -3,6 +3,7 @@ package pl.edu.agh.project_manager.controller.advice;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -30,6 +31,19 @@ public class GlobalExceptionHandler {
         log.warn("Authentication failed: {}", ex.getMessage());
 
         var error = ApiErrorCode.BAD_CREDENTIALS;
+        var body = new ApiErrorResponse(error.getCode(), error.getMessage());
+
+        return ResponseEntity
+                .status(error.getHttpStatus())
+                .body(body);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ApiErrorResponse> handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
+        log.warn("Access denied: {}", ex.getMessage());
+
+        var error = ApiErrorCode.ACCESS_DENIED;
+
         var body = new ApiErrorResponse(error.getCode(), error.getMessage());
 
         return ResponseEntity

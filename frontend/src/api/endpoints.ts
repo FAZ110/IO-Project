@@ -14,6 +14,10 @@ export const ENDPOINTS = {
     INVITATIONS: '/admin/invitations',
   },
   PROJECT: {
-    CREATE: '/project'
+    CREATE: '/project',
+    DETAIL: (id: string) => `/project/${id}`,
+    RISK: {
+      LIST: (projectId: string) => `/project/${projectId}/risk`
+    }
   }
 } as const;

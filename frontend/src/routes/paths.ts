@@ -1,5 +1,6 @@
 export const ROUTE_PARAMS = {
   USER_ID: 'userId',
+  PROJECT_ID: 'projectId'
 } as const;
 
 export const QUERY_PARAMS = {
@@ -14,5 +15,6 @@ export const PATHS = {
   PROFILE: `/profile`,
   ADMIN_USERS: '/admin/users',
   ADMIN_USER_DETAILS: (userId: string) => `/admin/users/${userId}`,
-  CREATEPROJECT: `/create-project`
+  CREATEPROJECT: `/create-project`,
+  PROJECT: (id: string) => `project/${id}`
 } as const;

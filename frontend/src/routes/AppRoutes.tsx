@@ -5,6 +5,7 @@ import { PATHS } from './paths';
 import { RegisterPage } from '../pages/RegisterPage';
 import { LoginPage } from '../pages/LoginPage';
 import { CreateProjectPage } from '@/pages/CreateProjectPage';
+import { ProjectDetailsPage } from '@/pages/ProjectDetailsPage.tsx';
 import { AdminUsersPage } from '../pages/AdminUsersPage';
 import { AdminUserDetailsPage } from '../pages/AdminUserDetailsPage';
 import { ROUTE_PARAMS } from './paths';
@@ -27,7 +28,10 @@ export const AppRoutes = () => {
         <Route element={<MainLayout/>}>
           <Route path={PATHS.ROOT} element={<DashboardPage/>} />
           <Route path={PATHS.PROFILE} element={<ProfilePage/>} />
+
           <Route path={PATHS.CREATEPROJECT} element={<CreateProjectPage/>} />
+          <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
+
 
           {/* ADMIN ROUTES */}
           <Route element={<ProtectedRoute redirectTo={PATHS.LOGIN} allowedRoles={[UserRole.ADMINISTRATOR]} />}>

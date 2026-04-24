@@ -1,5 +1,5 @@
 import type { FieldErrors, UseFormRegister, FieldArrayWithId, UseFieldArrayAppend, UseFieldArrayRemove } from "react-hook-form";
-import type { ProjectCreationRequest } from "../../project/project.types";
+import type { ProjectCreationRequest } from "../project.types.ts";
 
 interface CreateProjectViewProps {
   register: UseFormRegister<ProjectCreationRequest>;
@@ -21,7 +21,7 @@ export const CreateProjectView = ({
   onSubmit, 
   isPending, 
   errors, 
-  riskFields, 
+  riskFields,
   appendRisk, 
   removeRisk, 
   message 

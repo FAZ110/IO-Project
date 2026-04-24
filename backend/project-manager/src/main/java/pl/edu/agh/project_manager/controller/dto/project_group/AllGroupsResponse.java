@@ -1,6 +1,4 @@
-package pl.edu.agh.project_manager.controller.dto;
-
-import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupResponse;
+package pl.edu.agh.project_manager.controller.dto.project_group;
 
 import java.util.List;
 

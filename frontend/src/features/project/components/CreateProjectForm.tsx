@@ -1,7 +1,7 @@
 import { useForm, useFieldArray } from 'react-hook-form';
-import { CreateProjectView } from './CreateProjectForm.view';
-import type { ProjectCreationRequest } from '../../project/project.types';
-import { useCreateProject } from '../project.hooks';
+import { CreateProjectView } from './CreateProjectForm.view.tsx';
+import type { ProjectCreationRequest } from '../project.types.ts';
+import { useCreateProject } from '../project.hooks.ts';
 
 export const CreateProjectForm = () => {
 
