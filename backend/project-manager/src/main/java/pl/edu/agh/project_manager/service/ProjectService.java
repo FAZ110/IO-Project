@@ -5,6 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
 import pl.edu.agh.project_manager.domain.entity.*;
+import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
+import pl.edu.agh.project_manager.domain.entity.Project;
+import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
+import pl.edu.agh.project_manager.domain.entity.ProjectGroups;
+import pl.edu.agh.project_manager.domain.entity.User;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
@@ -56,6 +61,16 @@ public class ProjectService {
         Project savedProject = projectRepository.save(project);
 
         return savedProject.getId();
+    }
+
+    public ProjectResponse getProject(UUID projectId) {
+        Project project = projectRepository.findByIdWithManager(projectId)
+                .orElseThrow(() -> new ApplicationException(
+                        ApiErrorCode.PROJECT_NOT_FOUND,
+                        "Cannot find provided project - " + projectId
+                ));
+
+        return ProjectResponse.from(project);
     }
 
     private void addRolesAndBindWithSegments(Project project, List<ProjectSegment> segments, List<RoleCommand> roles) {

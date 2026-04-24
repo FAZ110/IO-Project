@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.project_manager.controller.dto.project.ProjectCreationRequest;
+import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
 import pl.edu.agh.project_manager.controller.dto.project.RiskRequest;
 import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
 import pl.edu.agh.project_manager.security.UserPrincipal;
@@ -31,7 +32,17 @@ public class ProjectManagement {
         ProjectCreationCommand command = projectCreationRequest.toCommand(userPrincipal.userId());
         UUID newProjectId = projectService.createProject(command);
 
+        // Return ID of project
         return ResponseEntity.status(HttpStatus.CREATED).body(newProjectId);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectSecurity.canAccessProject(#projectId, authentication.principal)")
+    @GetMapping("/project/{projectId}")
+    public ResponseEntity<ProjectResponse> getProject(
+            @PathVariable UUID projectId
+    ) {
+        ProjectResponse project = projectService.getProject(projectId);
+        return ResponseEntity.ok(project);
     }
 
     @DeleteMapping("/project/{projectId}/risk/{riskId}")
@@ -42,7 +53,7 @@ public class ProjectManagement {
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         projectService.deleteProjectRisk(projectId, riskId, userPrincipal.userId());
-        return  ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/project/{projectId}/risk/{riskId}")

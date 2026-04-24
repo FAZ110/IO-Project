@@ -66,10 +66,10 @@ export const Navbar = () => {
 
             {user?.role === UserRole.PROJECT_MANAGER && (
               <Link
-                to={PATHS.CREATEPROJECT}
+                to={PATHS.CREATE_PROJECT}
                 className={cn(
                   "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                  isActive(PATHS.CREATEPROJECT)
+                  isActive(PATHS.CREATE_PROJECT)
                     ? "bg-slate-100 text-slate-900"
                     : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                 )}
