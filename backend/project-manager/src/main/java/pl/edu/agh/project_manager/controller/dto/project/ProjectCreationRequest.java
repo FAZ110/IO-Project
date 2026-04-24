@@ -35,7 +35,7 @@ public record ProjectCreationRequest(
         List<RoleRequest> roles,
 
         @NotEmpty(message = "Lista kamieni milowych nie może być pusta")
-        List<LocalDateTime> milestones
+        List<MilestoneRequest> milestones
 ) {
     // By default, project is active and list with risks is empty
     public ProjectCreationRequest {
@@ -54,7 +54,7 @@ public record ProjectCreationRequest(
                 this.projectGroupId,
                 this.risks.stream().map(RiskRequest::toCommand).toList(),
                 this.roles.stream().map(RoleRequest::toCommand).toList(),
-                milestones
+                this.milestones.stream().map(MilestoneRequest::toCommand).toList()
         );
     }
 }

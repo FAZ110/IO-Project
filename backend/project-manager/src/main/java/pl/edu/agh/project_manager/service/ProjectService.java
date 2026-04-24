@@ -11,10 +11,12 @@ import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
 import pl.edu.agh.project_manager.repository.ProjectRepository;
 import pl.edu.agh.project_manager.repository.RiskRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
+import pl.edu.agh.project_manager.service.command.project.MilestoneCommand;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
 import pl.edu.agh.project_manager.service.command.project.RoleCommand;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,16 +88,17 @@ public class ProjectService {
         }
     }
 
-    private List<ProjectSegment> createSegmentsFromMilestones(List<LocalDateTime> milestones) {
+    private List<ProjectSegment> createSegmentsFromMilestones(List<MilestoneCommand> milestones) {
         if (milestones.size() < MINIMUM_MILESTONES) {
             throw new ApplicationException(ApiErrorCode.INVALID_MILESTONES);
         }
 
         List<ProjectSegment> segments = new ArrayList<>();
 
-        for (int i = 0; i < milestones.size() - 1; i++) {
-            LocalDateTime startDate = milestones.get(i);
-            LocalDateTime endDate = milestones.get(i + 1);
+        for (int i = 1; i < milestones.size(); i++) {
+            MilestoneCommand endMilestone = milestones.get(i);
+            LocalDate startDate = milestones.get(i - 1).date();
+            LocalDate endDate = endMilestone.date();
 
             if (!endDate.isAfter(startDate)) {
                 throw new ApplicationException(ApiErrorCode.INVALID_MILESTONE_ORDER);
@@ -104,6 +107,7 @@ public class ProjectService {
             ProjectSegment segment = ProjectSegment.builder()
                     .startDate(startDate)
                     .endDate(endDate)
+                    .label(endMilestone.name())
                     .build();
 
             segments.add(segment);

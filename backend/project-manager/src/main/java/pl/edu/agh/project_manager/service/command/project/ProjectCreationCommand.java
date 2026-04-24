@@ -15,6 +15,6 @@ public record ProjectCreationCommand(
         UUID projectGroupId,
         List<RiskCommand> risks,
         List<RoleCommand> roles,
-        List<LocalDateTime> milestones
+        List<MilestoneCommand> milestones
 ) {
 }

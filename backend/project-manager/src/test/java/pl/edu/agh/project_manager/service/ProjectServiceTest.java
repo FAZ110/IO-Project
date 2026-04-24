@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.agh.project_manager.controller.dto.RiskResponse;
+import pl.edu.agh.project_manager.controller.dto.project.MilestoneRequest;
 import pl.edu.agh.project_manager.domain.entity.Project;
 import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.User;
@@ -17,6 +18,7 @@ import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
 import pl.edu.agh.project_manager.repository.ProjectRepository;
 import pl.edu.agh.project_manager.repository.RiskRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
+import pl.edu.agh.project_manager.service.command.project.MilestoneCommand;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
 import pl.edu.agh.project_manager.service.command.project.RoleCommand;
@@ -53,9 +55,9 @@ class ProjectServiceTest {
     void createProject_Success() {
         // Given
         UUID managerId = UUID.randomUUID();
-        List<LocalDateTime> milestones = List.of(
-                LocalDateTime.now(),
-                LocalDateTime.now().plusMonths(3)
+        List<MilestoneCommand> milestones = List.of(
+                new MilestoneCommand("start", LocalDate.now()),
+                new MilestoneCommand("end", LocalDate.now().plusMonths(3))
         );
 
         ProjectCreationCommand command = new ProjectCreationCommand(
@@ -89,9 +91,9 @@ class ProjectServiceTest {
         // Given
         UUID creatorId = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        List<LocalDateTime> milestones = List.of(
-                now,
-                now.minusDays(1)
+        List<MilestoneCommand> milestones = List.of(
+                new MilestoneCommand("start", LocalDate.now()),
+                new MilestoneCommand("end", LocalDate.now().minusDays(5))
         );
 
         ProjectCreationCommand command = new ProjectCreationCommand(
@@ -114,8 +116,11 @@ class ProjectServiceTest {
         // Given
         UUID creatorId = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        List<LocalDateTime> milestones = List.of(now, now.plusDays(10), now.plusDays(20));
-
+        List<MilestoneCommand> milestones = List.of(
+                new MilestoneCommand("start", LocalDate.now()),
+                new MilestoneCommand("mid", LocalDate.now().plusDays(10)),
+                new MilestoneCommand("end", LocalDate.now().plusDays(20))
+        );
         RoleCommand invalidRole = new RoleCommand("Developer", List.of(100));
 
         ProjectCreationCommand command = new ProjectCreationCommand(
@@ -137,8 +142,8 @@ class ProjectServiceTest {
     void createProject_NotEnoughMilestones() {
         // Given
         UUID creatorId = UUID.randomUUID();
-        List<LocalDateTime> milestones = List.of(
-                LocalDateTime.now()
+        List<MilestoneCommand> milestones = List.of(
+                new MilestoneCommand("start", LocalDate.now())
         );
 
         ProjectCreationCommand command = new ProjectCreationCommand(
