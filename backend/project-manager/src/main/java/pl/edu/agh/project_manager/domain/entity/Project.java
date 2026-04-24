@@ -74,4 +74,14 @@ public class Project {
         member.setMembershipStatus(MembershipStatus.PENDING);
         this.members.add(member);
     }
+
+    public void addSegment(ProjectSegment segment) {
+        this.segments.add(segment);
+        segment.setProject(this);
+    }
+
+    public void addRole(ProjectRole role) {
+        this.roles.add(role);
+        role.setProject(this);
+    }
 }

@@ -20,7 +20,9 @@ import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,8 +52,21 @@ class ProjectServiceTest {
     void createProject_Success() {
         // Given
         UUID managerId = UUID.randomUUID();
+        List<LocalDateTime> milestones = List.of(
+                LocalDateTime.now(),
+                LocalDateTime.now().plusMonths(3)
+        );
+
         ProjectCreationCommand command = new ProjectCreationCommand(
-                "Title", "Desc", LocalDate.now(), true, null, managerId, new ArrayList<>()
+                "Title",
+                "Desc",
+                LocalDate.now(),
+                true,
+                null,
+                managerId,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                milestones
         );
         User manager = User.builder().id(managerId).projects(new ArrayList<>()).build();
         Project savedProject = Project.builder().id(UUID.randomUUID()).build();

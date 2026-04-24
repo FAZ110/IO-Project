@@ -1,8 +1,7 @@
 package pl.edu.agh.project_manager.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +11,9 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "project_roles")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProjectRole {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -26,5 +28,6 @@ public class ProjectRole {
     private Project project;
 
     @OneToMany(mappedBy = "projectRole", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ProjectRoleSegmentAllocation> segmentAllocations = new ArrayList<>();
 }

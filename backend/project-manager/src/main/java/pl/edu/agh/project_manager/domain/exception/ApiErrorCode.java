@@ -18,6 +18,8 @@ public enum ApiErrorCode {
     RISK_NOT_FOUND("RISK_001", HttpStatus.NOT_FOUND, "Cannot found provided risk in provided project"),
 
     PROJECT_GROUP_NOT_FOUND("PROJ_002", HttpStatus.NOT_FOUND, "Cannot found project group"),
+    INVALID_MILESTONES("PROJ_003", HttpStatus.BAD_REQUEST, "Project must have at least start and end milestones defined"),
+    INVALID_MILESTONE_ORDER("PROJ_004", HttpStatus.BAD_REQUEST, "Milestones must be chronologically ordered"),
 
     ACTIVATION_TOKEN_NOT_FOUND("AUTH_001", HttpStatus.NOT_FOUND, "Activation token is invalid or does not exist"),
     ACTIVATION_TOKEN_EXPIRED("AUTH_002", HttpStatus.BAD_REQUEST, "Activation token has expired"),

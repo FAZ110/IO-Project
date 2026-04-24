@@ -32,7 +32,6 @@ public class ProjectManagement {
         ProjectCreationCommand command = projectCreationRequest.toCommand(userPrincipal.userId());
         UUID newProjectId = projectService.createProject(command);
 
-        // Return ID of project
         return ResponseEntity.status(HttpStatus.CREATED).body(newProjectId);
     }
 

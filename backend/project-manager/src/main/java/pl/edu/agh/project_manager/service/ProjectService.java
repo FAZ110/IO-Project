@@ -4,10 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.edu.agh.project_manager.controller.dto.RiskResponse;
-import pl.edu.agh.project_manager.domain.entity.Project;
-import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
-import pl.edu.agh.project_manager.domain.entity.ProjectGroups;
-import pl.edu.agh.project_manager.domain.entity.User;
+import pl.edu.agh.project_manager.domain.entity.*;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
@@ -16,13 +13,18 @@ import pl.edu.agh.project_manager.repository.RiskRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
+import pl.edu.agh.project_manager.service.command.project.RoleCommand;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
+    private static final int MINIMUM_MILESTONES = 2;
+
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final RiskRepository riskRepository;
@@ -31,12 +33,12 @@ public class ProjectService {
     @Transactional
     public UUID createProject(ProjectCreationCommand command) {
         User projectManager = userRepository.findById(command.projectManagerId())
-                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_MANAGER_NOT_FOUND, "Cannot found provided project manager - " + command.projectManagerId()));
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_MANAGER_NOT_FOUND, "Cannot find provided project manager - " + command.projectManagerId()));
 
         ProjectGroups projectGroup = null;
         if (command.projectGroupId() != null) {
             projectGroup = projectGroupRepository.findById(command.projectGroupId())
-                    .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_GROUP_NOT_FOUND, "Cannot found provided project group - " + command.projectGroupId()));
+                    .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_GROUP_NOT_FOUND, "Cannot find provided project group - " + command.projectGroupId()));
         }
 
         Project project = buildProject(command, projectManager);
@@ -45,9 +47,48 @@ public class ProjectService {
 
         addRisksToProject(project, command.risks());
 
+        List<ProjectSegment> segments = createSegmentsFromMilestones(command.milestones());
+        for (ProjectSegment segment : segments) {
+            project.addSegment(segment);
+        }
+
+        for (RoleCommand role : command.roles()) {
+            ProjectRole projectRole = ProjectRole
+                    .builder()
+                    .roleName(role.name())
+                    .build();
+            project.addRole(projectRole);
+        }
+
         Project savedProject = projectRepository.save(project);
 
         return savedProject.getId();
+    }
+
+    private List<ProjectSegment> createSegmentsFromMilestones(List<LocalDateTime> milestones) {
+        if (milestones.size() < MINIMUM_MILESTONES) {
+            throw new ApplicationException(ApiErrorCode.INVALID_MILESTONES);
+        }
+
+        List<ProjectSegment> segments = new ArrayList<>();
+
+        for (int i = 0; i < milestones.size() - 1; i++) {
+            LocalDateTime startDate = milestones.get(i);
+            LocalDateTime endDate = milestones.get(i + 1);
+
+            if (!endDate.isAfter(startDate)) {
+                throw new ApplicationException(ApiErrorCode.INVALID_MILESTONE_ORDER);
+            }
+
+            ProjectSegment segment = ProjectSegment.builder()
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .build();
+
+            segments.add(segment);
+        }
+
+        return segments;
     }
 
     @Transactional
@@ -143,7 +184,7 @@ public class ProjectService {
         if (risks == null) return;
 
         risks.forEach(riskRequest -> {
-            ProjectRisk  risk = ProjectRisk.builder()
+            ProjectRisk risk = ProjectRisk.builder()
                     .name(riskRequest.name())
                     .description(riskRequest.description())
                     .probability(riskRequest.probability())
