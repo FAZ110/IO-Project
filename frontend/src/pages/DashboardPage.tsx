@@ -23,7 +23,7 @@ export const DashboardPage = () => {
   const { user } = useAuth(); 
   const navigate = useNavigate();
   
-  const { data: projects = [], isLoading, isError } = useQuery({
+  const { data: projects = [], isLoading } = useQuery({
     queryKey: ['projects', 'all'],
     queryFn: projectService.getAllProjects
   });
