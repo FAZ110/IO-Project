@@ -10,6 +10,11 @@ export const ENDPOINTS = {
     DETAIL: (id: string) => `/users/${id}`,
     RESEND_INVITATION: '/users/invitation',
   },
+  ME: {
+    QUALIFICATIONS: '/me/qualifications',
+    QUALIFICATION: (id: string) => `/me/qualifications/${id}`,
+    PASSWORD: '/me/password',
+  },
   ADMIN: {
     INVITATIONS: '/admin/invitations',
   },

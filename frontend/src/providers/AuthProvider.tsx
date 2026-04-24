@@ -15,6 +15,7 @@ const decodeUser = (token: string): UserInfo | null => {
       role: decoded.role,
       firstName: decoded.firstName || '',
       lastName: decoded.lastName || '',
+      loginAt: new Date(decoded.iat * 1000),
     }
   } catch {
     return null;
