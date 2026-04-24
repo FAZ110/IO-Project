@@ -1,24 +1,21 @@
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {projectService} from "@/features/project/project.service.ts";
 import {toast} from "sonner";
+import {PROJECT_KEYS} from "@/features/project/project.keys.ts";
 
 export const useProjectDetails = (id: string) => {
   return useQuery({
-    queryKey: ['project', id],
+    queryKey: PROJECT_KEYS.detail(id),
     queryFn: () => projectService.getDetails(id),
     enabled: !!id
   });
 }
 
-export const useCreateProject = (onSuccessCallback?: () => void) => {
+export const useCreateProject = () => {
   return useMutation({
     mutationFn: projectService.create,
     onSuccess: () => {
       toast.success('Dodano projekt.');
-
-      if (onSuccessCallback) {
-        onSuccessCallback();
-      }
     },
 
   });

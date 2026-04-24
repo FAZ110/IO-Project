@@ -17,7 +17,7 @@ public class ProjectSecurity {
             return false;
         }
 
-        UUID userId = currentUser.getId();
+        UUID userId = currentUser.userId();
 
         boolean isManager = projectRepository.existsByIdAndProjectManagerId(projectId, userId);
         if (isManager) {

@@ -20,8 +20,6 @@ public record UserPrincipal(
         return authorities;
     }
 
-    public UUID getId() { return userId; }
-
     @Override
     public String getPassword() {
         return password;
