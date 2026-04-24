@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.UUID;
 
 public record ProjectCreationCommand(
+        UUID creatorId,
         String title,
         String description,
         LocalDate startDate,
         Boolean isActive,
         UUID projectGroupId,
-        UUID projectManagerId,
         List<RiskCommand> risks,
         List<RoleCommand> roles,
         List<LocalDateTime> milestones

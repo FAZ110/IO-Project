@@ -13,13 +13,14 @@ public enum ApiErrorCode {
 
     USER_NOT_FOUND("USR_002", HttpStatus.NOT_FOUND, "Cannot found user"),
 
-    PROJECT_MANAGER_NOT_FOUND("PROJ_001", HttpStatus.NOT_FOUND, "Cannot found provided project manager"),
-    PROJECT_NOT_FOUND("PROJ_002", HttpStatus.NOT_FOUND, "Cannot found provided project"),
-    RISK_NOT_FOUND("RISK_001", HttpStatus.NOT_FOUND, "Cannot found provided risk in provided project"),
+    PROJECT_MANAGER_NOT_FOUND("PROJ_001", HttpStatus.NOT_FOUND, "Cannot find provided project manager"),
+    PROJECT_NOT_FOUND("PROJ_002", HttpStatus.NOT_FOUND, "Cannot find provided project"),
+    RISK_NOT_FOUND("RISK_001", HttpStatus.NOT_FOUND, "Cannot find provided risk in provided project"),
 
-    PROJECT_GROUP_NOT_FOUND("PROJ_002", HttpStatus.NOT_FOUND, "Cannot found project group"),
+    PROJECT_GROUP_NOT_FOUND("PROJ_002", HttpStatus.NOT_FOUND, "Cannot find project group"),
     INVALID_MILESTONES("PROJ_003", HttpStatus.BAD_REQUEST, "Project must have at least start and end milestones defined"),
     INVALID_MILESTONE_ORDER("PROJ_004", HttpStatus.BAD_REQUEST, "Milestones must be chronologically ordered"),
+    INVALID_ROLE_UTILIZATION("PROJ_005", HttpStatus.BAD_REQUEST, "Role utilization percentages must match timeline segments length"),
 
     ACTIVATION_TOKEN_NOT_FOUND("AUTH_001", HttpStatus.NOT_FOUND, "Activation token is invalid or does not exist"),
     ACTIVATION_TOKEN_EXPIRED("AUTH_002", HttpStatus.BAD_REQUEST, "Activation token has expired"),

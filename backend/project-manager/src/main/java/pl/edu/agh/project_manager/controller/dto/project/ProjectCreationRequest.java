@@ -31,6 +31,7 @@ public record ProjectCreationRequest(
         @Valid
         List<RiskRequest> risks,
 
+        @Valid
         List<RoleRequest> roles,
 
         @NotEmpty(message = "Lista kamieni milowych nie może być pusta")
@@ -43,14 +44,14 @@ public record ProjectCreationRequest(
         if (risks.isEmpty()) risks = List.of();
     }
 
-    public ProjectCreationCommand toCommand(UUID projectManagerId) {
+    public ProjectCreationCommand toCommand(UUID creatorId) {
         return new ProjectCreationCommand(
+                creatorId,
                 this.title,
                 this.description,
                 this.startDate,
                 this.isActive,
                 this.projectGroupId,
-                projectManagerId,
                 this.risks.stream().map(RiskRequest::toCommand).toList(),
                 this.roles.stream().map(RoleRequest::toCommand).toList(),
                 milestones

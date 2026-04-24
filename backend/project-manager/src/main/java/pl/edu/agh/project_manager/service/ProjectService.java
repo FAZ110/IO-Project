@@ -32,8 +32,8 @@ public class ProjectService {
 
     @Transactional
     public UUID createProject(ProjectCreationCommand command) {
-        User projectManager = userRepository.findById(command.projectManagerId())
-                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_MANAGER_NOT_FOUND, "Cannot find provided project manager - " + command.projectManagerId()));
+        User projectManager = userRepository.findById(command.creatorId())
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_MANAGER_NOT_FOUND, "Cannot find provided project manager - " + command.creatorId()));
 
         ProjectGroups projectGroup = null;
         if (command.projectGroupId() != null) {
@@ -43,7 +43,6 @@ public class ProjectService {
 
         Project project = buildProject(command, projectManager);
         project.setProjectGroup(projectGroup);
-        projectManager.getProjects().add(project);
 
         addRisksToProject(project, command.risks());
 
@@ -51,18 +50,40 @@ public class ProjectService {
         for (ProjectSegment segment : segments) {
             project.addSegment(segment);
         }
-
-        for (RoleCommand role : command.roles()) {
-            ProjectRole projectRole = ProjectRole
-                    .builder()
-                    .roleName(role.name())
-                    .build();
-            project.addRole(projectRole);
-        }
+        addRolesAndBindWithSegments(project, segments, command.roles());
 
         Project savedProject = projectRepository.save(project);
 
         return savedProject.getId();
+    }
+
+    private void addRolesAndBindWithSegments(Project project, List<ProjectSegment> segments, List<RoleCommand> roles) {
+        for (RoleCommand role : roles) {
+            if (role.utilizationPercentages().size() != segments.size()) {
+                throw new ApplicationException(ApiErrorCode.INVALID_ROLE_UTILIZATION, "Role " + role.name() + " has invalid number of utilization percentages - expected: " + segments.size() + ", actual: " + role.utilizationPercentages().size());
+            }
+
+            ProjectRole projectRole = ProjectRole
+                    .builder()
+                    .roleName(role.name())
+                    .build();
+
+            for (int i = 0; i < segments.size(); i++) {
+                ProjectSegment currentSegment = segments.get(i);
+                int percentage = role.utilizationPercentages().get(i);
+
+                ProjectRoleSegmentAllocation segmentAllocation = ProjectRoleSegmentAllocation
+                        .builder()
+                        .projectRole(projectRole)
+                        .segment(currentSegment)
+                        .utilizationPercentage(percentage)
+                        .build();
+
+                projectRole.addSegmentAllocation(segmentAllocation);
+            }
+
+            project.addRole(projectRole);
+        }
     }
 
     private List<ProjectSegment> createSegmentsFromMilestones(List<LocalDateTime> milestones) {
@@ -94,7 +115,7 @@ public class ProjectService {
     @Transactional
     public void deleteProjectRisk(UUID projectId, UUID riskId, UUID projectManagerId) {
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot found provided project - " + projectId));
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find provided project - " + projectId));
 
         if (!project.getProjectManager().getId().equals(projectManagerId)) {
             throw new ApplicationException(ApiErrorCode.ACCESS_DENIED, "Only project manager can delete project");
@@ -103,7 +124,7 @@ public class ProjectService {
         ProjectRisk removedRisk = project.getRisks().stream()
                 .filter(risk -> risk.getId().equals(riskId))
                 .findFirst()
-                .orElseThrow(() -> new ApplicationException(ApiErrorCode.RISK_NOT_FOUND, "Cannot found provided risk - " + riskId));
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.RISK_NOT_FOUND, "Cannot find provided risk - " + riskId));
 
         project.removeRisk(removedRisk);
     }
@@ -111,7 +132,7 @@ public class ProjectService {
     @Transactional
     public RiskResponse updateProjectRisk(UUID projectId, UUID riskId, UUID projectManagerId, RiskCommand command) {
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot found provided project - " + projectId));
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find provided project - " + projectId));
 
         if (!project.getProjectManager().getId().equals(projectManagerId)) {
             throw new ApplicationException(ApiErrorCode.ACCESS_DENIED, "Only project manager can update project risks");
@@ -144,10 +165,10 @@ public class ProjectService {
     @Transactional
     public RiskResponse createProjectRisk(RiskCommand command,  UUID projectManagerId, UUID projectId) {
         User projectManager = userRepository.findById(projectManagerId)
-                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_MANAGER_NOT_FOUND, "Cannot found provided project manager - " + projectManagerId));
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_MANAGER_NOT_FOUND, "Cannot find provided project manager - " + projectManagerId));
 
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot found provided project - " + projectId));
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find provided project - " + projectId));
 
         ProjectRisk risk = buildRisk(command, projectManager);
         project.addRisk(risk);
