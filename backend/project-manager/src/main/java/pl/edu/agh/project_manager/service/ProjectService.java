@@ -21,6 +21,7 @@ import pl.edu.agh.project_manager.repository.RiskRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
 import pl.edu.agh.project_manager.service.command.project.MilestoneCommand;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
+import pl.edu.agh.project_manager.service.command.project.ProjectSegmentCommand;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
 import pl.edu.agh.project_manager.service.command.project.RoleCommand;
 
@@ -53,6 +54,7 @@ public class ProjectService {
         Project project = buildProject(command, projectManager);
         project.setProjectGroup(projectGroup);
 
+        projectManager.getProjects().add(project);
         addRisksToProject(project, command.risks());
 
         List<ProjectSegment> segments = createSegmentsFromMilestones(command.milestones());
@@ -71,8 +73,6 @@ public class ProjectService {
 
         addSpecialMembersToProject(project, command.sponsors(), sponsorRole);
         addSpecialMembersToProject(project, command.committee(), committeeRole);
-
-        addSegmentsToProject(project, command.milestones());
 
         Project savedProject = projectRepository.save(project);
 
@@ -204,7 +204,7 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find provided project - " + projectId));
 
-        ProjectRisk risk = buildRisk(command, projectManager);
+        ProjectRisk risk = buildRisk(command);
         project.addRisk(risk);
 
         ProjectRisk savedRisk = riskRepository.save(risk);
@@ -258,17 +258,6 @@ public class ProjectService {
             projectMember.setMembershipStatus(MembershipStatus.ACCEPTED);
 
             project.addSpecialMember(projectMember);
-        });
-    }
-
-    private void addSegmentsToProject(Project project, List<ProjectSegmentCommand> segments) {
-        segments.forEach(segmentRequest -> {
-            ProjectSegment segment = new ProjectSegment();
-
-            segment.setStartDate(segmentRequest.startDate());
-            segment.setEndDate(segmentRequest.endDate());
-
-            project.addSegment(segment);
         });
     }
 }

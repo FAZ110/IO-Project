@@ -53,11 +53,11 @@ public record ProjectCreationRequest(
                 this.startDate,
                 true,
                 this.projectGroupId,
-                this.sponsors,
-                this.committee,
                 this.risks.stream().map(RiskRequest::toCommand).toList(),
                 this.roles.stream().map(RoleRequest::toCommand).toList(),
-                this.risks.stream().map(RiskRequest::toCommand).toList()
+                this.milestones.stream().map(MilestoneRequest::toCommand).toList(),
+                this.sponsors,
+                this.committee
         );
     }
 }
