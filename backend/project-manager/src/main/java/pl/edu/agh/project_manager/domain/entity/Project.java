@@ -30,7 +30,8 @@ public class Project {
     private LocalDate startDate;
 
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive;
+    @Builder.Default
+    private Boolean isActive = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
@@ -75,9 +76,14 @@ public class Project {
         this.members.add(member);
     }
 
-    public void addSegment(ProjectSegment segment) {
-        this.segments.add(segment);
-        segment.setProject(this);
+    public void addSpecialMember(ProjectMember special) {
+        this.members.add(special);
+        special.setProject(this);
+    }
+
+    public void addSegment(ProjectSegment projectSegment) {
+        this.segments.add(projectSegment);
+        projectSegment.setProject(this);
     }
 
     public void addRole(ProjectRole role) {

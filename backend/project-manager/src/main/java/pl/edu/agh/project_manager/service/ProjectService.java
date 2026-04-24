@@ -10,6 +10,9 @@ import pl.edu.agh.project_manager.domain.entity.Project;
 import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.ProjectGroups;
 import pl.edu.agh.project_manager.domain.entity.User;
+import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
+import pl.edu.agh.project_manager.domain.entity.*;
+import pl.edu.agh.project_manager.domain.enums.MembershipStatus;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
@@ -57,6 +60,19 @@ public class ProjectService {
             project.addSegment(segment);
         }
         addRolesAndBindWithSegments(project, segments, command.roles());
+
+        ProjectRole sponsorRole = new ProjectRole();
+        sponsorRole.setRoleName("Sponsor");
+        ProjectRole committeeRole = new ProjectRole();
+        committeeRole.setRoleName("Komitet sterujący");
+
+        project.addRole(sponsorRole);
+        project.addRole(committeeRole);
+
+        addSpecialMembersToProject(project, command.sponsors(), sponsorRole);
+        addSpecialMembersToProject(project, command.committee(), committeeRole);
+
+        addSegmentsToProject(project, command.milestones());
 
         Project savedProject = projectRepository.save(project);
 
@@ -207,11 +223,10 @@ public class ProjectService {
                 .description(command.description())
                 .projectManager(projectManager)
                 .startDate(command.startDate())
-                .isActive(command.isActive())
                 .build();
     }
 
-    private ProjectRisk buildRisk(RiskCommand command, User projectManager) {
+    private ProjectRisk buildRisk(RiskCommand command) {
         return ProjectRisk.builder()
                 .name(command.name())
                 .description(command.description())
@@ -230,6 +245,30 @@ public class ProjectService {
                     .build();
 
             project.addRisk(risk);
+        });
+    }
+
+    private void addSpecialMembersToProject(Project project, List<UUID> specialMembers, ProjectRole role) {
+        List<User> sponsorUsers = userRepository.findAllById(specialMembers);
+
+        sponsorUsers.forEach(user -> {
+            ProjectMember projectMember = new ProjectMember();
+            projectMember.setUser(user);
+            projectMember.setRole(role);
+            projectMember.setMembershipStatus(MembershipStatus.ACCEPTED);
+
+            project.addSpecialMember(projectMember);
+        });
+    }
+
+    private void addSegmentsToProject(Project project, List<ProjectSegmentCommand> segments) {
+        segments.forEach(segmentRequest -> {
+            ProjectSegment segment = new ProjectSegment();
+
+            segment.setStartDate(segmentRequest.startDate());
+            segment.setEndDate(segmentRequest.endDate());
+
+            project.addSegment(segment);
         });
     }
 }

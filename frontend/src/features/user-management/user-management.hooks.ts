@@ -31,3 +31,11 @@ export const useResendInvitationMutation = () =>
   useMutation({
     mutationFn: (userId: string) => userManagementService.resendInvitation(userId),
   });
+
+export const useSearchUsers = (searchTerm: string) => {
+    return useQuery({
+        queryKey: ['searchUsers', searchTerm],
+        queryFn: () => userManagementService.searchUsers(searchTerm),
+        enabled: searchTerm.length >= 2
+    });
+}

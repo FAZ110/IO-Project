@@ -23,10 +23,13 @@ public record ProjectCreationRequest(
         @FutureOrPresent(message = "Data początkowa musi być z przyszłości")
         LocalDate startDate,
 
-        @NotNull(message = "Aktywność projektu nie może być pusta")
-        Boolean isActive,
-
         UUID projectGroupId,
+
+        @NotNull(message = "Lista sponsorów nie może być pusta")
+        List<UUID> sponsors,
+
+        @NotNull(message = "Lista członków komitetu sterującego nie może być pusta")
+        List<UUID> committee,
 
         @Valid
         List<RiskRequest> risks,
@@ -39,8 +42,6 @@ public record ProjectCreationRequest(
 ) {
     // By default, project is active and list with risks is empty
     public ProjectCreationRequest {
-        if (isActive == null) isActive = true;
-
         if (risks.isEmpty()) risks = List.of();
     }
 
@@ -50,11 +51,13 @@ public record ProjectCreationRequest(
                 this.title,
                 this.description,
                 this.startDate,
-                this.isActive,
+                true,
                 this.projectGroupId,
+                this.sponsors,
+                this.committee,
                 this.risks.stream().map(RiskRequest::toCommand).toList(),
                 this.roles.stream().map(RoleRequest::toCommand).toList(),
-                this.milestones.stream().map(MilestoneRequest::toCommand).toList()
+                this.risks.stream().map(RiskRequest::toCommand).toList()
         );
     }
 }
