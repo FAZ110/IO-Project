@@ -30,10 +30,7 @@ public record UserResponse(
 
                 user.getQualifications() != null ?
                         user.getQualifications().stream()
-                                .map(q -> new QualificationResponse(
-                                        q.getId(),
-                                        q.getSkill().getName(),
-                                        q.getStatus()))
+                                .map(QualificationResponse::from)
                                 .toList()
                         : List.of()
         );
