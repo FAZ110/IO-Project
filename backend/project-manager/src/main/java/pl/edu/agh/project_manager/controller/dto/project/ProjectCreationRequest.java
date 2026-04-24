@@ -35,7 +35,7 @@ public record ProjectCreationRequest(
         List<RoleRequest> roles,
 
         @NotEmpty(message = "Lista kamieni milowych nie może być pusta")
-        List<MilestoneRequest> milestones
+        List<@Valid MilestoneRequest> milestones
 ) {
     // By default, project is active and list with risks is empty
     public ProjectCreationRequest {
