@@ -2,7 +2,7 @@ package pl.edu.agh.project_manager.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.edu.agh.project_manager.controller.dto.*;
+import pl.edu.agh.project_manager.controller.dto.project_group.AllGroupsResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.GroupOwnerResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupDetailsResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupResponse;

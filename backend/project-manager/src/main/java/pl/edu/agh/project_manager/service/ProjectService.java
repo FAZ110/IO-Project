@@ -3,7 +3,9 @@ package pl.edu.agh.project_manager.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.edu.agh.project_manager.controller.dto.RiskResponse;
+import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
+import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
+import pl.edu.agh.project_manager.controller.dto.user.UserResponse;
 import pl.edu.agh.project_manager.domain.entity.Project;
 import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.ProjectGroups;
@@ -48,6 +50,16 @@ public class ProjectService {
         Project savedProject = projectRepository.save(project);
 
         return savedProject.getId();
+    }
+
+    public ProjectResponse getProject(UUID projectId) {
+        Project project = projectRepository.findByIdWithManager(projectId)
+                .orElseThrow(() -> new ApplicationException(
+                        ApiErrorCode.PROJECT_NOT_FOUND,
+                        "Cannot find provided project - " + projectId
+                ));
+
+        return ProjectResponse.from(project);
     }
 
     @Transactional

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.agh.project_manager.controller.dto.AllGroupsResponse;
+import pl.edu.agh.project_manager.controller.dto.project_group.AllGroupsResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupDetailsResponse;
 import pl.edu.agh.project_manager.domain.entity.ProjectGroups;
 import pl.edu.agh.project_manager.domain.entity.User;

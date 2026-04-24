@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.agh.project_manager.controller.dto.RiskResponse;
+import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
 import pl.edu.agh.project_manager.domain.entity.Project;
 import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.User;

@@ -1,7 +1,9 @@
 import { useForm, useFieldArray } from 'react-hook-form';
-import { CreateProjectView } from './CreateProjectForm.view';
-import type { ProjectCreationRequest } from '../../project/project.types';
-import { useCreateProject } from '../project.hooks';
+import { CreateProjectView } from './CreateProjectForm.view.tsx';
+import type { ProjectCreationRequest } from '../project.types.ts';
+import { useCreateProject } from '../project.hooks.ts';
+import {PATHS} from "@/routes/paths.ts";
+import {useNavigate} from "react-router-dom";
 
 export const CreateProjectForm = () => {
 
@@ -23,7 +25,8 @@ export const CreateProjectForm = () => {
     name: "risks"
   });
 
-  const mutation = useCreateProject(() => reset());
+  const mutation = useCreateProject();
+  const navigate = useNavigate();
 
   const onSubmit = (data: ProjectCreationRequest) => {
     
@@ -33,7 +36,12 @@ export const CreateProjectForm = () => {
       programId: data.programId ? Number(data.programId) : undefined,
     };
 
-    mutation.mutate(payload);
+    mutation.mutate(payload, {
+      onSuccess: (newProjectId) =>  {
+        reset();
+        navigate(PATHS.PROJECT(newProjectId));
+      }
+    });
   };
 
   return (
