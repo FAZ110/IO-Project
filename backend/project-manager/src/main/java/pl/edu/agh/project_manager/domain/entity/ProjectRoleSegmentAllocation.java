@@ -3,8 +3,7 @@ package pl.edu.agh.project_manager.domain.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -17,6 +16,9 @@ import java.util.UUID;
                 @UniqueConstraint(columnNames = {"project_role_id", "segment_id"})
         }
 )
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProjectRoleSegmentAllocation {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
