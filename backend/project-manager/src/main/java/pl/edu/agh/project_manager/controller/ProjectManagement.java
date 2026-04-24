@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.project_manager.controller.dto.project.ProjectCreationRequest;
+import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
 import pl.edu.agh.project_manager.controller.dto.project.RiskRequest;
 import pl.edu.agh.project_manager.controller.dto.RiskResponse;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.ProjectService;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -78,4 +80,17 @@ public class ProjectManagement {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRisk);
     }
+
+
+    @GetMapping("/project/all")
+    @PreAuthorize("hasAnyRole('PROJECT_MANAGER', 'AUTHORITY', 'USER')")
+    public ResponseEntity<List<ProjectResponse>> getAllProjects() {
+
+        List<ProjectResponse> projects = projectService.getAllProjects();
+
+        return ResponseEntity.ok(projects);
+    }
 }
+
+
+

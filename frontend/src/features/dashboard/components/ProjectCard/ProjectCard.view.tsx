@@ -1,0 +1,52 @@
+// src/features/dashboard/components/ProjectCard/ProjectCard.view.tsx
+import type { Project } from '@/features/project/project.types';
+import { Badge } from '@/components/ui/badge';
+import { CalendarDays } from 'lucide-react'; // Upewnij się, że masz zainstalowane lucide-react
+
+// 1. Zdefiniuj propsy widoku, PAMIĘTAJ O onClick!
+interface ProjectCardViewProps {
+  project: Project;
+  onClick: () => void;
+}
+
+export const ProjectCardView = ({ project, onClick }: ProjectCardViewProps) => {
+  return (
+    <div 
+      onClick={onClick} // <--- TO NAPRAWIA ONCLICK
+      className="group bg-white hover:shadow-lg transition-all border border-gray-200 rounded-xl p-5 flex flex-col gap-4 cursor-pointer"
+    >
+      <div className="flex justify-between items-start gap-4">
+        <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
+          {project.title || "Nienazwany projekt"}
+        </h3>
+        
+        {/* Renderowanie statusu jako Badge */}
+        <Badge 
+          variant={project.status === 'ACTIVE' ? 'default' : 'secondary'}
+          className={project.status === 'ACTIVE' ? 'bg-green-100 text-green-800 hover:bg-green-200 border-transparent' : ''}
+        >
+          {project.status === 'ACTIVE' ? 'W toku' : project.status}
+        </Badge>
+      </div>
+
+      <p className="text-gray-500 text-sm line-clamp-2 min-h-[2.5rem] flex-grow">
+        {project.description || "Brak opisu projektu."}
+      </p>
+
+      {/* 2. Tymczasowo ukrywamy "members", bo nie wspiera tego backend. 
+          Możesz odkomentować poniższy kod, gdy backend doda pole members. */}
+      {/* <div className="flex items-center gap-4 mt-2">
+         Tu kiedyś będą awatary członków
+      </div> 
+      */}
+
+      <div className="pt-4 border-t border-gray-100 flex justify-between items-center text-xs text-gray-400">
+        <div className="flex items-center gap-1.5">
+          <CalendarDays size={14} />
+          {/* Bezpieczne sprawdzenie daty (jeśli istnieje) */}
+          <span>Utworzono: {project.start_date ? new Date(project.start_date).toLocaleDateString('pl-PL') : '-'}</span>
+        </div>
+      </div>
+    </div>
+  );
+};

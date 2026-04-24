@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.edu.agh.project_manager.controller.dto.RiskResponse;
+import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
 import pl.edu.agh.project_manager.domain.entity.Project;
 import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.ProjectGroups;
@@ -151,5 +152,19 @@ public class ProjectService {
 
             project.addRisk(risk);
         });
+    }
+
+    public List<ProjectResponse> getAllProjects() {
+        List<Project> projects = projectRepository.findAll();
+
+        return projects.stream()
+                .map(project -> new ProjectResponse(
+                        project.getId(),
+                        project.getTitle(),
+                        project.getDescription(),
+                        project.getStartDate(),
+                        project.getIsActive()
+                ))
+                .toList();
     }
 }
