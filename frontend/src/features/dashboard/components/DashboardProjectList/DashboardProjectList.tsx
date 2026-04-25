@@ -1,4 +1,3 @@
-// src/features/dashboard/components/DashboardProjectList/DashboardProjectList.tsx
 import { useProjects } from '@/features/project/project.hooks';
 import { DashboardProjectListView } from './DashboardProjectList.view.tsx';
 

@@ -25,7 +25,7 @@ export interface SingleGroupResponse {
   name: string;
 }
 
-export interface Project {
+export interface ProjectResponse {
   id: string;
   title: string;
   description: string;

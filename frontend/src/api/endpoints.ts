@@ -14,8 +14,7 @@ export const ENDPOINTS = {
     INVITATIONS: '/admin/invitations',
   },
   PROJECT: {
-    CREATE: '/project',
-    GETALL: '/project/all',
+    BASE: '/projects',
           DETAIL: (id: string) => `/project/${id}`,
           RISK: {
             LIST: (projectId: string) => `/project/${projectId}/risk`

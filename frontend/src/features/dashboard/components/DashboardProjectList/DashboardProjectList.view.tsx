@@ -1,9 +1,11 @@
 // src/features/dashboard/components/DashboardProjectList/DashboardProjectList.view.tsx
-import type { Project } from '@/features/project/project.types';
-import { ProjectCard } from '../ProjectCard/ProjectCard';
+import type { ProjectResponse } from '@/features/project/project.types';
+import { Link } from 'react-router-dom';
+import { PATHS } from '@/routes/paths';
+import { ProjectCardView } from '../ProjectCard/ProjectCard.view';
 
 interface DashboardProjectListViewProps {
-  projects: Project[];
+  projects: ProjectResponse[];
   isLoading: boolean;
   isError: boolean;
   onRetry: () => void;
@@ -48,9 +50,15 @@ export const DashboardProjectListView = ({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {projects.map((project) => (
-        <ProjectCard key={project.id} project={project} />
-      ))}
-    </div>
+    {projects.map((project) => (
+      <Link 
+        key={project.id} 
+        to={PATHS.PROJECT(project.id)} 
+        className="block hover:opacity-90 transition-opacity" 
+      >
+        <ProjectCardView project={project} />
+      </Link>
+    ))}
+  </div>
   );
 };

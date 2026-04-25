@@ -4,7 +4,7 @@ import { projectService } from '../project/project.service';
 
 export const useCreateProject = (onSuccessCallback?: () => void) => {
   return useMutation({
-    mutationFn: projectService.createProject,
+    mutationFn: projectService.create,
     onSuccess: () => {
       toast.success('Dodano projekt.');
       

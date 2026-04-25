@@ -5,7 +5,7 @@ import { PROJECT_KEYS } from '@/features/project/project.keys.ts';
 
 export const useProjects = () => {
   return useQuery({
-    queryKey: ['projects', 'all'],
+    queryKey: PROJECT_KEYS.all,
     queryFn: projectService.getAllProjects,
   });
 };

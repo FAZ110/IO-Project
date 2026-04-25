@@ -1,17 +1,14 @@
-// src/features/dashboard/components/ProjectCard/ProjectCard.view.tsx
-import type { Project } from '@/features/project/project.types';
+import type { ProjectResponse } from '@/features/project/project.types';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays } from 'lucide-react'; 
 
 interface ProjectCardViewProps {
-  project: Project;
-  onClick: () => void;
+  project: ProjectResponse;
 }
 
-export const ProjectCardView = ({ project, onClick }: ProjectCardViewProps) => {
+export const ProjectCardView = ({ project }: ProjectCardViewProps) => {
   return (
-    <div 
-      onClick={onClick} 
+    <div  
       className="group bg-white hover:shadow-lg transition-all border border-gray-200 rounded-xl p-5 flex flex-col gap-4 cursor-pointer"
     >
       <div className="flex justify-between items-start gap-4">
@@ -27,7 +24,7 @@ export const ProjectCardView = ({ project, onClick }: ProjectCardViewProps) => {
         </Badge>
       </div>
 
-      <p className="text-gray-500 text-sm line-clamp-2 min-h-[2.5rem] flex-grow">
+      <p className="text-gray-500 text-sm line-clamp-2 min-h-10 grow">
         {project.description || "Brak opisu projektu."}
       </p>
 
