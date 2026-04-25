@@ -6,13 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.agh.project_manager.controller.dto.*;
+import pl.edu.agh.project_manager.controller.dto.project_group.AllGroupsResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.ProjectGroupCreationRequest;
 import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupDetailsResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupResponse;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.ProjectGroupsService;
-import pl.edu.agh.project_manager.service.command.ProjectGroupCreationCommand;
+import pl.edu.agh.project_manager.service.command.project.ProjectGroupCreationCommand;
 
 import java.util.List;
 import java.util.Map;

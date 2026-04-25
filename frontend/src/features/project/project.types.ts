@@ -1,5 +1,7 @@
+import type {UserResponse} from "@/features/user-management";
+
 export interface ProjectCreationRequest {
-    title: string
+    title: string;
     description: string;
     startDate: string;
     isActive: boolean;
@@ -9,19 +11,17 @@ export interface ProjectCreationRequest {
 }
 
 export interface Risk {
-    name: string
-    description: string
-    probability: number
+name: string;
+  description: string;
+  probability: number;
 }
-
 
 export interface RiskResponse extends Risk {
-  id: string; 
+  id: string;
 }
 
-
 export interface SingleGroupResponse {
-  id: string; 
+  id: string;
   name: string;
 }
 
@@ -31,4 +31,13 @@ export interface Project {
   description: string;
   isActive: boolean;
   startDate: string;
+}
+
+export interface ProjectDetailsResponse {
+  id: string;
+  title: string;
+  description: string;
+  startDate: string;
+  isActive: boolean,
+  manager: UserResponse
 }

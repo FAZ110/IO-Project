@@ -1,8 +1,0 @@
-package pl.edu.agh.project_manager.service.command;
-
-public record RiskCommand(
-        String name,
-        String description,
-        Integer probability
-) {
-}

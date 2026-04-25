@@ -1,9 +1,9 @@
 package pl.edu.agh.project_manager.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
@@ -13,6 +13,9 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "project_segments")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProjectSegment {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -24,11 +27,15 @@ public class ProjectSegment {
     private Project project;
 
     @Column(name = "start_date", nullable = false)
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date", nullable = false)
-    private LocalDateTime endDate;
+    private LocalDate endDate;
+
+    @Column(name = "label")
+    private String label;
 
     @OneToMany(mappedBy = "segment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ProjectRoleSegmentAllocation> roleAllocations = new ArrayList<>();
 }

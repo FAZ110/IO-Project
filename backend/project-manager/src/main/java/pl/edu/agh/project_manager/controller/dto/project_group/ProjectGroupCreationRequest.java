@@ -3,7 +3,7 @@ package pl.edu.agh.project_manager.controller.dto.project_group;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import pl.edu.agh.project_manager.domain.enums.GroupType;
-import pl.edu.agh.project_manager.service.command.ProjectGroupCreationCommand;
+import pl.edu.agh.project_manager.service.command.project.ProjectGroupCreationCommand;
 
 import java.util.UUID;
 

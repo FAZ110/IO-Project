@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.agh.project_manager.controller.dto.RiskResponse;
+import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
 import pl.edu.agh.project_manager.domain.entity.Project;
 import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.User;
@@ -16,16 +16,19 @@ import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
 import pl.edu.agh.project_manager.repository.ProjectRepository;
 import pl.edu.agh.project_manager.repository.RiskRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
+import pl.edu.agh.project_manager.service.command.project.MilestoneCommand;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
+import pl.edu.agh.project_manager.service.command.project.RoleCommand;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -50,8 +53,21 @@ class ProjectServiceTest {
     void createProject_Success() {
         // Given
         UUID managerId = UUID.randomUUID();
+        List<MilestoneCommand> milestones = List.of(
+                new MilestoneCommand("start", LocalDate.now()),
+                new MilestoneCommand("end", LocalDate.now().plusMonths(3))
+        );
+
         ProjectCreationCommand command = new ProjectCreationCommand(
-                "Title", "Desc", LocalDate.now(), true, null, managerId, new ArrayList<>()
+                managerId,
+                "Title",
+                "Desc",
+                LocalDate.now(),
+                true,
+                null,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                milestones
         );
         User manager = User.builder().id(managerId).projects(new ArrayList<>()).build();
         Project savedProject = Project.builder().id(UUID.randomUUID()).build();
@@ -65,6 +81,88 @@ class ProjectServiceTest {
         // Then
         assertThat(resultId).isEqualTo(savedProject.getId());
         verify(projectRepository).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("Should throw exception when milestones are not in chronological order")
+    void createProject_InvalidMilestoneOrder() {
+        // Given
+        UUID creatorId = UUID.randomUUID();
+        LocalDateTime now = LocalDateTime.now();
+        List<MilestoneCommand> milestones = List.of(
+                new MilestoneCommand("start", LocalDate.now()),
+                new MilestoneCommand("end", LocalDate.now().minusDays(5))
+        );
+
+        ProjectCreationCommand command = new ProjectCreationCommand(
+                creatorId, "Title", "Desc", LocalDate.now(), true, null,
+                new ArrayList<>(), new ArrayList<>(), milestones
+        );
+
+        when(userRepository.findById(creatorId)).thenReturn(Optional.of(User.builder().id(creatorId).build()));
+
+        // When & Then
+        assertThatExceptionOfType(ApplicationException.class)
+                .isThrownBy(() -> projectService.createProject(command))
+                .extracting(ApplicationException::getErrorCode)
+                .isEqualTo(ApiErrorCode.INVALID_MILESTONE_ORDER);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when role utilization count does not match segments count")
+    void createProject_InvalidRoleUtilization() {
+        // Given
+        UUID creatorId = UUID.randomUUID();
+        LocalDateTime now = LocalDateTime.now();
+        List<MilestoneCommand> milestones = List.of(
+                new MilestoneCommand("start", LocalDate.now()),
+                new MilestoneCommand("mid", LocalDate.now().plusDays(10)),
+                new MilestoneCommand("end", LocalDate.now().plusDays(20))
+        );
+        RoleCommand invalidRole = new RoleCommand("Developer", List.of(100));
+
+        ProjectCreationCommand command = new ProjectCreationCommand(
+                creatorId, "Title", "Desc", LocalDate.now(), true, null,
+                new ArrayList<>(), List.of(invalidRole), milestones
+        );
+
+        when(userRepository.findById(creatorId)).thenReturn(Optional.of(User.builder().id(creatorId).build()));
+
+        // When & Then
+        assertThatExceptionOfType(ApplicationException.class)
+                .isThrownBy(() -> projectService.createProject(command))
+                .extracting(ApplicationException::getErrorCode)
+                .isEqualTo(ApiErrorCode.INVALID_ROLE_UTILIZATION);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when not enough milestones")
+    void createProject_NotEnoughMilestones() {
+        // Given
+        UUID creatorId = UUID.randomUUID();
+        List<MilestoneCommand> milestones = List.of(
+                new MilestoneCommand("start", LocalDate.now())
+        );
+
+        ProjectCreationCommand command = new ProjectCreationCommand(
+                creatorId,
+                "Title",
+                "Desc",
+                LocalDate.now(),
+                true,
+                null,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                milestones
+        );
+        User manager = User.builder().id(creatorId).build();
+        when(userRepository.findById(creatorId)).thenReturn(Optional.of(manager));
+
+        // When & Then
+        assertThatExceptionOfType(ApplicationException.class)
+                .isThrownBy(() -> projectService.createProject(command))
+                .extracting(ApplicationException::getErrorCode)
+                .isEqualTo(ApiErrorCode.INVALID_MILESTONES);
     }
 
 

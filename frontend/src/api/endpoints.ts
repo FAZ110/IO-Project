@@ -16,7 +16,10 @@ export const ENDPOINTS = {
   PROJECT: {
     CREATE: '/project',
     GETALL: '/project/all',
-    RISK: (projectId: string) => `/project/${projectId}/risk`,
+          DETAIL: (id: string) => `/project/${id}`,
+          RISK: {
+            LIST: (projectId: string) => `/project/${projectId}/risk`
+          },
   },
   PROJECT_GROUP: {
     LIST_ALL: '/groups',
