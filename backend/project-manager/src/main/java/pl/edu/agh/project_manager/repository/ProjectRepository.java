@@ -28,4 +28,12 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
 
     @EntityGraph(attributePaths = {"projectManager", "projectManager.qualifications"})
     List<Project> findAll();
+
+    @EntityGraph(attributePaths = {"projectManager", "projectManager.qualifications"})
+    @Query("SELECT p FROM Project p WHERE p.projectManager.id = :userId")
+    List<Project> findAllByProjectManagerId(@Param("userId") UUID userId);
+
+    @EntityGraph(attributePaths = {"projectManager", "projectManager.qualifications"})
+    @Query("SELECT DISTINCT p FROM Project p JOIN p.members m WHERE m.user.id = :userId")
+    List<Project> findAllByMemberId(@Param("userId") UUID userId);
 }

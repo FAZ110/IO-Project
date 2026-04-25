@@ -29,7 +29,9 @@ export const AppRoutes = () => {
           <Route path={PATHS.ROOT} element={<DashboardPage/>} />
           <Route path={PATHS.PROFILE} element={<ProfilePage/>} />
 
-          <Route path={PATHS.CREATE_PROJECT} element={<CreateProjectPage/>} />
+          <Route element={<ProtectedRoute redirectTo={PATHS.ROOT} allowedRoles={[UserRole.PROJECT_MANAGER]} />}>
+            <Route path={PATHS.CREATE_PROJECT} element={<CreateProjectPage/>} />
+          </Route>
           <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
 
 

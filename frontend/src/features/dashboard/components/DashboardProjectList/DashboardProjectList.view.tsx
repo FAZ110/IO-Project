@@ -1,4 +1,3 @@
-// src/features/dashboard/components/DashboardProjectList/DashboardProjectList.view.tsx
 import type { ProjectResponse } from '@/features/project/project.types';
 import { Link } from 'react-router-dom';
 import { PATHS } from '@/routes/paths';

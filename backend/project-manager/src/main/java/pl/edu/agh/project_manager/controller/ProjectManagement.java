@@ -91,11 +91,11 @@ public class ProjectManagement {
 
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('PROJECT_MANAGER', 'AUTHORITY', 'USER', 'ADMINISTRATOR')")
-    public ResponseEntity<List<ProjectResponse>> getAllProjects() {
-
-        List<ProjectResponse> projects = projectService.getAllProjects();
-
+    @PreAuthorize("hasAnyRole('PROJECT_MANAGER', 'AUTHORITY', 'LINEAR_MANAGER', 'COMMON', 'ADMINISTRATOR')")
+    public ResponseEntity<List<ProjectResponse>> getAllProjects(
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        List<ProjectResponse> projects = projectService.getAllProjects(userPrincipal);
         return ResponseEntity.ok(projects);
     }
 }

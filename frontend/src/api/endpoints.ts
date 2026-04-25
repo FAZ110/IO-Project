@@ -15,9 +15,9 @@ export const ENDPOINTS = {
   },
   PROJECT: {
     BASE: '/projects',
-          DETAIL: (id: string) => `/project/${id}`,
+          DETAIL: (id: string) => `/projects/${id}`,
           RISK: {
-            LIST: (projectId: string) => `/project/${projectId}/risk`
+            LIST: (projectId: string) => `/projects/${projectId}/risk`
           },
   },
   PROJECT_GROUP: {

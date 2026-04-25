@@ -16,6 +16,7 @@ import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
 import pl.edu.agh.project_manager.repository.ProjectRepository;
 import pl.edu.agh.project_manager.repository.RiskRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
+import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.command.project.MilestoneCommand;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
@@ -233,8 +234,16 @@ public class ProjectService {
         });
     }
 
-    public List<ProjectResponse> getAllProjects() {
-        List<Project> projects = projectRepository.findAll();
+    public List<ProjectResponse> getAllProjects(UserPrincipal userPrincipal) {
+
+        String role = userPrincipal.userRole().name();
+
+        List<Project> projects = switch (role) {
+            case "ADMINISTRATOR", "AUTHORITY" -> projectRepository.findAll();
+            case "PROJECT_MANAGER"            -> projectRepository.findAllByProjectManagerId(userPrincipal.userId());
+            case "LINEAR_MANAGER", "COMMON"   -> projectRepository.findAllByMemberId(userPrincipal.userId());
+            default                           -> List.of();
+        };
 
         return projects.stream()
                 .map(ProjectResponse::from)

@@ -1,10 +1,9 @@
 import { useMemo,  } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PATHS } from '@/routes/paths';
-import { useQuery } from '@tanstack/react-query';
-import { projectService } from '@/features/project/project.service';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/providers/AuthContext'; 
+import { useAuth } from '@/providers/AuthContext';
+import { UserRole } from '@/features/auth/auth.types';
 import { 
   Plus, 
   LayoutGrid, 
@@ -16,16 +15,14 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { ProjectCardView } from '@/features/dashboard/components/ProjectCard/ProjectCard.view';
+import { useProjects } from '@/features/project/project.hooks';
 
 
 export const DashboardPage = () => {
   const { user } = useAuth(); 
   const navigate = useNavigate();
   
-  const { data: projects = [], isLoading } = useQuery({
-    queryKey: ['projects', 'all'],
-    queryFn: projectService.getAllProjects
-  });
+  const { data: projects = [], isLoading } = useProjects();
 
   const stats = useMemo(() => {
     const total = projects.length;
@@ -51,9 +48,11 @@ export const DashboardPage = () => {
               To dobry dzień na realizację celów!
             </p>
           </div>
-          <Button variant="secondary" onClick={() => navigate(PATHS.CREATE_PROJECT)} className="gap-2 bg-white text-purple-700 hover:bg-purple-50 shadow-lg px-6 py-6 text-lg font-bold rounded-2xl transition-transform hover:scale-105">
-            <Plus size={22} /> Nowy Projekt
-          </Button>
+          {user?.role === UserRole.PROJECT_MANAGER && (
+            <Button variant="secondary" onClick={() => navigate(PATHS.CREATE_PROJECT)} className="gap-2 bg-white text-purple-700 hover:bg-purple-50 shadow-lg px-6 py-6 text-lg font-bold rounded-2xl transition-transform hover:scale-105">
+              <Plus size={22} /> Nowy Projekt
+            </Button>
+          )}
         </div>
       </div>
 
