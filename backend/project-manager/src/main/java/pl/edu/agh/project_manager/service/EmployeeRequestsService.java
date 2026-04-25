@@ -3,19 +3,24 @@ package pl.edu.agh.project_manager.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.edu.agh.project_manager.controller.dto.employee_requests.ChartIntervalResponse;
+import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeRequestDetails;
 import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeRequestResult;
 import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeRequestStatus;
 import pl.edu.agh.project_manager.domain.entity.*;
 import pl.edu.agh.project_manager.domain.enums.MembershipStatus;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
-import pl.edu.agh.project_manager.repository.ProjectMemberRepository;
-import pl.edu.agh.project_manager.repository.ProjectRepository;
-import pl.edu.agh.project_manager.repository.ProjectRoleRepository;
-import pl.edu.agh.project_manager.repository.UserRepository;
+import pl.edu.agh.project_manager.repository.*;
 import pl.edu.agh.project_manager.service.command.employee_request.EmployeeRequestCommand;
+import pl.edu.agh.project_manager.service.command.employee_request.EmployeeRequestDetailsCommand;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -27,6 +32,8 @@ public class EmployeeRequestsService {
     private final ProjectRoleRepository projectRoleRepository;
 
     private final ProjectMemberRepository projectMemberRepository;
+
+    private final ProjectRoleSegmentAllocationRepository segmentAllocationRepository;
 
     @Transactional
     public void createEmployeeRequest(EmployeeRequestCommand command) {
@@ -86,4 +93,88 @@ public class EmployeeRequestsService {
                 })
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public EmployeeRequestDetails getEmployeeRequestDetails(EmployeeRequestDetailsCommand command) {
+        ProjectMember projectRequest = projectMemberRepository.findById(command.requestId())
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.EMPLOYEE_REQUEST_NOT_FOUND));
+
+        return new EmployeeRequestDetails(
+                calculateAggregatedWorkload(projectRequest.getUser().getId()),
+                getRequestIncrement(projectRequest)
+        );
+    }
+
+    private List<ChartIntervalResponse> calculateAggregatedWorkload(UUID userId) {
+        List<ProjectRoleSegmentAllocation> allocations = segmentAllocationRepository.findAllUserAllocations(userId);
+
+        if (allocations.isEmpty()) return List.of();
+
+        return generateWorkloadSteps(allocations);
+    }
+
+    private List<ChartIntervalResponse> getRequestIncrement(ProjectMember request) {
+        return generateWorkloadSteps(request.getRole().getSegmentAllocations());
+    }
+
+    private List<ChartIntervalResponse> generateWorkloadSteps(List<ProjectRoleSegmentAllocation> segmentAllocations) {
+        List<RawAllocation> rawAllocations = flattenAllocations(segmentAllocations);
+
+        if (rawAllocations.isEmpty()) return List.of();
+
+        List<LocalDate> timeline = rawAllocations.stream()
+                .flatMap(a -> Stream.of(a.start(), a.end()))
+                .distinct()
+                .sorted()
+                .toList();
+
+        List<ChartIntervalResponse> steps = new ArrayList<>();
+
+        for (int i = 0; i < timeline.size() - 1; i++) {
+            LocalDate start = timeline.get(i);
+            LocalDate end = timeline.get(i + 1);
+
+            int totalPercent = rawAllocations.stream()
+                    .filter(a -> !a.start().isAfter(start) && !a.end().isBefore(end))
+                    .mapToInt(RawAllocation::percent)
+                    .sum();
+
+            steps.add(new ChartIntervalResponse(start, end, totalPercent));
+        }
+
+        return mergeContinuousSteps(steps);
+    }
+
+    private List<RawAllocation> flattenAllocations(List<ProjectRoleSegmentAllocation> allocations) {
+        return allocations.stream()
+                .map(a -> new RawAllocation(
+                        a.getSegment().getStartDate(),
+                        a.getSegment().getEndDate(),
+                        a.getUtilizationPercentage()
+                ))
+                .toList();
+    }
+
+    private List<ChartIntervalResponse> mergeContinuousSteps(List<ChartIntervalResponse> steps) {
+        if (steps.size() < 2) return steps;
+
+        List<ChartIntervalResponse> merged = new ArrayList<>();
+        ChartIntervalResponse current = steps.getFirst();
+
+        for (int i = 1; i < steps.size(); i++) {
+            ChartIntervalResponse next = steps.get(i);
+
+            if (current.percentage() == next.percentage()) {
+                current = new ChartIntervalResponse(current.startDate(), next.endDate(), current.percentage());
+            } else {
+                merged.add(current);
+                current = next;
+            }
+        }
+        merged.add(current);
+
+        return merged;
+    }
+
+    private record RawAllocation(LocalDate start, LocalDate end, int percent) {}
 }
