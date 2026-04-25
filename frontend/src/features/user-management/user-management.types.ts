@@ -14,6 +14,12 @@ export interface UserResponse {
   supervisorEmail: string | null;
 }
 
+export interface SimpleUserResponse {
+  id: string,
+  name: string,
+  surname: string
+}
+
 export interface InviteUserRequest {
   email: string;
   role: AdminAssignableRole;

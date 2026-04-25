@@ -12,9 +12,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "project_members", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"project_id", "user_id"})
-})
+@Table(name = "project_members")
 public class ProjectMember {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

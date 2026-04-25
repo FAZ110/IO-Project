@@ -1,4 +1,4 @@
-import { CreateProjectForm } from "@/features/project/components/CreateProjectForm.tsx";
+import { CreateProjectForm } from "@/features/project/components/create_project/CreateProjectForm.tsx";
 
 export const CreateProjectPage = () => {
   return (

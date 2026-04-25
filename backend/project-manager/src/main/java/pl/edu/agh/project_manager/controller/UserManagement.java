@@ -11,6 +11,7 @@ import pl.edu.agh.project_manager.controller.dto.PagedResponse;
 import pl.edu.agh.project_manager.controller.dto.invitation.AdminUserInvitationRequest;
 import pl.edu.agh.project_manager.controller.dto.invitation.ManagerUserInvitationRequest;
 import pl.edu.agh.project_manager.controller.dto.invitation.ResendInvitationRequest;
+import pl.edu.agh.project_manager.controller.dto.user.SimpleUserResponse;
 import pl.edu.agh.project_manager.controller.dto.user.UserResponse;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
@@ -20,6 +21,7 @@ import pl.edu.agh.project_manager.service.UserService;
 import pl.edu.agh.project_manager.service.command.invitation.AdminInviteUserCommand;
 import pl.edu.agh.project_manager.service.command.invitation.ManagerInviteUserCommand;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -87,5 +89,10 @@ class UserManagement {
         invitationService.inviteUser(command);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/users/search")
+    public ResponseEntity<List<SimpleUserResponse>> searchUsers(@RequestParam("search") String search) {
+        return ResponseEntity.ok(userService.searchUsers(search));
     }
 }
