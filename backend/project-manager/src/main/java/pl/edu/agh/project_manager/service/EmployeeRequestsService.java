@@ -80,7 +80,8 @@ public class EmployeeRequestsService {
                             member.getRole().getRoleName(),
                             user.getName(),
                             user.getSurname(),
-                            requestStatus
+                            requestStatus,
+                            member.getCreatedAt()
                     );
                 })
                 .toList();
