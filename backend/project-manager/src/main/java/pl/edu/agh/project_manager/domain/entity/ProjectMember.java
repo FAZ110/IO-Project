@@ -2,10 +2,12 @@ package pl.edu.agh.project_manager.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import pl.edu.agh.project_manager.domain.enums.MembershipStatus;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -39,4 +41,8 @@ public class ProjectMember {
     @Enumerated(EnumType.STRING)
     @Column(name = "membership_status", nullable = false)
     private MembershipStatus membershipStatus;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 }
