@@ -63,7 +63,6 @@ class ProjectServiceTest {
                 "Title",
                 "Desc",
                 LocalDate.now(),
-                true,
                 null,
                 new ArrayList<>(),
                 new ArrayList<>(),
@@ -97,7 +96,7 @@ class ProjectServiceTest {
         );
 
         ProjectCreationCommand command = new ProjectCreationCommand(
-                creatorId, "Title", "Desc", LocalDate.now(), true, null,
+                creatorId, "Title", "Desc", LocalDate.now(), null,
                 new ArrayList<>(), new ArrayList<>(), milestones, new ArrayList<>(), new ArrayList<>()
         );
 
@@ -124,7 +123,7 @@ class ProjectServiceTest {
         RoleCommand invalidRole = new RoleCommand("Developer", List.of(100));
 
         ProjectCreationCommand command = new ProjectCreationCommand(
-                creatorId, "Title", "Desc", LocalDate.now(), true, null,
+                creatorId, "Title", "Desc", LocalDate.now(), null,
                 new ArrayList<>(), List.of(invalidRole), milestones, new ArrayList<>(), new ArrayList<>()
         );
 
@@ -147,7 +146,7 @@ class ProjectServiceTest {
         );
 
         ProjectCreationCommand command = new ProjectCreationCommand(
-                creatorId, "Title", "Desc", LocalDate.now(), true, null,
+                creatorId, "Title", "Desc", LocalDate.now(), null,
                 new ArrayList<>(), new ArrayList<>(), milestones, new ArrayList<>(), new ArrayList<>()
         );
 

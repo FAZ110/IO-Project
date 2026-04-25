@@ -1,17 +1,8 @@
-import {
-    type FieldErrors,
-    type UseFormRegister,
-    type FieldArrayWithId,
-    type UseFieldArrayAppend,
-    type UseFieldArrayRemove,
-    type UseFormSetValue,
-    type UseFormGetValues,
-    type UseFormTrigger,
-} from "react-hook-form";
-import type { ProjectCreationRequest} from "../../project.types.ts";
+import { useFieldArray, useFormContext } from "react-hook-form";
+import type { ProjectCreationRequest } from "../project.types.ts";
 import { useState } from "react";
 import type { SimpleUserResponse } from "@/features/user-management";
-import { UserAutocomplite } from "./UserAutocomplite.tsx";
+import { UserAutocomplete } from "./UserAutocomplete.tsx";
 import { StepProgressTracker } from "./StepProgressTracker.tsx";
 import { StepBasicInformation } from "./StepBasicInformation.view.tsx";
 import { StepMilestonesAndRisks } from "./StepMilestoneAndRisk.tsx";
@@ -19,61 +10,70 @@ import { StepNavigation } from "./StepNavigation.tsx";
 import { StepRoleUtilization } from "./StepRoleUtilization.tsx";
 
 interface CreateProjectViewProps {
-    register: UseFormRegister<ProjectCreationRequest>;
-    onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
+    onSubmitProject: () => Promise<void>;
     isPending: boolean;
-    errors: FieldErrors<ProjectCreationRequest>;
-    setError: (name: keyof ProjectCreationRequest, error: { type: string; message: string }) => void;
-    clearErrors: (name?: keyof ProjectCreationRequest) => void;
-    trigger: UseFormTrigger<ProjectCreationRequest>;
-
-    riskFields: FieldArrayWithId<ProjectCreationRequest, "risks", "id">[];
-    appendRisk: UseFieldArrayAppend<ProjectCreationRequest, "risks">;
-    removeRisk: UseFieldArrayRemove;
-
-    maileStonesFields: FieldArrayWithId<ProjectCreationRequest, "milestones", "id">[];
-    appendMileStone: UseFieldArrayAppend<ProjectCreationRequest, "milestones">;
-    removeMileStone: UseFieldArrayRemove;
-    milestones: ProjectCreationRequest["milestones"];
-
     groups: { id: string; name: string }[];
-
     foundUsers: SimpleUserResponse[];
     onUserSearch: (query: string) => void;
-
-    setValue: UseFormSetValue<ProjectCreationRequest>;
-    getValues: UseFormGetValues<ProjectCreationRequest>;
-
     message?: string;
 }
 
-export const CreateProjectView = ({
-    register,
-    onSubmit,
-    isPending,
-    errors,
-    trigger,
-    riskFields,
-    appendRisk,
-    removeRisk,
-    message,
-    setValue,
-    setError,
-    getValues,
-    clearErrors,
-    groups,
-    foundUsers,
-    onUserSearch,
-    milestones,
-    maileStonesFields,
-    appendMileStone,
-    removeMileStone,
-}: CreateProjectViewProps) => {
+export const CreateProjectView = ({ onSubmitProject, isPending, groups, foundUsers, onUserSearch, message }: CreateProjectViewProps) => {
+    const {
+        register,
+        control,
+        formState: { errors },
+        clearErrors,
+        watch,
+        setValue,
+        trigger,
+    } = useFormContext<ProjectCreationRequest>();
+
+    const milestones = watch("milestones");
+    const {
+        fields: riskFields,
+        append: appendRisk,
+        remove: removeRisk,
+    } = useFieldArray({
+        control,
+        name: "risks",
+    });
+    const {
+        fields: maileStonesFields,
+        append: appendMileStone,
+        remove: removeMileStone,
+    } = useFieldArray({
+        control,
+        name: "milestones",
+    });
+    const {
+        fields: roleFields,
+        append: appendRole,
+        remove: removeRole,
+    } = useFieldArray({
+        control,
+        name: "roles",
+    });
+
     const [currentStep, setCurrentStep] = useState(1);
     const totalSteps = 2;
 
     const [selectedSponsors, setSelectedSponsors] = useState<SimpleUserResponse[]>([]);
     const [selectedCommittee, setSelectedCommittee] = useState<SimpleUserResponse[]>([]);
+
+    const handleNextStep = async () => {
+        if (currentStep !== 1) return;
+
+        const isValid = await trigger(["title", "description", "sponsors", "committee", "milestones"]);
+
+        if (isValid) {
+            setCurrentStep((prev) => prev + 1);
+        }
+    };
+
+    const handlePrevStep = () => {
+        setCurrentStep((prev) => prev - 1);
+    };
 
     return (
         <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
@@ -87,19 +87,14 @@ export const CreateProjectView = ({
 
             <StepProgressTracker currentStep={currentStep} steps={["Podstawowe informacje", "Role i alokacja czasu"]} />
 
-            <form onSubmit={onSubmit} className="space-y-6 text-left">
+            <form className="space-y-6 text-left">
                 {currentStep === 1 && (
                     <>
                         {/* --- PODSTAWOWE INFORMACJE --- */}
-                        <StepBasicInformation
-                            register={register}
-                            errors={errors}
-                            setValue={setValue}
-                            groups={groups}
-                        />
+                        <StepBasicInformation register={register} errors={errors} setValue={setValue} groups={groups} />
 
                         {/* --- SPONSORZY --- */}
-                        <UserAutocomplite
+                        <UserAutocomplete
                             label="Sponsorzy"
                             foundUsers={foundUsers}
                             selectedUsers={selectedSponsors}
@@ -110,14 +105,10 @@ export const CreateProjectView = ({
                             clearErrors={clearErrors}
                         />
 
-                        {errors.sponsors?.message && (
-                            <p className="text-red-500 text-sm mt-2">
-                                {errors.sponsors.message}
-                            </p>
-                        )}
+                        {errors.sponsors?.message && <p className="text-red-500 text-sm mt-2">{errors.sponsors.message}</p>}
 
                         {/* --- KKOMITET STERUJACY --- */}
-                        <UserAutocomplite
+                        <UserAutocomplete
                             label="Komitet Sterujący"
                             foundUsers={foundUsers}
                             selectedUsers={selectedCommittee}
@@ -126,19 +117,13 @@ export const CreateProjectView = ({
                             setValue={setValue}
                             roles="committee"
                             clearErrors={clearErrors}
-
                         />
-                        
-                        {errors.committee?.message && (
-                            <p className="text-red-500 text-sm mt-2">
-                                {errors.committee.message}
-                            </p>
-                        )}
+
+                        {errors.committee?.message && <p className="text-red-500 text-sm mt-2">{errors.committee.message}</p>}
 
                         <StepMilestonesAndRisks
                             register={register}
                             errors={errors}
-                            getValues={getValues}
                             riskFields={riskFields}
                             appendRisk={appendRisk}
                             removeRisk={removeRisk}
@@ -147,35 +132,24 @@ export const CreateProjectView = ({
                             appendMileStone={appendMileStone}
                             removeMileStone={removeMileStone}
                         />
-                     </>
+                    </>
                 )}
 
                 {currentStep === 2 && (
                     <>
-                    <StepRoleUtilization
-                        setValue={setValue}
-                        getValues={getValues}
-                        clearErrors={clearErrors}
-                        register={register}
-                    />
+                        <StepRoleUtilization roleFields={roleFields} appendRole={appendRole} removeRole={removeRole} />
 
-                    {errors.roles?.message && (
-                        <p className="text-red-500 text-sm mt-2">
-                            {errors.roles.message}
-                        </p>
-                    )}
+                        {errors.roles?.message && <p className="text-red-500 text-sm mt-2">{errors.roles.message}</p>}
                     </>
                 )}
 
-                <StepNavigation 
-                    getValues={getValues}
-                    setError={setError}
-                    clearErrors={clearErrors}
+                <StepNavigation
                     isPending={isPending}
-                    trigger={trigger}
                     currentStep={currentStep}
-                    setCurrentStep={setCurrentStep}
                     totalSteps={totalSteps}
+                    handleNextStep={handleNextStep}
+                    handlePrevStep={handlePrevStep}
+                    handleSubmitProject={onSubmitProject}
                 />
             </form>
         </div>

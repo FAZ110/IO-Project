@@ -3,15 +3,13 @@ import {
     type FieldErrors,
     type UseFieldArrayAppend,
     type UseFieldArrayRemove,
-    type UseFormGetValues,
     type UseFormRegister,
 } from "react-hook-form";
-import type { ProjectCreationRequest } from "../../project.types";
+import type { ProjectCreationRequest } from "../project.types";
 
 interface StepMilestonesAndRisksProps {
     register: UseFormRegister<ProjectCreationRequest>;
     errors: FieldErrors<ProjectCreationRequest>;
-    getValues: UseFormGetValues<ProjectCreationRequest>;
     milestones: ProjectCreationRequest["milestones"];
 
     maileStonesFields: FieldArrayWithId<ProjectCreationRequest, "milestones", "id">[];
@@ -28,7 +26,6 @@ const today = new Date().toISOString().split("T")[0];
 export const StepMilestonesAndRisks = ({
     register,
     errors,
-    getValues,
     milestones,
     maileStonesFields,
     appendMileStone,
@@ -37,8 +34,6 @@ export const StepMilestonesAndRisks = ({
     appendRisk,
     removeRisk,
 }: StepMilestonesAndRisksProps) => {
-    const showMilestoneWarning = milestones.length < 2;
-
     return (
         <>
             <div className="pt-6 border-t border-gray-200">
@@ -64,7 +59,7 @@ export const StepMilestonesAndRisks = ({
                 <div className="space-y-4">
                     {maileStonesFields.map((field, index) => {
                         const lastMilestone = milestones[index - 1];
-                        const minDate = lastMilestone ? lastMilestone.date : getValues("startDate") || today;
+                        const minDate = lastMilestone?.date ?? today;
 
                         return (
                             <div key={field.id} className="p-4 border border-gray-200 rounded-lg bg-gray-50 relative">
@@ -105,7 +100,7 @@ export const StepMilestonesAndRisks = ({
                                                         return "Data startu jest wymagana";
                                                     }
                                                     return true;
-                                                }
+                                                },
                                             })}
                                             type="date"
                                             min={minDate}
@@ -123,7 +118,9 @@ export const StepMilestonesAndRisks = ({
                 </div>
             </div>
 
-            {showMilestoneWarning && <p className="text-red-500 text-sm mt-2">Musza byc co najmniej dwa kamienie milowe</p>}
+            {errors.milestones && typeof errors.milestones.message === "string" && (
+                <p className="text-red-500 text-sm mt-2">{errors.milestones.message}</p>
+            )}
 
             <div className="pt-6 border-t border-gray-200">
                 <div className="flex justify-between items-center mb-4">
@@ -164,6 +161,9 @@ export const StepMilestonesAndRisks = ({
                                         type="text"
                                         className="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-blue-500"
                                     />
+                                    {errors.risks?.[index]?.name && (
+                                        <span className="text-red-500 text-xs">{errors.risks[index].name.message}</span>
+                                    )}
                                 </div>
                                 <div>
                                     <label className="block text-xs font-medium text-gray-700 mb-1">Prawdopodobienstwo (0-100 %)</label>
@@ -172,10 +172,14 @@ export const StepMilestonesAndRisks = ({
                                             valueAsNumber: true,
                                             min: 0,
                                             max: 100,
+                                            required: true,
                                         })}
                                         type="number"
                                         className="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-blue-500"
                                     />
+                                    {errors.risks?.[index]?.probability && (
+                                        <span className="text-red-500 text-xs">{errors.risks[index].probability.message}</span>
+                                    )}
                                 </div>
                             </div>
                             <div>
@@ -189,6 +193,9 @@ export const StepMilestonesAndRisks = ({
                         </div>
                     ))}
                 </div>
+                {errors.risks && typeof errors.risks.message === "string" && (
+                    <p className="text-red-500 text-sm mt-2">{errors.risks.message}</p>
+                )}
             </div>
         </>
     );

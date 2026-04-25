@@ -1,5 +1,5 @@
 import type { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
-import type { ProjectCreationRequest } from "../../project.types";
+import type { ProjectCreationRequest } from "../project.types";
 import { useState } from "react";
 
 interface StepBasicInformationViewProps {
@@ -15,19 +15,18 @@ export const StepBasicInformation = ({
     setValue, 
     groups
 }: StepBasicInformationViewProps) => {
-    const filteredGroups = groups.filter((g) => g.name.toLowerCase().includes(groupSearch.toLowerCase()));
 
     const [groupSearch, setGroupSearch] = useState("");
     const [showGroupDropdown, setShowGroupDropdown] = useState(false);
+
+    const filteredGroups = groups.filter((g) => g.name.toLowerCase().includes(groupSearch.toLowerCase()));
 
     return <div className="space-y-4">
                 {/* TYTUŁ */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Nazwa *</label>
                     <input
-                        {...register("title", {
-                            required: "Tytuł jest wymagany",
-                        })}
+                        {...register("title")}
                         type="text"
                         className={`w-full border rounded p-2 focus:ring-blue-500 ${errors.title ? "border-red-500" : "border-gray-300"}`}
                     />
@@ -38,9 +37,7 @@ export const StepBasicInformation = ({
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Opis *</label>
                     <textarea
-                        {...register("description", {
-                            required: "Opis jest wymagany",
-                        })}
+                        {...register("description")}
                         rows={3}
                         className={`w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 ${errors.description ? "border-red-500" : "border-gray-300"}`}
                     />
@@ -58,7 +55,7 @@ export const StepBasicInformation = ({
                         onChange={(e) => {
                             setGroupSearch(e.target.value);
                             setShowGroupDropdown(true);
-                            if (e.target.value === "") setValue("projectGroupId", "");
+                            if (e.target.value === "") setValue("projectGroupId", null, { shouldValidate: true });
                         }}
                         onFocus={() => setShowGroupDropdown(true)}
                         type="text"

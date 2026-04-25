@@ -1,9 +1,9 @@
 import type { SimpleUserResponse } from "@/features/user-management";
 import { useState } from "react";
 import { type UseFormSetValue } from "react-hook-form";
-import type { ProjectCreationRequest } from "../../project.types";
+import type { ProjectCreationRequest } from "../project.types";
 
-interface UserAutocompliteProps {
+interface UserAutocompleteProps {
     label: string;
     foundUsers: SimpleUserResponse[];
     onSearch: (query: string) => void;
@@ -14,7 +14,7 @@ interface UserAutocompliteProps {
     roles: "committee" | "sponsors";
 }
 
-export const UserAutocomplite = ({
+export const UserAutocomplete = ({
     label,
     foundUsers,
     onSearch,
@@ -24,7 +24,7 @@ export const UserAutocomplite = ({
     clearErrors,
     roles
 
-}: UserAutocompliteProps) => {
+}: UserAutocompleteProps) => {
 
     const [searchInput, setSearchInput] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);

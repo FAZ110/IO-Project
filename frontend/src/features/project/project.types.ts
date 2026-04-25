@@ -3,12 +3,11 @@ import type {UserResponse} from "@/features/user-management";
 export interface ProjectCreationRequest {
     title: string;
     description: string;
-    startDate: string;
     projectGroupId?: string | null;
     sponsors: string[];
     committee: string[];
     milestones: Milestone[];
-    roles: Role[];
+    roles: ProjectRole[];
     risks?: Risk[];
 }
 
@@ -39,7 +38,7 @@ export interface ProjectDetailsResponse {
   manager: UserResponse
 }
 
-export interface Role {
+export interface ProjectRole {
   name: string,
   utilizationPercentages: number[]
 }

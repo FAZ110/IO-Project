@@ -57,6 +57,24 @@ public class Project {
     @Builder.Default
     private List<ProjectSegment> segments = new ArrayList<>();
 
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "project_sponsors",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @Builder.Default
+    private Set<User> sponsors = new HashSet<>();
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "project_committees",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @Builder.Default
+    private Set<User> committees = new HashSet<>();
+
     public void addRisk(ProjectRisk risk) {
         this.risks.add(risk);
         risk.setProject(this);
@@ -88,5 +106,15 @@ public class Project {
     public void addRole(ProjectRole role) {
         this.roles.add(role);
         role.setProject(this);
+    }
+
+    public void addSponsor(User sponsor) {
+        this.sponsors.add(sponsor);
+        sponsor.getSponsorProjects().add(this);
+    }
+
+    public void addCommittee(User committee) {
+        this.committees.add(committee);
+        committee.getCommitteeProjects().add(this);
     }
 }

@@ -21,7 +21,6 @@ import pl.edu.agh.project_manager.repository.RiskRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
 import pl.edu.agh.project_manager.service.command.project.MilestoneCommand;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
-import pl.edu.agh.project_manager.service.command.project.ProjectSegmentCommand;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
 import pl.edu.agh.project_manager.service.command.project.RoleCommand;
 import pl.edu.agh.project_manager.service.command.project.*;
@@ -47,6 +46,7 @@ public class ProjectService {
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_MANAGER_NOT_FOUND, "Cannot find provided project manager - " + command.creatorId()));
 
         ProjectGroups projectGroup = null;
+        System.out.println(command.projectGroupId());
         if (command.projectGroupId() != null) {
             projectGroup = projectGroupRepository.findById(command.projectGroupId())
                     .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_GROUP_NOT_FOUND, "Cannot find provided project group - " + command.projectGroupId()));
@@ -63,16 +63,8 @@ public class ProjectService {
         }
         addRolesAndBindWithSegments(project, segments, command.roles());
 
-        ProjectRole sponsorRole = new ProjectRole();
-        sponsorRole.setRoleName("Sponsor");
-        ProjectRole committeeRole = new ProjectRole();
-        committeeRole.setRoleName("Komitet sterujący");
-
-        project.addRole(sponsorRole);
-        project.addRole(committeeRole);
-
-        addSpecialMembersToProject(project, command.sponsors(), sponsorRole);
-        addSpecialMembersToProject(project, command.committee(), committeeRole);
+        addSponsorsToProject(project, command.sponsors());
+        addCommitteesToProject(project, command.committee());
 
         Project savedProject = projectRepository.save(project);
 
@@ -248,16 +240,13 @@ public class ProjectService {
         });
     }
 
-    private void addSpecialMembersToProject(Project project, List<UUID> specialMembers, ProjectRole role) {
-        List<User> sponsorUsers = userRepository.findAllById(specialMembers);
+    private void addSponsorsToProject(Project project, List<UUID> sponsors) {
+        List<User> sponsorUsers = userRepository.findAllById(sponsors);
+        sponsorUsers.forEach(project::addSponsor);
+    }
 
-        sponsorUsers.forEach(user -> {
-            ProjectMember projectMember = new ProjectMember();
-            projectMember.setUser(user);
-            projectMember.setRole(role);
-            projectMember.setMembershipStatus(MembershipStatus.ACCEPTED);
-
-            project.addSpecialMember(projectMember);
-        });
+    private void addCommitteesToProject(Project project, List<UUID> committee) {
+        List<User> sponsorUsers = userRepository.findAllById(committee);
+        sponsorUsers.forEach(project::addCommittee);
     }
 }

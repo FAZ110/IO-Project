@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { userManagementService } from './user-management.service';
 import type { InviteUserRequest, UserListParams } from './user-management.types';
-import { USERS_QUERY_KEY } from './query-keys';
+import { usersKeys } from './query-keys';
 
 export const useUsersQuery = (page: number, size: number, filters: UserListParams = {}) =>
   useQuery({
-    queryKey: [...USERS_QUERY_KEY, page, size, filters],
+    queryKey: usersKeys.list(page, size, filters).queryKey,
     queryFn: () => userManagementService.getUsers({ pageNumber: page, pageSize: size, ...filters }),
   });
 
@@ -14,7 +14,7 @@ export const useInviteUserMutation = () => {
 
   return useMutation({
     mutationFn: (data: InviteUserRequest) => userManagementService.inviteUser(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: usersKeys._def }),
   });
 };
 
@@ -23,7 +23,7 @@ export const useDeleteUserMutation = () => {
 
   return useMutation({
     mutationFn: (userId: string) => userManagementService.deleteUser(userId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: usersKeys._def }),
   });
 };
 
@@ -34,7 +34,7 @@ export const useResendInvitationMutation = () =>
 
 export const useSearchUsers = (searchTerm: string) => {
     return useQuery({
-        queryKey: ['searchUsers', searchTerm],
+        queryKey: usersKeys.search(searchTerm).queryKey,
         queryFn: () => userManagementService.searchUsers(searchTerm),
         enabled: searchTerm.length >= 2
     });

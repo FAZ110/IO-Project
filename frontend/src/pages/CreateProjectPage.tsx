@@ -1,11 +1,11 @@
-import { CreateProjectForm } from "@/features/project/components/create_project/CreateProjectForm.tsx";
+import { CreateProjectForm } from "@/features/project/components/CreateProjectForm";
 
 export const CreateProjectPage = () => {
-  return (
-    <div className="flex items-center justify-center p-4">
-      <div className="w-full max-w-3xl">
-        <CreateProjectForm />
-      </div>
-    </div>
-  );
+    return (
+        <div className="flex items-center justify-center p-4">
+            <div className="w-full max-w-3xl">
+                <CreateProjectForm />
+            </div>
+        </div>
+    );
 };
