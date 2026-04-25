@@ -94,6 +94,32 @@ public class EmployeeRequestsService {
                 .toList();
     }
 
+    @Transactional
+    public void acceptEmployeeRequest(UUID requestId) {
+        ProjectMember projectRequest = projectMemberRepository.findById(requestId)
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.EMPLOYEE_REQUEST_NOT_FOUND));
+
+        validatePendingStatus(projectRequest);
+
+        projectRequest.setMembershipStatus(MembershipStatus.ACCEPTED);
+    }
+
+    @Transactional
+    public void rejectEmployeeRequest(UUID requestId) {
+        ProjectMember projectRequest = projectMemberRepository.findById(requestId)
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.EMPLOYEE_REQUEST_NOT_FOUND));
+
+        validatePendingStatus(projectRequest);
+
+        projectRequest.setMembershipStatus(MembershipStatus.REJECTED);
+    }
+
+    private void validatePendingStatus(ProjectMember request) {
+        if (request.getMembershipStatus() != MembershipStatus.PENDING) {
+            throw new ApplicationException(ApiErrorCode.INVALID_REQUEST_STATUS);
+        }
+    }
+
     @Transactional(readOnly = true)
     public EmployeeRequestDetails getEmployeeRequestDetails(EmployeeRequestDetailsCommand command) {
         ProjectMember projectRequest = projectMemberRepository.findById(command.requestId())
