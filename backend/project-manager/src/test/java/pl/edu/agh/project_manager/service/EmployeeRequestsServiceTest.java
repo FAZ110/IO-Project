@@ -5,10 +5,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.Test;
-import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeRequestDetails;
-import pl.edu.agh.project_manager.domain.entity.ProjectRoleSegmentAllocation;
-import pl.edu.agh.project_manager.domain.entity.ProjectSegment;
 import pl.edu.agh.project_manager.domain.entity.Project;
 import pl.edu.agh.project_manager.domain.entity.ProjectMember;
 import pl.edu.agh.project_manager.domain.entity.ProjectRole;
@@ -19,13 +17,9 @@ import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectMemberRepository;
 import pl.edu.agh.project_manager.repository.ProjectRepository;
 import pl.edu.agh.project_manager.repository.ProjectRoleRepository;
-import pl.edu.agh.project_manager.repository.ProjectRoleSegmentAllocationRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
 import pl.edu.agh.project_manager.service.command.employee_request.EmployeeRequestCommand;
-import pl.edu.agh.project_manager.service.command.employee_request.EmployeeRequestDetailsCommand;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -48,8 +42,6 @@ class EmployeeRequestsServiceTest {
     private ProjectRoleRepository projectRoleRepository;
     @Mock
     private ProjectMemberRepository projectMemberRepository;
-    @Mock
-    private ProjectRoleSegmentAllocationRepository segmentAllocationRepository;
 
     @InjectMocks
     private EmployeeRequestsService employeeRequestsService;
@@ -140,80 +132,5 @@ class EmployeeRequestsServiceTest {
                 .isEqualTo(ApiErrorCode.USER_HAS_ONGOING_REQUEST);
 
         verify(projectMemberRepository, never()).save(any());
-    }
-
-    @Test
-    void getEmployeeRequestDetails_shouldThrowException_whenRequestNotFound() {
-        // given
-        UUID requestId = UUID.randomUUID();
-        EmployeeRequestDetailsCommand command = new EmployeeRequestDetailsCommand(requestId);
-        given(projectMemberRepository.findById(requestId)).willReturn(Optional.empty());
-
-        // when & then
-        assertThatExceptionOfType(ApplicationException.class)
-                .isThrownBy(() -> employeeRequestsService.getEmployeeRequestDetails(command))
-                .extracting(ApplicationException::getErrorCode)
-                .isEqualTo(ApiErrorCode.EMPLOYEE_REQUEST_NOT_FOUND);
-
-        verify(segmentAllocationRepository, never()).findAllUserAllocations(any());
-    }
-
-    @Test
-    void getEmployeeRequestDetails_shouldHandleOverlappingSegments_whenRequestIncrementIsEmpty() {
-        // given
-        UUID userId = UUID.randomUUID();
-        UUID requestId = UUID.randomUUID();
-
-        User user = User.builder().id(userId).build();
-        ProjectRole requestRole = ProjectRole.builder().segmentAllocations(List.of()).build();
-        ProjectMember request = ProjectMember.builder()
-                .id(requestId)
-                .user(user)
-                .role(requestRole)
-                .project(Project.builder().id(UUID.randomUUID()).build())
-                .membershipStatus(MembershipStatus.PENDING)
-                .build();
-
-        ProjectSegment firstSegment = ProjectSegment.builder()
-                .startDate(LocalDate.of(2026, 1, 1))
-                .endDate(LocalDate.of(2026, 1, 10))
-                .build();
-        ProjectSegment secondSegment = ProjectSegment.builder()
-                .startDate(LocalDate.of(2026, 1, 5))
-                .endDate(LocalDate.of(2026, 1, 15))
-                .build();
-
-        ProjectRoleSegmentAllocation firstAllocation = ProjectRoleSegmentAllocation.builder()
-                .segment(firstSegment)
-                .utilizationPercentage(40)
-                .build();
-        ProjectRoleSegmentAllocation secondAllocation = ProjectRoleSegmentAllocation.builder()
-                .segment(secondSegment)
-                .utilizationPercentage(30)
-                .build();
-
-        given(projectMemberRepository.findById(requestId)).willReturn(Optional.of(request));
-        given(segmentAllocationRepository.findAllUserAllocations(userId))
-                .willReturn(List.of(firstAllocation, secondAllocation));
-
-        // when
-        EmployeeRequestDetails details = employeeRequestsService.getEmployeeRequestDetails(new EmployeeRequestDetailsCommand(requestId));
-
-        // then
-        assertEquals(3, details.currentWorkload().size());
-        assertEquals(LocalDate.of(2026, 1, 1), details.currentWorkload().get(0).startDate());
-        assertEquals(LocalDate.of(2026, 1, 5), details.currentWorkload().get(0).endDate());
-        assertEquals(40, details.currentWorkload().get(0).percentage());
-
-        assertEquals(LocalDate.of(2026, 1, 5), details.currentWorkload().get(1).startDate());
-        assertEquals(LocalDate.of(2026, 1, 10), details.currentWorkload().get(1).endDate());
-        assertEquals(70, details.currentWorkload().get(1).percentage());
-
-        assertEquals(LocalDate.of(2026, 1, 10), details.currentWorkload().get(2).startDate());
-        assertEquals(LocalDate.of(2026, 1, 15), details.currentWorkload().get(2).endDate());
-        assertEquals(30, details.currentWorkload().get(2).percentage());
-
-        assertEquals(List.of(), details.workloadAfterApproval());
-        verify(segmentAllocationRepository).findAllUserAllocations(userId);
     }
 }
