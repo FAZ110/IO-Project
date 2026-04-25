@@ -24,6 +24,7 @@ import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand
 import pl.edu.agh.project_manager.service.command.project.ProjectSegmentCommand;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
 import pl.edu.agh.project_manager.service.command.project.RoleCommand;
+import pl.edu.agh.project_manager.service.command.project.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -54,7 +55,6 @@ public class ProjectService {
         Project project = buildProject(command, projectManager);
         project.setProjectGroup(projectGroup);
 
-        projectManager.getProjects().add(project);
         addRisksToProject(project, command.risks());
 
         List<ProjectSegment> segments = createSegmentsFromMilestones(command.milestones());

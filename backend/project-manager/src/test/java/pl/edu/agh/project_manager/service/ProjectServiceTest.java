@@ -98,7 +98,7 @@ class ProjectServiceTest {
 
         ProjectCreationCommand command = new ProjectCreationCommand(
                 creatorId, "Title", "Desc", LocalDate.now(), true, null,
-                new ArrayList<>(), new ArrayList<>(), milestones
+                new ArrayList<>(), new ArrayList<>(), milestones, new ArrayList<>(), new ArrayList<>()
         );
 
         when(userRepository.findById(creatorId)).thenReturn(Optional.of(User.builder().id(creatorId).build()));
@@ -125,7 +125,7 @@ class ProjectServiceTest {
 
         ProjectCreationCommand command = new ProjectCreationCommand(
                 creatorId, "Title", "Desc", LocalDate.now(), true, null,
-                new ArrayList<>(), List.of(invalidRole), milestones
+                new ArrayList<>(), List.of(invalidRole), milestones, new ArrayList<>(), new ArrayList<>()
         );
 
         when(userRepository.findById(creatorId)).thenReturn(Optional.of(User.builder().id(creatorId).build()));
@@ -147,16 +147,10 @@ class ProjectServiceTest {
         );
 
         ProjectCreationCommand command = new ProjectCreationCommand(
-                creatorId,
-                "Title",
-                "Desc",
-                LocalDate.now(),
-                true,
-                null,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                milestones
+                creatorId, "Title", "Desc", LocalDate.now(), true, null,
+                new ArrayList<>(), new ArrayList<>(), milestones, new ArrayList<>(), new ArrayList<>()
         );
+
         User manager = User.builder().id(creatorId).build();
         when(userRepository.findById(creatorId)).thenReturn(Optional.of(manager));
 

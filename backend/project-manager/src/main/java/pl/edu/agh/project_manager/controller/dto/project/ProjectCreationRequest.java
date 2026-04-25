@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotNull;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,7 +39,6 @@ public record ProjectCreationRequest(
         @NotEmpty(message = "Lista kamieni milowych nie może być pusta")
         List<@Valid MilestoneRequest> milestones
 ) {
-    // By default, project is active and list with risks is empty
     public ProjectCreationRequest {
         if (risks.isEmpty()) risks = List.of();
     }

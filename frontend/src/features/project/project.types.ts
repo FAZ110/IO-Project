@@ -8,6 +8,7 @@ export interface ProjectCreationRequest {
     sponsors: string[];
     committee: string[];
     milestones: Milestone[];
+    roles: Role[];
     risks?: Risk[];
 }
 
@@ -25,8 +26,8 @@ export interface RiskResponse {
 }
 
 export interface Milestone {
-    startDate: string
-    endDate: string
+    date: string;
+    name: string;
 }
 
 export interface ProjectDetailsResponse {
@@ -36,5 +37,10 @@ export interface ProjectDetailsResponse {
   startDate: string;
   isActive: boolean;
   manager: UserResponse
+}
+
+export interface Role {
+  name: string,
+  utilizationPercentages: number[]
 }
 
