@@ -13,11 +13,9 @@ public enum ApiErrorCode {
 
     USER_NOT_FOUND("USR_002", HttpStatus.NOT_FOUND, "Cannot found user"),
 
-    PROJECT_MANAGER_NOT_FOUND("PROJ_001", HttpStatus.NOT_FOUND, "Cannot find provided project manager"),
-    // TODO: zmienic kod bledu bo sie powtarza
-    PROJECT_NOT_FOUND("PROJ_002", HttpStatus.NOT_FOUND, "Cannot find provided project"),
     RISK_NOT_FOUND("RISK_001", HttpStatus.NOT_FOUND, "Cannot find provided risk in provided project"),
 
+    PROJECT_MANAGER_NOT_FOUND("PROJ_001", HttpStatus.NOT_FOUND, "Cannot find provided project manager"),
     PROJECT_GROUP_NOT_FOUND("PROJ_002", HttpStatus.NOT_FOUND, "Cannot find project group"),
     INVALID_MILESTONES("PROJ_003", HttpStatus.BAD_REQUEST, "Project must have at least start and end milestones defined"),
     INVALID_MILESTONE_ORDER("PROJ_004", HttpStatus.BAD_REQUEST, "Milestones must be chronologically ordered"),
