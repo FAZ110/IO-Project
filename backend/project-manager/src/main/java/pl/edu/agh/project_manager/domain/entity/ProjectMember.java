@@ -1,8 +1,7 @@
 package pl.edu.agh.project_manager.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import pl.edu.agh.project_manager.domain.enums.MembershipStatus;
@@ -15,6 +14,9 @@ import java.util.UUID;
 @Table(name = "project_members", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"project_id", "user_id"})
 })
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProjectMember {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
