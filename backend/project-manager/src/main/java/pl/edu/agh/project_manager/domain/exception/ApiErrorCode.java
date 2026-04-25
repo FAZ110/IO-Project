@@ -21,6 +21,10 @@ public enum ApiErrorCode {
     INVALID_MILESTONES("PROJ_003", HttpStatus.BAD_REQUEST, "Project must have at least start and end milestones defined"),
     INVALID_MILESTONE_ORDER("PROJ_004", HttpStatus.BAD_REQUEST, "Milestones must be chronologically ordered"),
     INVALID_ROLE_UTILIZATION("PROJ_005", HttpStatus.BAD_REQUEST, "Role utilization percentages must match timeline segments length"),
+    PROJECT_ROLE_NOT_FOUND("PROJ_006", HttpStatus.NOT_FOUND, "Cannot find provided project role"),
+    ROLE_NOT_IN_PROJECT("PROJ_007", HttpStatus.BAD_REQUEST, "Role must exist within the provided project"),
+    USER_ALREADY_IN_PROJECT("PROJ_008", HttpStatus.CONFLICT, "User is already a member of this project"),
+    USER_HAS_ONGOING_REQUEST("PROJ_009", HttpStatus.CONFLICT, "User already has a pending request for this project"),
 
     ACTIVATION_TOKEN_NOT_FOUND("AUTH_001", HttpStatus.NOT_FOUND, "Activation token is invalid or does not exist"),
     ACTIVATION_TOKEN_EXPIRED("AUTH_002", HttpStatus.BAD_REQUEST, "Activation token has expired"),
