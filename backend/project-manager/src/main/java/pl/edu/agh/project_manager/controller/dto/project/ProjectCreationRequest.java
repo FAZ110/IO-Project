@@ -36,7 +36,6 @@ public record ProjectCreationRequest(
         @Valid
         List<RiskRequest> risks
 ) {
-    // By default, project is active and list with risks is empty
     public ProjectCreationRequest {
         if (risks.isEmpty()) risks = List.of();
     }

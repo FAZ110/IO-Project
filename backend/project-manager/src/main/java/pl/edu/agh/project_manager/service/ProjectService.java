@@ -15,6 +15,11 @@ import pl.edu.agh.project_manager.repository.UserRepository;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 import pl.edu.agh.project_manager.service.command.project.ProjectSegmentCommand;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
+<<<<<<< HEAD
+=======
+import pl.edu.agh.project_manager.service.command.project.RoleCommand;
+import pl.edu.agh.project_manager.service.command.project.*;
+>>>>>>> 7eb1fea (Update form to create new project with roles time allocations)
 
 import java.util.List;
 import java.util.UUID;
@@ -40,7 +45,11 @@ public class ProjectService {
 
         Project project = buildProject(command, projectManager);
         project.setProjectGroup(projectGroup);
+<<<<<<< HEAD
         projectManager.getProjects().add(project);
+=======
+
+>>>>>>> 7eb1fea (Update form to create new project with roles time allocations)
         addRisksToProject(project, command.risks());
 
         ProjectRole sponsorRole = new ProjectRole();

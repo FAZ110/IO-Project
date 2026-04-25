@@ -67,6 +67,85 @@ class ProjectServiceTest {
         verify(projectRepository).save(any(Project.class));
     }
 
+<<<<<<< HEAD
+=======
+    @Test
+    @DisplayName("Should throw exception when milestones are not in chronological order")
+    void createProject_InvalidMilestoneOrder() {
+        // Given
+        UUID creatorId = UUID.randomUUID();
+        LocalDateTime now = LocalDateTime.now();
+        List<MilestoneCommand> milestones = List.of(
+                new MilestoneCommand("start", LocalDate.now()),
+                new MilestoneCommand("end", LocalDate.now().minusDays(5))
+        );
+
+        ProjectCreationCommand command = new ProjectCreationCommand(
+                creatorId, "Title", "Desc", LocalDate.now(), true, null,
+                new ArrayList<>(), new ArrayList<>(), milestones, new ArrayList<>(), new ArrayList<>()
+        );
+
+        when(userRepository.findById(creatorId)).thenReturn(Optional.of(User.builder().id(creatorId).build()));
+
+        // When & Then
+        assertThatExceptionOfType(ApplicationException.class)
+                .isThrownBy(() -> projectService.createProject(command))
+                .extracting(ApplicationException::getErrorCode)
+                .isEqualTo(ApiErrorCode.INVALID_MILESTONE_ORDER);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when role utilization count does not match segments count")
+    void createProject_InvalidRoleUtilization() {
+        // Given
+        UUID creatorId = UUID.randomUUID();
+        LocalDateTime now = LocalDateTime.now();
+        List<MilestoneCommand> milestones = List.of(
+                new MilestoneCommand("start", LocalDate.now()),
+                new MilestoneCommand("mid", LocalDate.now().plusDays(10)),
+                new MilestoneCommand("end", LocalDate.now().plusDays(20))
+        );
+        RoleCommand invalidRole = new RoleCommand("Developer", List.of(100));
+
+        ProjectCreationCommand command = new ProjectCreationCommand(
+                creatorId, "Title", "Desc", LocalDate.now(), true, null,
+                new ArrayList<>(), List.of(invalidRole), milestones, new ArrayList<>(), new ArrayList<>()
+        );
+
+        when(userRepository.findById(creatorId)).thenReturn(Optional.of(User.builder().id(creatorId).build()));
+
+        // When & Then
+        assertThatExceptionOfType(ApplicationException.class)
+                .isThrownBy(() -> projectService.createProject(command))
+                .extracting(ApplicationException::getErrorCode)
+                .isEqualTo(ApiErrorCode.INVALID_ROLE_UTILIZATION);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when not enough milestones")
+    void createProject_NotEnoughMilestones() {
+        // Given
+        UUID creatorId = UUID.randomUUID();
+        List<MilestoneCommand> milestones = List.of(
+                new MilestoneCommand("start", LocalDate.now())
+        );
+
+        ProjectCreationCommand command = new ProjectCreationCommand(
+                creatorId, "Title", "Desc", LocalDate.now(), true, null,
+                new ArrayList<>(), new ArrayList<>(), milestones, new ArrayList<>(), new ArrayList<>()
+        );
+
+        User manager = User.builder().id(creatorId).build();
+        when(userRepository.findById(creatorId)).thenReturn(Optional.of(manager));
+
+        // When & Then
+        assertThatExceptionOfType(ApplicationException.class)
+                .isThrownBy(() -> projectService.createProject(command))
+                .extracting(ApplicationException::getErrorCode)
+                .isEqualTo(ApiErrorCode.INVALID_MILESTONES);
+    }
+
+>>>>>>> 7eb1fea (Update form to create new project with roles time allocations)
 
     @Test
     @DisplayName("Should delete risk when user is project manager")
