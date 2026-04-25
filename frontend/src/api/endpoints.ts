@@ -19,5 +19,11 @@ export const ENDPOINTS = {
     RISK: {
       LIST: (projectId: string) => `/project/${projectId}/risk`
     }
+  },
+  EMPLOYEE: {
+    REQUESTS: '/employee/requests',
+    REQUEST_DETAIL: (id: string) => `/employee/requests/${id}`,
+    ACCEPT_REQUEST: (id: string) => `/employee/requests/${id}/accept`,
+    REJECT_REQUEST: (id: string) => `/employee/requests/${id}/reject`
   }
 } as const;
