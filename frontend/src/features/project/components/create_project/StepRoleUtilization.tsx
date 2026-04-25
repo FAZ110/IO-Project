@@ -1,4 +1,4 @@
-import type { UseFormGetValues, UseFormSetValue, FieldErrors, UseFormRegister } from "react-hook-form";
+import type { UseFormGetValues, UseFormSetValue, UseFormRegister } from "react-hook-form";
 import type { ProjectCreationRequest, Role } from "../../project.types";
 import { useState } from "react";
 import { generatePhasesFromMilestones } from "../../project.utils";
