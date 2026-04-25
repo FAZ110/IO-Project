@@ -75,10 +75,9 @@ public class Project {
         member.setMembershipStatus(MembershipStatus.PENDING);
         this.members.add(member);
     }
-
-    public void addSpecialMember(ProjectMember special) {
-        this.members.add(special);
-        special.setProject(this);
+    public void addSpecialMember(ProjectMember stakeholder) {
+        this.members.add(stakeholder);
+        stakeholder.setProject(this);
     }
 
     public void addSegment(ProjectSegment projectSegment) {
