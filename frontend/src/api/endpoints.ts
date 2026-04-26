@@ -15,7 +15,6 @@ export const ENDPOINTS = {
     INVITATIONS: '/admin/invitations',
   },
   PROJECT: {
-    CREATE: '/project',
     BASE: '/projects',
           DETAIL: (id: string) => `/projects/${id}`,
           RISK: {
