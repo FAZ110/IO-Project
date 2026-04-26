@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeAssignmentRequest;
 import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeAssignmentDetailsResponse;
 import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeAssignmentResponse;
+import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeAssignmentRequestStatus;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.EmployeeAssignmentsService;
 import pl.edu.agh.project_manager.service.command.employee_request.EmployeeRequestCommand;
@@ -38,8 +39,10 @@ public class EmployeeAssignmentsController {
 
     @GetMapping
     @PreAuthorize("hasRole('LINEAR_MANAGER')")
-    public ResponseEntity<List<EmployeeAssignmentResponse>> getEmployeeAssignments() {
-        List<EmployeeAssignmentResponse> requests = employeeAssignmentsService.getEmployeeAssignments();
+    public ResponseEntity<List<EmployeeAssignmentResponse>> getEmployeeAssignments(
+            @RequestParam(required = false) EmployeeAssignmentRequestStatus status
+    ) {
+        List<EmployeeAssignmentResponse> requests = employeeAssignmentsService.getEmployeeAssignments(status);
 
         return ResponseEntity.ok(requests);
     }
