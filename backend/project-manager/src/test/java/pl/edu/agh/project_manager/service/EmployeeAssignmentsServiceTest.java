@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.Test;
-import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeRequestDetails;
+import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeAssignmentDetailsResponse;
 import pl.edu.agh.project_manager.domain.entity.Project;
 import pl.edu.agh.project_manager.domain.entity.ProjectMember;
 import pl.edu.agh.project_manager.domain.entity.ProjectRole;
@@ -37,7 +37,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class EmployeeRequestsServiceTest {
+class EmployeeAssignmentsServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -51,10 +51,10 @@ class EmployeeRequestsServiceTest {
     private ProjectRoleSegmentAllocationRepository segmentAllocationRepository;
 
     @InjectMocks
-    private EmployeeRequestsService employeeRequestsService;
+    private EmployeeAssignmentsService employeeAssignmentsService;
 
     @Test
-    void createEmployeeRequest_shouldCreateNewRequestWithPendingStatus() {
+    void createEmployeeRequest_shouldCreateNewAssignmentWithPendingStatus() {
         // given
         UUID userId = UUID.randomUUID();
         UUID projectId = UUID.randomUUID();
@@ -78,7 +78,7 @@ class EmployeeRequestsServiceTest {
                 .willReturn(false);
 
         // when
-        employeeRequestsService.createEmployeeRequest(command);
+        employeeAssignmentsService.createEmployeeAssignment(command);
 
         // then
         ArgumentCaptor<ProjectMember> memberCaptor = ArgumentCaptor.forClass(ProjectMember.class);
@@ -92,7 +92,7 @@ class EmployeeRequestsServiceTest {
     }
 
     @Test
-    void createEmployeeRequest_shouldThrowException_whenRoleNotInProject() {
+    void createEmployeeAssignment_shouldThrowException_whenRoleNotInProject() {
         // given
         UUID projectId = UUID.randomUUID();
         UUID otherProjectId = UUID.randomUUID();
@@ -108,7 +108,7 @@ class EmployeeRequestsServiceTest {
 
         // when & then
         assertThatExceptionOfType(ApplicationException.class)
-                .isThrownBy(() -> employeeRequestsService.createEmployeeRequest(command))
+                .isThrownBy(() -> employeeAssignmentsService.createEmployeeAssignment(command))
                 .extracting(ApplicationException::getErrorCode)
                 .isEqualTo(ApiErrorCode.ROLE_NOT_IN_PROJECT);
 
@@ -116,7 +116,7 @@ class EmployeeRequestsServiceTest {
     }
 
     @Test
-    void createEmployeeRequest_shouldThrowException_whenUserHasOngoingRequest() {
+    void createEmployeeRequest_shouldThrowException_whenUserHasOngoingAssignment() {
         // given
         UUID userId = UUID.randomUUID();
         UUID projectId = UUID.randomUUID();
@@ -134,7 +134,7 @@ class EmployeeRequestsServiceTest {
 
         // when & then
         assertThatExceptionOfType(ApplicationException.class)
-                .isThrownBy(() -> employeeRequestsService.createEmployeeRequest(command))
+                .isThrownBy(() -> employeeAssignmentsService.createEmployeeAssignment(command))
                 .extracting(ApplicationException::getErrorCode)
                 .isEqualTo(ApiErrorCode.USER_HAS_ONGOING_REQUEST);
 
@@ -150,7 +150,7 @@ class EmployeeRequestsServiceTest {
 
         // when & then
         assertThatExceptionOfType(ApplicationException.class)
-                .isThrownBy(() -> employeeRequestsService.getEmployeeRequestDetails(command))
+                .isThrownBy(() -> employeeAssignmentsService.getEmployeeRequestDetails(command))
                 .extracting(ApplicationException::getErrorCode)
                 .isEqualTo(ApiErrorCode.EMPLOYEE_REQUEST_NOT_FOUND);
 
@@ -196,7 +196,7 @@ class EmployeeRequestsServiceTest {
                 .willReturn(List.of(firstAllocation, secondAllocation));
 
         // when
-        EmployeeRequestDetails details = employeeRequestsService.getEmployeeRequestDetails(new EmployeeRequestDetailsCommand(requestId));
+        EmployeeAssignmentDetailsResponse details = employeeAssignmentsService.getEmployeeRequestDetails(new EmployeeRequestDetailsCommand(requestId));
 
         // then
         assertEquals(3, details.currentWorkload().size());
