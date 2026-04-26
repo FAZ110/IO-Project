@@ -13,7 +13,6 @@ export interface UserInfo {
   role: UserRole;
   firstName: string;
   lastName: string;
-  loginAt: Date;
 }
 
 export interface JwtPayload {

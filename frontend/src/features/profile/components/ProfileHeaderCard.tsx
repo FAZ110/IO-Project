@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Clock, KeyRound, Mail, ShieldCheck } from 'lucide-react';
+import { KeyRound, Mail, ShieldCheck } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -13,15 +13,6 @@ interface ProfileHeaderCardProps {
 
 const getInitials = (firstName: string, lastName: string) =>
   `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || 'U';
-
-const formatLoginDate = (date: Date) =>
-  date.toLocaleString('pl-PL', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
 
 export const ProfileHeaderCard = ({ user }: ProfileHeaderCardProps) => {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -43,22 +34,8 @@ export const ProfileHeaderCard = ({ user }: ProfileHeaderCardProps) => {
             <div className="flex w-full flex-col items-center gap-2 pb-2 sm:flex-row sm:items-end sm:justify-between">
               <div className="flex flex-col items-center sm:items-start">
                 <h2 className="font-heading text-3xl font-semibold text-foreground">{fullName}</h2>
-                  <p className="text-sm text-muted-foreground">
-                    TODO: coś tutaj trzeba dać, ale jeszcze nie wiem co
-                  </p>
-              </div>
-              <div className="flex flex-col items-center gap-1 sm:items-end">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsPasswordModalOpen(true)}
-                  className="cursor-pointer"
-                >
-                  <KeyRound className="size-4" />
-                  Zmień hasło
-                </Button>
-                <p className="flex items-center gap-1 text-xs text-muted-foreground/60">
-                  <Clock className="size-3" />
-                  Ostatnie logowanie: {formatLoginDate(user.loginAt)}
+                <p className="text-sm text-muted-foreground">
+                  Zarządzaj swoimi danymi konta i ustawieniami bezpieczeństwa.
                 </p>
               </div>
             </div>
@@ -66,26 +43,36 @@ export const ProfileHeaderCard = ({ user }: ProfileHeaderCardProps) => {
 
         </CardContent>
 
-        <CardFooter className="gap-12">
-          <div className="flex items-center gap-3">
+        <CardFooter className="grid w-full gap-4 sm:grid-cols-3 sm:gap-0">
+          <div className="flex items-center justify-center gap-3 text-center sm:px-6">
             <div className="flex size-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
               <Mail className="size-4" />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 text-left">
               <dt className="text-xs uppercase tracking-wide text-muted-foreground">E-mail</dt>
               <dd className="truncate text-sm font-medium text-foreground">{user.email}</dd>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center gap-3 text-center sm:border-l sm:border-border/70 sm:px-6">
             <div className="flex size-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
               <ShieldCheck className="size-4" />
             </div>
-            <div>
+            <div className="text-left">
               <dt className="text-xs uppercase tracking-wide text-muted-foreground">Rola</dt>
               <dd className="text-sm font-medium text-foreground">
                 <RoleBadge role={user.role} />
               </dd>
             </div>
+          </div>
+          <div className="flex items-center justify-center sm:border-l sm:border-border/70 sm:px-6">
+            <Button
+              variant="outline"
+              onClick={() => setIsPasswordModalOpen(true)}
+              className="cursor-pointer"
+            >
+              <KeyRound className="size-4" />
+              Zmień hasło
+            </Button>
           </div>
         </CardFooter>
       </Card>

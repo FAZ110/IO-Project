@@ -18,7 +18,7 @@ public class MeController {
     private final UserService userService;
 
     @PostMapping("/password")
-    @PreAuthorize("hasRole('COMMON')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> changePassword(
             @Valid @RequestBody ChangePasswordRequest request,
             @AuthenticationPrincipal UserPrincipal principal

@@ -23,7 +23,7 @@ public class QualificationController {
     private final QualificationService qualificationService;
 
     @GetMapping
-    @PreAuthorize("hasRole('COMMON')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<QualificationResponse>> getMyQualifications(
             @AuthenticationPrincipal UserPrincipal principal
     ) {
@@ -32,7 +32,7 @@ public class QualificationController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('COMMON')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<QualificationResponse>> addQualification(
             @Valid @RequestBody AddQualificationRequest request,
             @AuthenticationPrincipal UserPrincipal principal
@@ -45,7 +45,7 @@ public class QualificationController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('COMMON')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> removeQualification(
             @PathVariable UUID id,
             @AuthenticationPrincipal UserPrincipal principal
