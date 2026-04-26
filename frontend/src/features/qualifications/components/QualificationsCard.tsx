@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Award, ChevronDown, Plus, Trash2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { Award, ChevronDown, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -14,53 +13,23 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import {
-  useDeleteQualificationsMutation,
-  useMyQualificationsQuery,
-} from '../qualifications.hooks';
-import { QualificationStatus } from '../qualifications.types';
-import type { QualificationResponse } from '../qualifications.types';
+import { useMyQualificationsQuery } from '../qualifications.hooks';
+import type { QualificationStatus } from '../qualifications.types';
 import { QualificationsList } from './QualificationsList';
 import { QualificationStats } from './QualificationStats';
 import { AddQualificationModal } from './AddQualificationModal';
 
 export const QualificationsCard = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isDeleteRejectedModalOpen, setIsDeleteRejectedModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
   const [activeFilter, setActiveFilter] = useState<QualificationStatus | null>(null);
   const { data: qualifications, isLoading, isError } = useMyQualificationsQuery();
-  const deleteRejectedMutation = useDeleteQualificationsMutation();
 
   const filteredQualifications = activeFilter
     ? (qualifications ?? []).filter((q) => q.status === activeFilter)
     : (qualifications ?? []);
-  const rejectedQualifications = (qualifications ?? []).filter(
-    (qualification) => qualification.status === QualificationStatus.REJECTED,
-  );
-  const isRejectedFilterActive = activeFilter === QualificationStatus.REJECTED;
-
-  const handleDeleteRejected = (items: QualificationResponse[]) => {
-    if (items.length === 0) return;
-
-    deleteRejectedMutation.mutate(items.map((item) => item.id), {
-      onSuccess: () => {
-        toast.success('Usunięto wszystkie odrzucone kompetencje.');
-        setIsDeleteRejectedModalOpen(false);
-      },
-      onError: () => toast.error('Nie udało się usunąć odrzuconych kompetencji.'),
-    });
-  };
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -95,17 +64,6 @@ export const QualificationsCard = () => {
                 />
               )}
               <div className="flex shrink-0 items-center gap-2 self-start md:self-auto">
-                {isRejectedFilterActive && rejectedQualifications.length > 0 && (
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsDeleteRejectedModalOpen(true)}
-                    disabled={deleteRejectedMutation.isPending}
-                    className="cursor-pointer text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="size-4" />
-                    {deleteRejectedMutation.isPending ? 'Usuwanie...' : 'Usuń odrzucone'}
-                  </Button>
-                )}
                 <Button
                   onClick={() => setIsAddModalOpen(true)}
                   className="cursor-pointer"
@@ -149,38 +107,6 @@ export const QualificationsCard = () => {
           onOpenChange={setIsAddModalOpen}
           existingQualifications={qualifications ?? []}
         />
-        <Dialog
-          open={isDeleteRejectedModalOpen}
-          onOpenChange={setIsDeleteRejectedModalOpen}
-        >
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Usunąć odrzucone kompetencje?</DialogTitle>
-              <DialogDescription>
-                Ta akcja usunie wszystkie odrzucone kompetencje z Twojej listy.
-                {` Aktualnie do usunięcia: ${rejectedQualifications.length}.`}
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsDeleteRejectedModalOpen(false)}
-                disabled={deleteRejectedMutation.isPending}
-              >
-                Anuluj
-              </Button>
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={() => handleDeleteRejected(rejectedQualifications)}
-                disabled={deleteRejectedMutation.isPending}
-              >
-                {deleteRejectedMutation.isPending ? 'Usuwanie...' : 'Usuń wszystko'}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </Card>
     </Collapsible>
   );

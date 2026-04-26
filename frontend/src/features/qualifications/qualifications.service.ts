@@ -16,8 +16,4 @@ export const qualificationsService = {
   deleteQualification: async (id: string): Promise<void> => {
     await api.delete(ENDPOINTS.ME.QUALIFICATION(id));
   },
-
-  deleteQualifications: async (ids: string[]): Promise<void> => {
-    await Promise.all(ids.map((id) => qualificationsService.deleteQualification(id)));
-  },
 };

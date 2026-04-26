@@ -26,12 +26,3 @@ export const useDeleteQualificationMutation = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: MY_QUALIFICATIONS_QUERY_KEY }),
   });
 };
-
-export const useDeleteQualificationsMutation = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (ids: string[]) => qualificationsService.deleteQualifications(ids),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: MY_QUALIFICATIONS_QUERY_KEY }),
-  });
-};
