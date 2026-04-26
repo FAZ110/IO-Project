@@ -16,6 +16,7 @@ import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
 import pl.edu.agh.project_manager.repository.ProjectRepository;
 import pl.edu.agh.project_manager.repository.RiskRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
+import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.command.project.MilestoneCommand;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import pl.edu.agh.project_manager.domain.enums.UserRole;
 
 @Service
 @RequiredArgsConstructor
@@ -231,5 +233,21 @@ public class ProjectService {
 
             project.addRisk(risk);
         });
+    }
+
+    public List<ProjectResponse> getAllProjects(UserPrincipal userPrincipal) {
+
+        UserRole role = userPrincipal.userRole();
+
+        List<Project> projects = switch (role) {
+            case ADMINISTRATOR, AUTHORITY -> projectRepository.findAll();
+            case PROJECT_MANAGER          -> projectRepository.findAllByProjectManagerId(userPrincipal.userId());
+            case LINEAR_MANAGER, COMMON   -> projectRepository.findAllByMemberId(userPrincipal.userId());
+            default                       -> List.of();
+        };
+
+        return projects.stream()
+                .map(ProjectResponse::from)
+                .toList();
     }
 }

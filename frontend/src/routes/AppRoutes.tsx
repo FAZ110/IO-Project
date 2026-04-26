@@ -31,9 +31,14 @@ export const AppRoutes = () => {
           <Route path={PATHS.ROOT} element={<DashboardPage />} />
           <Route path={PATHS.PROFILE} element={<ProfilePage />} />
 
+          <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER]} />}>
+            <Route path={PATHS.CREATE_PROJECT} element={<CreateProjectPage/>} />
+          </Route>
+          <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
+
           {/* LINEAR MANAGER ROUTES */}
           <Route element={<AuthorizedRoute allowedRoles={[UserRole.LINEAR_MANAGER]} />}>
-              <Route path={PATHS.REQUESTS} element={<RequestsPage />} />
+            <Route path={PATHS.REQUESTS} element={<RequestsPage />} />
           </Route>
 
           {/* PROJECT MANAGER ROUTES */}

@@ -2,6 +2,8 @@ package pl.edu.agh.project_manager.security;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import pl.edu.agh.project_manager.controller.dto.invitation.AdminAssignableRole;
+import pl.edu.agh.project_manager.domain.enums.UserRole;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -12,7 +14,8 @@ public record UserPrincipal(
         String password,
         String firstName,
         String lastName,
-        Collection<? extends GrantedAuthority> authorities
+        Collection<? extends GrantedAuthority> authorities,
+        UserRole userRole
 ) implements UserDetails {
 
     @Override
