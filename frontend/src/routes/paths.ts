@@ -13,6 +13,7 @@ export const PATHS = {
   LOGIN: '/login',
   REGISTER: `/register`,
   PROFILE: `/profile`,
+  REQUESTS: `/requests`,
   ADMIN_USERS: '/admin/users',
   ADMIN_USER_DETAILS: (userId: string) => `/admin/users/${userId}`,
   CREATE_PROJECT: `/create-project`,
