@@ -5,11 +5,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeAssignmentRequest;
 import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeAssignmentDetailsResponse;
 import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeAssignmentResponse;
+import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.EmployeeAssignmentsService;
+import pl.edu.agh.project_manager.service.command.employee_request.EmployeeRequestCommand;
 import pl.edu.agh.project_manager.service.command.employee_request.EmployeeRequestDetailsCommand;
 
 import java.util.List;
@@ -23,8 +26,16 @@ public class EmployeeAssignmentsController {
 
     @PostMapping
     @PreAuthorize("hasRole('PROJECT_MANAGER')")
-    public ResponseEntity<Void> createEmployeeAssignment(@Valid @RequestBody EmployeeAssignmentRequest request) {
-        employeeAssignmentsService.createEmployeeAssignment(EmployeeAssignmentRequest.toCommand(request));
+    public ResponseEntity<Void> createEmployeeAssignment(
+            @Valid @RequestBody EmployeeAssignmentRequest request,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        employeeAssignmentsService.createEmployeeAssignment(new EmployeeRequestCommand(
+                userPrincipal.userId(),
+                request.userId(),
+                request.projectId(),
+                request.roleId()
+        ));
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

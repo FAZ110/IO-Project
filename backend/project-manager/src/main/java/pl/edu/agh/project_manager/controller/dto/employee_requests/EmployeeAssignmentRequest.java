@@ -15,11 +15,4 @@ public record EmployeeAssignmentRequest(
     @NotNull(message = "ID roli nie może być puste")
     UUID roleId
 ) {
-    public static EmployeeRequestCommand toCommand(EmployeeAssignmentRequest request) {
-        return new EmployeeRequestCommand(
-                request.userId(),
-                request.projectId(),
-                request.roleId()
-        );
-    }
 }
