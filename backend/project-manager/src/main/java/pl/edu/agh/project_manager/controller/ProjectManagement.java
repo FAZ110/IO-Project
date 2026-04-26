@@ -7,10 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.agh.project_manager.controller.dto.project.ProjectCreationRequest;
-import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
-import pl.edu.agh.project_manager.controller.dto.project.RiskRequest;
-import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
+import pl.edu.agh.project_manager.controller.dto.project.*;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.ProjectService;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
@@ -96,5 +93,16 @@ public class ProjectManagement {
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRisk);
+    }
+
+    @PostMapping("/project/{projectId}/role")
+    @PreAuthorize("hasRole('PROJECT_MANAGER')")
+    public ResponseEntity<Void> createProjectRole(
+            @PathVariable UUID projectId,
+            @Valid @RequestBody ProjectRoleRequest roleRequest,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        projectService.createProjectRole(projectId, userPrincipal.userId(), roleRequest.toCommand());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

@@ -66,13 +66,10 @@ class ProjectRoleServiceTest {
 
     @Test
     void getProjectRolesStatus_ShouldReturnRolesWithStatus() {
-        // Given
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
-        // When
         List<ProjectRoleStatusResponse> responses = projectRoleService.getProjectRolesStatus(projectId);
 
-        // Then
         assertThat(responses).hasSize(1);
         assertThat(responses.get(0).roleName()).isEqualTo("Developer");
         assertThat(responses.get(0).status()).isEqualTo("OPEN");
@@ -80,7 +77,6 @@ class ProjectRoleServiceTest {
 
     @Test
     void createAllocationRequest_ShouldCreateRequest_WhenValid() {
-        // Given
         UUID employeeId = UUID.randomUUID();
         UUID creatorId = UUID.randomUUID();
         User employee = new User(); employee.setId(employeeId);
@@ -105,10 +101,8 @@ class ProjectRoleServiceTest {
         
         when(allocationRequestRepository.save(any(AllocationRequest.class))).thenReturn(savedRequest);
 
-        // When
         AllocationRequestResponse response = projectRoleService.createAllocationRequest(command);
 
-        // Then
         assertThat(response).isNotNull();
         assertThat(response.status()).isEqualTo(AllocationRequestStatus.SUBMITTED);
         assertThat(response.justification()).isEqualTo("Need more dev power");
@@ -117,7 +111,6 @@ class ProjectRoleServiceTest {
 
     @Test
     void createAllocationRequest_ShouldThrowException_WhenRoleAlreadyFilled() {
-        // Given
         role.setMembers(List.of(new ProjectMember()));
         CreateAllocationRequestCommand command = new CreateAllocationRequestCommand(
                 role.getId(), UUID.randomUUID(), UUID.randomUUID(), "Justification"
@@ -126,7 +119,6 @@ class ProjectRoleServiceTest {
         when(projectRoleRepository.findById(role.getId())).thenReturn(Optional.of(role));
         when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
 
-        // When & Then
         assertThatThrownBy(() -> projectRoleService.createAllocationRequest(command))
                 .isInstanceOf(ApplicationException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ApiErrorCode.INVALID_REQUEST_STATUS);
@@ -134,7 +126,6 @@ class ProjectRoleServiceTest {
 
     @Test
     void createAllocationRequest_ShouldThrowException_WhenPendingRequestExists() {
-        // Given
         AllocationRequest pendingRequest = new AllocationRequest();
         pendingRequest.setStatus(AllocationRequestStatus.SUBMITTED);
         role.setAllocationRequests(List.of(pendingRequest));
@@ -146,7 +137,6 @@ class ProjectRoleServiceTest {
         when(projectRoleRepository.findById(role.getId())).thenReturn(Optional.of(role));
         when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
 
-        // When & Then
         assertThatThrownBy(() -> projectRoleService.createAllocationRequest(command))
                 .isInstanceOf(ApplicationException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ApiErrorCode.INVALID_REQUEST_STATUS);

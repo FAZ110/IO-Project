@@ -7,9 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
-import pl.edu.agh.project_manager.domain.entity.Project;
-import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
-import pl.edu.agh.project_manager.domain.entity.User;
+import pl.edu.agh.project_manager.domain.entity.*;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
@@ -81,6 +79,56 @@ class ProjectServiceTest {
         // Then
         assertThat(resultId).isEqualTo(savedProject.getId());
         verify(projectRepository).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("Should add new role to project")
+    void createProjectRole_Success() {
+        // Given
+        UUID projectId = UUID.randomUUID();
+        UUID managerId = UUID.randomUUID();
+        User manager = User.builder().id(managerId).build();
+        Project project = Project.builder()
+                .id(projectId)
+                .projectManager(manager)
+                .segments(List.of(new ProjectSegment()))
+                .roles(new ArrayList<>())
+                .build();
+        
+        RoleCommand command = new RoleCommand("Developer", List.of(100));
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+
+        // When
+        projectService.createProjectRole(projectId, managerId, command);
+
+        // Then
+        assertThat(project.getRoles()).hasSize(1);
+        assertThat(project.getRoles().get(0).getRoleName()).isEqualTo("Developer");
+        verify(projectRepository).save(project);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when utilization values count mismatch")
+    void createProjectRole_UtilizationMismatch() {
+        // Given
+        UUID projectId = UUID.randomUUID();
+        UUID managerId = UUID.randomUUID();
+        User manager = User.builder().id(managerId).build();
+        Project project = Project.builder()
+                .id(projectId)
+                .projectManager(manager)
+                .segments(List.of(new ProjectSegment(), new ProjectSegment()))
+                .build();
+        
+        RoleCommand command = new RoleCommand("Developer", List.of(100)); // Only 1, expected 2
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+
+        // When & Then
+        assertThatThrownBy(() -> projectService.createProjectRole(projectId, managerId, command))
+                .isInstanceOf(ApplicationException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ApiErrorCode.INVALID_ROLE_UTILIZATION);
     }
 
     @Test
