@@ -45,10 +45,6 @@ public class EmployeeAssignmentsService {
         ProjectRole role = projectRoleRepository.findById(command.roleId())
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_ROLE_NOT_FOUND));
 
-        if (!command.creatorId().equals(project.getProjectManager().getId())) {
-            throw new ApplicationException(ApiErrorCode.CREATOR_IS_NOT_PROJECT_MANAGER);
-        }
-
         if (!role.getProject().getId().equals(command.projectId())) {
             throw new ApplicationException(ApiErrorCode.ROLE_NOT_IN_PROJECT);
         }

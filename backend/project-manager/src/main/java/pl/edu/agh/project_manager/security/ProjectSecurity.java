@@ -28,4 +28,14 @@ public class ProjectSecurity {
 
         return isMember;
     }
+
+    public boolean isProjectManagerForProject(UUID projectId, UserPrincipal currentUser) {
+        if (currentUser == null) {
+            return false;
+        }
+
+        UUID userId = currentUser.userId();
+
+        return projectRepository.existsByIdAndProjectManagerId(projectId, userId);
+    }
 }
