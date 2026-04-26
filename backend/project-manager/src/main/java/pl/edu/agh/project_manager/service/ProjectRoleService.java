@@ -51,12 +51,10 @@ public class ProjectRoleService {
         User createdBy = userRepository.findById(command.createdById())
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Creator not found"));
 
-        // Check if role is already filled
         if (role.getMembers() != null && !role.getMembers().isEmpty()) {
             throw new ApplicationException(ApiErrorCode.INVALID_REQUEST_STATUS, "Role is already filled");
         }
 
-        // Check if there is already a pending request for this role
         boolean hasPending = role.getAllocationRequests().stream()
                 .anyMatch(req -> req.getStatus() == AllocationRequestStatus.SUBMITTED);
         

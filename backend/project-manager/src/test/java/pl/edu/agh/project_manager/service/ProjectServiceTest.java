@@ -49,7 +49,6 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Should create project successfully")
     void createProject_Success() {
-        // Given
         UUID managerId = UUID.randomUUID();
         List<MilestoneCommand> milestones = List.of(
                 new MilestoneCommand("start", LocalDate.now()),
@@ -73,10 +72,8 @@ class ProjectServiceTest {
         when(userRepository.findById(managerId)).thenReturn(Optional.of(manager));
         when(projectRepository.save(any(Project.class))).thenReturn(savedProject);
 
-        // When
         UUID resultId = projectService.createProject(command);
 
-        // Then
         assertThat(resultId).isEqualTo(savedProject.getId());
         verify(projectRepository).save(any(Project.class));
     }
@@ -84,7 +81,6 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Should add new role to project")
     void createProjectRole_Success() {
-        // Given
         UUID projectId = UUID.randomUUID();
         UUID managerId = UUID.randomUUID();
         User manager = User.builder().id(managerId).build();
@@ -99,10 +95,8 @@ class ProjectServiceTest {
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
-        // When
         projectService.createProjectRole(projectId, managerId, command);
 
-        // Then
         assertThat(project.getRoles()).hasSize(1);
         assertThat(project.getRoles().get(0).getRoleName()).isEqualTo("Developer");
         verify(projectRepository).save(project);
@@ -111,7 +105,6 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Should throw exception when utilization values count mismatch")
     void createProjectRole_UtilizationMismatch() {
-        // Given
         UUID projectId = UUID.randomUUID();
         UUID managerId = UUID.randomUUID();
         User manager = User.builder().id(managerId).build();
@@ -121,11 +114,10 @@ class ProjectServiceTest {
                 .segments(List.of(new ProjectSegment(), new ProjectSegment()))
                 .build();
         
-        RoleCommand command = new RoleCommand("Developer", List.of(100)); // Only 1, expected 2
+        RoleCommand command = new RoleCommand("Developer", List.of(100));
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
-        // When & Then
         assertThatThrownBy(() -> projectService.createProjectRole(projectId, managerId, command))
                 .isInstanceOf(ApplicationException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ApiErrorCode.INVALID_ROLE_UTILIZATION);
@@ -134,7 +126,6 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Should throw exception when milestones are not in chronological order")
     void createProject_InvalidMilestoneOrder() {
-        // Given
         UUID creatorId = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
         List<MilestoneCommand> milestones = List.of(
@@ -149,7 +140,6 @@ class ProjectServiceTest {
 
         when(userRepository.findById(creatorId)).thenReturn(Optional.of(User.builder().id(creatorId).build()));
 
-        // When & Then
         assertThatExceptionOfType(ApplicationException.class)
                 .isThrownBy(() -> projectService.createProject(command))
                 .extracting(ApplicationException::getErrorCode)
@@ -159,7 +149,6 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Should throw exception when role utilization count does not match segments count")
     void createProject_InvalidRoleUtilization() {
-        // Given
         UUID creatorId = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
         List<MilestoneCommand> milestones = List.of(
@@ -176,7 +165,6 @@ class ProjectServiceTest {
 
         when(userRepository.findById(creatorId)).thenReturn(Optional.of(User.builder().id(creatorId).build()));
 
-        // When & Then
         assertThatExceptionOfType(ApplicationException.class)
                 .isThrownBy(() -> projectService.createProject(command))
                 .extracting(ApplicationException::getErrorCode)
@@ -186,7 +174,6 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Should throw exception when not enough milestones")
     void createProject_NotEnoughMilestones() {
-        // Given
         UUID creatorId = UUID.randomUUID();
         List<MilestoneCommand> milestones = List.of(
                 new MilestoneCommand("start", LocalDate.now())
@@ -206,7 +193,6 @@ class ProjectServiceTest {
         User manager = User.builder().id(creatorId).build();
         when(userRepository.findById(creatorId)).thenReturn(Optional.of(manager));
 
-        // When & Then
         assertThatExceptionOfType(ApplicationException.class)
                 .isThrownBy(() -> projectService.createProject(command))
                 .extracting(ApplicationException::getErrorCode)
@@ -217,7 +203,6 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Should delete risk when user is project manager")
     void deleteProjectRisk_Success() {
-        // Given
         UUID projectId = UUID.randomUUID();
         UUID riskId = UUID.randomUUID();
         UUID managerId = UUID.randomUUID();
@@ -232,10 +217,8 @@ class ProjectServiceTest {
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
-        // When
         projectService.deleteProjectRisk(projectId, riskId, managerId);
 
-        // Then
         assertThat(project.getRisks()).isEmpty();
     }
 
@@ -243,7 +226,6 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Should throw exception when someone else tries to delete risk")
     void deleteProjectRisk_AccessDenied() {
-        // Given
         UUID projectId = UUID.randomUUID();
         UUID managerId = UUID.randomUUID();
         UUID intruderId = UUID.randomUUID();
@@ -253,7 +235,6 @@ class ProjectServiceTest {
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
-        // When & Then
         assertThatThrownBy(() -> projectService.deleteProjectRisk(projectId, UUID.randomUUID(), intruderId))
                 .isInstanceOf(ApplicationException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ApiErrorCode.ACCESS_DENIED);
@@ -263,7 +244,6 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Should update risk fields correctly")
     void updateProjectRisk_Success() {
-        // Given
         UUID projectId = UUID.randomUUID();
         UUID riskId = UUID.randomUUID();
         UUID managerId = UUID.randomUUID();
@@ -279,10 +259,8 @@ class ProjectServiceTest {
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
-        // When
         RiskResponse response = projectService.updateProjectRisk(projectId, riskId, managerId, command);
 
-        // Then
         assertThat(response.name()).isEqualTo("New Name");
         assertThat(risk.getName()).isEqualTo("New Name");
         assertThat(risk.getProbability()).isEqualTo(90);
@@ -316,7 +294,6 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Should add new risk to existing project")
     void createProjectRisk_Success() {
-        // Given
         UUID projectId = UUID.randomUUID();
         UUID managerId = UUID.randomUUID();
         RiskCommand command = new RiskCommand("Title", "Desc", 50);
@@ -329,10 +306,9 @@ class ProjectServiceTest {
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(riskRepository.save(any(ProjectRisk.class))).thenReturn(savedRisk);
 
-        // When
         RiskResponse response = projectService.createProjectRisk(command, managerId, projectId);
 
-        // Then
+
         assertThat(response.id()).isEqualTo(savedRisk.getId());
         verify(riskRepository).save(any(ProjectRisk.class));
         assertThat(project.getRisks()).hasSize(1);

@@ -39,7 +39,6 @@ public class ProjectRoleController {
             @Valid @RequestBody CreateAllocationRequest request,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        // Jawne tworzenie komendy z roleId z path, aby uniknąć problemów z null w DTO
         CreateAllocationRequestCommand command = new CreateAllocationRequestCommand(
                 roleId,
                 request.requestedEmployeeId(),

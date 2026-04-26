@@ -9,7 +9,7 @@ import java.util.UUID;
 public record ProjectRoleStatusResponse(
         UUID id,
         String roleName,
-        String status // OPEN, PENDING, FILLED
+        String status
 ) {
     public static ProjectRoleStatusResponse from(ProjectRole role) {
         String status = "OPEN";

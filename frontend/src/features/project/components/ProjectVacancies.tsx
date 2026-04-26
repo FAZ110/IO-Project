@@ -18,7 +18,6 @@ export const ProjectRolesStatus = ({ projectId }: { projectId: string }) => {
   const [selectedUserId, setSelectedUserId] = useState('');
   const [justification, setJustification] = useState('');
 
-  // Pobieramy użytkowników - strona 0, duży limit, filtr wyszukiwania
   const { data: usersData, isLoading: isUsersLoading } = useUsersQuery(0, 100, { search: searchQuery });
 
   const handleOpenAllocationDialog = (role: ProjectRoleStatusResponse) => {

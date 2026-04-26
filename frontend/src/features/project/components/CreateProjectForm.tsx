@@ -17,7 +17,7 @@ export const CreateProjectForm = () => {
       walletId: undefined,
       programId: undefined,
       risks: [],
-      roles: [] // roles represent our vacancies at creation
+      roles: []
     }
   });
 
@@ -36,12 +36,11 @@ export const CreateProjectForm = () => {
 
   const onSubmit = (data: ProjectCreationRequest) => {
     
-    // Create dummy milestones to pass backend validation
+    // Na razie nie ma jeszcze dodawania Milestonów, to jest żeby backend nie krzyczał
     const startDate = new Date(data.startDate);
     const endDate = new Date(startDate);
-    endDate.setMonth(endDate.getMonth() + 6); // default 6-month project length
-    
-    // Ensure all roles have utilization percentages matching the segment count (we have 1 segment -> [100])
+    endDate.setMonth(endDate.getMonth() + 6); // default: konczy sie za 6ms
+
     const mappedRoles = (data.roles || []).map(r => ({
       name: r.name,
       utilizationPercentages: [100] // hardcoded 100% utilization for 1 segment for simplicity
