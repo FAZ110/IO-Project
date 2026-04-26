@@ -37,6 +37,7 @@ public enum ApiErrorCode {
     USER_HAS_ONGOING_REQUEST("REQ_003", HttpStatus.CONFLICT, "User already has a pending request for this project"),
     EMPLOYEE_REQUEST_NOT_FOUND("REQ_004", HttpStatus.NOT_FOUND, "Employee request not found"),
     INVALID_REQUEST_STATUS("REQ_005", HttpStatus.BAD_REQUEST, "Request is not in PENDING state"),
+    CREATOR_IS_NOT_PROJECT_MANAGER("REQ_006", HttpStatus.BAD_REQUEST, "Only project manager can create employee request"),
 
     VALIDATION_ERROR("GEN_001", HttpStatus.BAD_REQUEST, "Validation failed"),
     ACCESS_DENIED("GEN_002", HttpStatus.FORBIDDEN, "Access denied"),

@@ -56,13 +56,16 @@ class EmployeeAssignmentsServiceTest {
     @Test
     void createEmployeeRequest_shouldCreateNewAssignmentWithPendingStatus() {
         // given
+        UUID creatorId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
         UUID projectId = UUID.randomUUID();
         UUID roleId = UUID.randomUUID();
-        EmployeeRequestCommand command = new EmployeeRequestCommand(userId, projectId, roleId);
+        EmployeeRequestCommand command = new EmployeeRequestCommand(creatorId, userId, projectId, roleId);
 
         User user = new User();
-        Project project = Project.builder().id(projectId).build();
+        User projectManager = User.builder().id(creatorId).build();
+
+        Project project = Project.builder().id(projectId).projectManager(projectManager).build();
         ProjectRole role = ProjectRole.builder()
                 .project(project)
                 .build();
@@ -94,11 +97,14 @@ class EmployeeAssignmentsServiceTest {
     @Test
     void createEmployeeAssignment_shouldThrowException_whenRoleNotInProject() {
         // given
+        UUID creatorId = UUID.randomUUID();
         UUID projectId = UUID.randomUUID();
         UUID otherProjectId = UUID.randomUUID();
-        EmployeeRequestCommand command = new EmployeeRequestCommand(UUID.randomUUID(), projectId, UUID.randomUUID());
+        EmployeeRequestCommand command = new EmployeeRequestCommand(creatorId, UUID.randomUUID(), projectId, UUID.randomUUID());
 
-        Project project = Project.builder().id(projectId).build();
+        User projectManager = User.builder().id(creatorId).build();
+
+        Project project = Project.builder().id(projectId).projectManager(projectManager).build();
         Project otherProject = Project.builder().id(otherProjectId).build();
         ProjectRole role = ProjectRole.builder().project(otherProject).build();
 
@@ -118,11 +124,14 @@ class EmployeeAssignmentsServiceTest {
     @Test
     void createEmployeeRequest_shouldThrowException_whenUserHasOngoingAssignment() {
         // given
+        UUID creatorId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
         UUID projectId = UUID.randomUUID();
-        EmployeeRequestCommand command = new EmployeeRequestCommand(userId, projectId, UUID.randomUUID());
+        EmployeeRequestCommand command = new EmployeeRequestCommand(creatorId, userId, projectId, UUID.randomUUID());
 
-        Project project = Project.builder().id(projectId).build();
+        User projectManager = User.builder().id(creatorId).build();
+
+        Project project = Project.builder().id(projectId).projectManager(projectManager).build();
         ProjectRole role = ProjectRole.builder().project(project).build();
 
         given(userRepository.findById(any())).willReturn(Optional.of(new User()));
