@@ -64,7 +64,7 @@ public class Project {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     @Builder.Default
-    private Set<User> sponsors = new HashSet<>();
+    private List<User> sponsors = new ArrayList<>();
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
@@ -73,7 +73,7 @@ public class Project {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     @Builder.Default
-    private Set<User> committees = new HashSet<>();
+    private List<User> committees = new ArrayList<>();
 
     public void addRisk(ProjectRisk risk) {
         this.risks.add(risk);
@@ -92,10 +92,6 @@ public class Project {
         member.setRole(role);
         member.setMembershipStatus(MembershipStatus.PENDING);
         this.members.add(member);
-    }
-    public void addSpecialMember(ProjectMember stakeholder) {
-        this.members.add(stakeholder);
-        stakeholder.setProject(this);
     }
 
     public void addSegment(ProjectSegment projectSegment) {

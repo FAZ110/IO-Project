@@ -1,6 +1,6 @@
 import type { SimpleUserResponse } from "@/features/user-management";
-import { useState } from "react";
-import { type UseFormSetValue } from "react-hook-form";
+import { useState, useMemo } from "react";
+import { type UseFormGetValues, type UseFormSetValue } from "react-hook-form";
 import type { ProjectCreationRequest } from "../project.types";
 
 interface UserAutocompleteProps {
@@ -8,10 +8,11 @@ interface UserAutocompleteProps {
     foundUsers: SimpleUserResponse[];
     onSearch: (query: string) => void;
     setValue: UseFormSetValue<ProjectCreationRequest>;
-    selectedUsers: SimpleUserResponse[];
-    setSelectedUsers: React.Dispatch<React.SetStateAction<SimpleUserResponse[]>>;
+    getValues: UseFormGetValues<ProjectCreationRequest>;
     clearErrors: (name: keyof ProjectCreationRequest) => void;
     roles: "committee" | "sponsors";
+    usersById: Record<string, SimpleUserResponse>;
+    onRememberUser: (user: SimpleUserResponse) => void; 
 }
 
 export const UserAutocomplete = ({
@@ -19,36 +20,61 @@ export const UserAutocomplete = ({
     foundUsers,
     onSearch,
     setValue,
-    selectedUsers,
-    setSelectedUsers,
+    getValues,
     clearErrors,
-    roles
+    roles,
+    usersById,
+    onRememberUser,
 
 }: UserAutocompleteProps) => {
 
     const [searchInput, setSearchInput] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const handleAddUser = (user: SimpleUserResponse) => {
-        if (!selectedUsers.find((s) => s.id === user.id)) {
-            const newList = [...selectedUsers, user];
-            setSelectedUsers(newList);
-            setValue(
-                roles,
-                newList.map((s) => s.id),
-            );
-          setSearchInput('');
-          clearErrors(roles);
-        }
-    }
+    const mergedUsersById = useMemo(() => {
+      const next = { ...usersById };
+      for (const user of foundUsers) {
+      next[user.id] = user;
+      }
+      return next;
+    }, [usersById, foundUsers]);
 
-    const handleRemoveUser = (sponsorId: string) => {
-        const newList = selectedUsers.filter((s) => s.id !== sponsorId);
-        setSelectedUsers(newList);
-        setValue(
-            roles,
-            newList.map((s) => s.id),
-        );
+    const selectedUserIds = getValues(roles);
+
+    const selectedUsers = useMemo(() => {
+        return selectedUserIds
+            .map((id) => {
+                const known = mergedUsersById[id];
+                if (known) return known;
+                return { id, name: "Wybrany", surname: "użytkownik" } as SimpleUserResponse;
+            });
+    }, [selectedUserIds, mergedUsersById]);
+
+    const handleAddUser = (user: SimpleUserResponse) => {
+        const currentIds = getValues(roles);
+
+        if (!currentIds.includes(user.id)) {
+            setValue(roles, [...currentIds, user.id], {
+                shouldValidate: true,
+                shouldDirty: true,
+            });
+            clearErrors(roles);
+        }
+
+        onRememberUser(user);
+        setSearchInput("");
+        onSearch("");
+        setIsDropdownOpen(false);
+    };
+
+    const handleRemoveUser = (userId: string) => {
+        const currentIds = getValues(roles);
+        const nextIds = currentIds.filter((id) => id !== userId);
+
+        setValue(roles, nextIds, {
+            shouldValidate: true,
+            shouldDirty: true,
+        });
         clearErrors(roles);
     };
 
@@ -83,10 +109,10 @@ export const UserAutocomplete = ({
           )}
           
           <div className="flex flex-wrap gap-2 mt-2">
-            {selectedUsers.map(user => (
-                <span key={user.id} className="flex items-center bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">
-                  {user.name} {user.surname}
-                  <button type="button" onClick={() => handleRemoveUser(user.id)} className="ml-1 text-blue-500 hover:text-blue-800 cursor-pointer">
+            {selectedUsers.map(userId => (
+                <span key={userId.id} className="flex items-center bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">
+                  {userId.name} {userId.surname}
+                  <button type="button" onClick={() => handleRemoveUser(userId.id)} className="ml-1 text-blue-500 hover:text-blue-800 cursor-pointer">
                     <span aria-hidden="true" className="text-sm leading-none">×</span>
                   </button>
                 </span>

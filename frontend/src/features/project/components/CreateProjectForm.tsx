@@ -21,7 +21,16 @@ export const CreateProjectForm = () => {
             projectGroupId: "",
             sponsors: [],
             committee: [],
-            milestones: [],
+            milestones: [
+                {
+                    name: "",
+                    date: "",
+                },
+                {
+                    name: "",
+                    date: "",
+                }
+            ],
             roles: [],
             risks: [],
         },
@@ -29,14 +38,20 @@ export const CreateProjectForm = () => {
 
     const { data: groups = [] } = useProjectGroups();
 
-    const [userQuery, setUserQuery] = useState("");
-    const [userQueryValue] = useDebounce(userQuery, 300);
-    const { data: foundUsers = [] } = useSearchUsers(userQueryValue);
+    const [sponsorsQuery, setSponsorsQuery] = useState("");
+    const [sponsorsQueryValue] = useDebounce(sponsorsQuery, 300);
+
+    const [committeeQuery, setCommitteeQuery] = useState("");
+    const [committeeQueryValue] = useDebounce(committeeQuery, 300);
+
+    const { data: foundSponsors = [] } = useSearchUsers(sponsorsQueryValue);
+    const { data: foundCommittee = [] } = useSearchUsers(committeeQueryValue);
 
     const mutation = useCreateProject();
     const navigate = useNavigate();
 
     const onSubmit = methods.handleSubmit((data) => {
+
         mutation.mutate(data, {
             onSuccess: (newProjectId) => {
                 methods.reset();
@@ -51,8 +66,10 @@ export const CreateProjectForm = () => {
                 onSubmitProject={onSubmit}
                 isPending={mutation.isPending}
                 groups={groups}
-                foundUsers={foundUsers}
-                onUserSearch={setUserQuery}
+                foundSponsors={foundSponsors}
+                foundCommittee={foundCommittee}
+                onSponsorSearch={setSponsorsQuery}
+                onCommitteeSearch={setCommitteeQuery}
             />
         </FormProvider>
     );

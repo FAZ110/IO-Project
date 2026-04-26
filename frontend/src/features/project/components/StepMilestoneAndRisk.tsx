@@ -12,9 +12,9 @@ interface StepMilestonesAndRisksProps {
     errors: FieldErrors<ProjectCreationRequest>;
     milestones: ProjectCreationRequest["milestones"];
 
-    maileStonesFields: FieldArrayWithId<ProjectCreationRequest, "milestones", "id">[];
-    appendMileStone: UseFieldArrayAppend<ProjectCreationRequest, "milestones">;
-    removeMileStone: UseFieldArrayRemove;
+    milestonesFields: FieldArrayWithId<ProjectCreationRequest, "milestones", "id">[];
+    appendMilestone: UseFieldArrayAppend<ProjectCreationRequest, "milestones">;
+    removeMilestone: UseFieldArrayRemove;
 
     riskFields: FieldArrayWithId<ProjectCreationRequest, "risks", "id">[];
     appendRisk: UseFieldArrayAppend<ProjectCreationRequest, "risks">;
@@ -27,9 +27,9 @@ export const StepMilestonesAndRisks = ({
     register,
     errors,
     milestones,
-    maileStonesFields,
-    appendMileStone,
-    removeMileStone,
+    milestonesFields,
+    appendMilestone,
+    removeMilestone,
     riskFields,
     appendRisk,
     removeRisk,
@@ -45,7 +45,7 @@ export const StepMilestonesAndRisks = ({
                     <button
                         type="button"
                         onClick={() => {
-                            appendMileStone({
+                            appendMilestone({
                                 date: "",
                                 name: "",
                             });
@@ -57,7 +57,7 @@ export const StepMilestonesAndRisks = ({
                 </div>
 
                 <div className="space-y-4">
-                    {maileStonesFields.map((field, index) => {
+                    {milestonesFields.map((field, index) => {
                         const lastMilestone = milestones[index - 1];
                         const minDate = lastMilestone?.date ?? today;
 
@@ -65,7 +65,7 @@ export const StepMilestonesAndRisks = ({
                             <div key={field.id} className="p-4 border border-gray-200 rounded-lg bg-gray-50 relative">
                                 <button
                                     type="button"
-                                    onClick={() => removeMileStone(index)}
+                                    onClick={() => removeMilestone(index)}
                                     className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-sm font-bold cursor-pointer"
                                 >
                                     <span aria-hidden="true" className="text-sm leading-none">

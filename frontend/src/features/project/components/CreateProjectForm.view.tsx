@@ -1,6 +1,6 @@
 import { useFieldArray, useFormContext } from "react-hook-form";
 import type { ProjectCreationRequest } from "../project.types.ts";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import type { SimpleUserResponse } from "@/features/user-management";
 import { UserAutocomplete } from "./UserAutocomplete.tsx";
 import { StepProgressTracker } from "./StepProgressTracker.tsx";
@@ -13,12 +13,14 @@ interface CreateProjectViewProps {
     onSubmitProject: () => Promise<void>;
     isPending: boolean;
     groups: { id: string; name: string }[];
-    foundUsers: SimpleUserResponse[];
-    onUserSearch: (query: string) => void;
+    foundSponsors: SimpleUserResponse[];
+    foundCommittee: SimpleUserResponse[];
+    onSponsorSearch: (query: string) => void;
+    onCommitteeSearch: (query: string) => void;
     message?: string;
 }
 
-export const CreateProjectView = ({ onSubmitProject, isPending, groups, foundUsers, onUserSearch, message }: CreateProjectViewProps) => {
+export const CreateProjectView = ({ onSubmitProject, isPending, groups, foundSponsors, foundCommittee, onSponsorSearch, onCommitteeSearch, message }: CreateProjectViewProps) => {
     const {
         register,
         control,
@@ -26,6 +28,7 @@ export const CreateProjectView = ({ onSubmitProject, isPending, groups, foundUse
         clearErrors,
         watch,
         setValue,
+        getValues,
         trigger,
     } = useFormContext<ProjectCreationRequest>();
 
@@ -39,9 +42,9 @@ export const CreateProjectView = ({ onSubmitProject, isPending, groups, foundUse
         name: "risks",
     });
     const {
-        fields: maileStonesFields,
-        append: appendMileStone,
-        remove: removeMileStone,
+        fields: milestonesFields,
+        append: appendMilestone,
+        remove: removeMilestone,
     } = useFieldArray({
         control,
         name: "milestones",
@@ -55,11 +58,14 @@ export const CreateProjectView = ({ onSubmitProject, isPending, groups, foundUse
         name: "roles",
     });
 
+    const [usersById, setUsersById] = useState<Record<string, SimpleUserResponse>>({});
+
+    const rememberUser = useCallback((user: SimpleUserResponse) => {
+        setUsersById((prev) => ({ ...prev, [user.id]: user }));
+    }, []);
+
     const [currentStep, setCurrentStep] = useState(1);
     const totalSteps = 2;
-
-    const [selectedSponsors, setSelectedSponsors] = useState<SimpleUserResponse[]>([]);
-    const [selectedCommittee, setSelectedCommittee] = useState<SimpleUserResponse[]>([]);
 
     const handleNextStep = async () => {
         if (currentStep !== 1) return;
@@ -91,18 +97,19 @@ export const CreateProjectView = ({ onSubmitProject, isPending, groups, foundUse
                 {currentStep === 1 && (
                     <>
                         {/* --- PODSTAWOWE INFORMACJE --- */}
-                        <StepBasicInformation register={register} errors={errors} setValue={setValue} groups={groups} />
+                        <StepBasicInformation register={register} errors={errors} groups={groups} />
 
                         {/* --- SPONSORZY --- */}
                         <UserAutocomplete
                             label="Sponsorzy"
-                            foundUsers={foundUsers}
-                            selectedUsers={selectedSponsors}
-                            setSelectedUsers={setSelectedSponsors}
-                            onSearch={onUserSearch}
+                            foundUsers={foundSponsors}
+                            onSearch={onSponsorSearch}
                             setValue={setValue}
+                            getValues={getValues}
                             roles="sponsors"
                             clearErrors={clearErrors}
+                            usersById={usersById}
+                            onRememberUser={rememberUser}
                         />
 
                         {errors.sponsors?.message && <p className="text-red-500 text-sm mt-2">{errors.sponsors.message}</p>}
@@ -110,13 +117,14 @@ export const CreateProjectView = ({ onSubmitProject, isPending, groups, foundUse
                         {/* --- KKOMITET STERUJACY --- */}
                         <UserAutocomplete
                             label="Komitet Sterujący"
-                            foundUsers={foundUsers}
-                            selectedUsers={selectedCommittee}
-                            setSelectedUsers={setSelectedCommittee}
-                            onSearch={onUserSearch}
+                            foundUsers={foundCommittee}
+                            onSearch={onCommitteeSearch}
                             setValue={setValue}
+                            getValues={getValues}
                             roles="committee"
                             clearErrors={clearErrors}
+                            usersById={usersById}
+                            onRememberUser={rememberUser}
                         />
 
                         {errors.committee?.message && <p className="text-red-500 text-sm mt-2">{errors.committee.message}</p>}
@@ -128,9 +136,9 @@ export const CreateProjectView = ({ onSubmitProject, isPending, groups, foundUse
                             appendRisk={appendRisk}
                             removeRisk={removeRisk}
                             milestones={milestones}
-                            maileStonesFields={maileStonesFields}
-                            appendMileStone={appendMileStone}
-                            removeMileStone={removeMileStone}
+                            milestonesFields={milestonesFields}
+                            appendMilestone={appendMilestone}
+                            removeMilestone={removeMilestone}
                         />
                     </>
                 )}

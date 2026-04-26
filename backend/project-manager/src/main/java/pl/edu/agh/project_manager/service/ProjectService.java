@@ -46,7 +46,6 @@ public class ProjectService {
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_MANAGER_NOT_FOUND, "Cannot find provided project manager - " + command.creatorId()));
 
         ProjectGroups projectGroup = null;
-        System.out.println(command.projectGroupId());
         if (command.projectGroupId() != null) {
             projectGroup = projectGroupRepository.findById(command.projectGroupId())
                     .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_GROUP_NOT_FOUND, "Cannot find provided project group - " + command.projectGroupId()));
