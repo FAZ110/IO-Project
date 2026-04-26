@@ -5,7 +5,7 @@ import pl.edu.agh.project_manager.service.command.employee_request.EmployeeReque
 
 import java.util.UUID;
 
-public record EmployeeRequestData(
+public record EmployeeAssignmentRequest(
     @NotNull(message = "ID użytkownika nie może być puste")
     UUID userId,
 
@@ -15,7 +15,7 @@ public record EmployeeRequestData(
     @NotNull(message = "ID roli nie może być puste")
     UUID roleId
 ) {
-    public static EmployeeRequestCommand toCommand(EmployeeRequestData request) {
+    public static EmployeeRequestCommand toCommand(EmployeeAssignmentRequest request) {
         return new EmployeeRequestCommand(
                 request.userId(),
                 request.projectId(),

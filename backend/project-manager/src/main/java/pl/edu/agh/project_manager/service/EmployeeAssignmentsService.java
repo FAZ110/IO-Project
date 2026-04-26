@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.project_manager.controller.dto.employee_requests.ChartIntervalResponse;
-import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeRequestDetails;
-import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeRequestResult;
-import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeRequestStatus;
+import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeAssignmentDetailsResponse;
+import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeAssignmentResponse;
+import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeAssignmentRequestStatus;
 import pl.edu.agh.project_manager.domain.entity.*;
 import pl.edu.agh.project_manager.domain.enums.MembershipStatus;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
@@ -17,14 +17,13 @@ import pl.edu.agh.project_manager.service.command.employee_request.EmployeeReque
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
-public class EmployeeRequestsService {
+public class EmployeeAssignmentsService {
     private final UserRepository userRepository;
 
     private final ProjectRepository projectRepository;
@@ -36,7 +35,7 @@ public class EmployeeRequestsService {
     private final ProjectRoleSegmentAllocationRepository segmentAllocationRepository;
 
     @Transactional
-    public void createEmployeeRequest(EmployeeRequestCommand command) {
+    public void createEmployeeAssignment(EmployeeRequestCommand command) {
         User employee = userRepository.findById(command.userId())
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.USER_NOT_FOUND));
 
@@ -70,18 +69,18 @@ public class EmployeeRequestsService {
     }
 
     @Transactional(readOnly = true)
-    public List<EmployeeRequestResult> getEmployeeRequests() {
+    public List<EmployeeAssignmentResponse> getEmployeeAssignments() {
         return projectMemberRepository.findAllWithDetails().stream()
                 .map(member -> {
                     var project = member.getProject();
                     var user = member.getUser();
                     var requestStatus = switch (member.getMembershipStatus()) {
-                        case PENDING -> EmployeeRequestStatus.PENDING;
-                        case ACCEPTED -> EmployeeRequestStatus.ACCEPTED;
-                        case REJECTED -> EmployeeRequestStatus.REJECTED;
+                        case PENDING -> EmployeeAssignmentRequestStatus.PENDING;
+                        case ACCEPTED -> EmployeeAssignmentRequestStatus.ACCEPTED;
+                        case REJECTED -> EmployeeAssignmentRequestStatus.REJECTED;
                     };
 
-                    return new EmployeeRequestResult(
+                    return new EmployeeAssignmentResponse(
                             project.getTitle(),
                             project.getId().toString(),
                             member.getRole().getRoleName(),
@@ -95,9 +94,12 @@ public class EmployeeRequestsService {
     }
 
     @Transactional
-    public void acceptEmployeeRequest(UUID requestId) {
+    public void acceptEmployeeAssignment(UUID requestId) {
         ProjectMember projectRequest = projectMemberRepository.findById(requestId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.EMPLOYEE_REQUEST_NOT_FOUND));
+
+        // TODO: zarówno tutaj jak i ponizej trzeba sprawdzic
+        //  czy uzytkownik akceptujacy wniosek jest supervisorem
 
         validatePendingStatus(projectRequest);
 
@@ -105,7 +107,7 @@ public class EmployeeRequestsService {
     }
 
     @Transactional
-    public void rejectEmployeeRequest(UUID requestId) {
+    public void rejectEmployeeAssignment(UUID requestId) {
         ProjectMember projectRequest = projectMemberRepository.findById(requestId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.EMPLOYEE_REQUEST_NOT_FOUND));
 
@@ -121,11 +123,11 @@ public class EmployeeRequestsService {
     }
 
     @Transactional(readOnly = true)
-    public EmployeeRequestDetails getEmployeeRequestDetails(EmployeeRequestDetailsCommand command) {
+    public EmployeeAssignmentDetailsResponse getEmployeeRequestDetails(EmployeeRequestDetailsCommand command) {
         ProjectMember projectRequest = projectMemberRepository.findById(command.requestId())
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.EMPLOYEE_REQUEST_NOT_FOUND));
 
-        return new EmployeeRequestDetails(
+        return new EmployeeAssignmentDetailsResponse(
                 calculateAggregatedWorkload(projectRequest.getUser().getId()),
                 getRequestIncrement(projectRequest)
         );
