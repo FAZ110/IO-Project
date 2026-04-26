@@ -48,6 +48,7 @@ export interface ProjectRoleStatusResponse {
   id: string;
   roleName: string;
   status: 'OPEN' | 'PENDING' | 'FILLED';
+  utilizationPercentages: number[];
 }
 
 export interface CreateAllocationRequest {

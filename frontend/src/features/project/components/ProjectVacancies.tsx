@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { ProjectRoleStatusResponse } from '../project.types';
-import { Loader2, Search, User as UserIcon, Check } from 'lucide-react';
+import { Loader2, Search, User as UserIcon, Check, Clock } from 'lucide-react';
 
 export const ProjectRolesStatus = ({ projectId }: { projectId: string }) => {
   const { data: roles, isLoading, isError } = useProjectRolesStatus(projectId);
@@ -25,7 +25,10 @@ export const ProjectRolesStatus = ({ projectId }: { projectId: string }) => {
     setIsAllocationDialogOpen(true);
     setSearchQuery('');
     setSelectedUserId('');
-    setJustification('Wniosek o przydzielenie pracownika do roli w projekcie.');
+    const avgUtilization = role.utilizationPercentages.length > 0 
+      ? Math.round(role.utilizationPercentages.reduce((a, b) => a + b, 0) / role.utilizationPercentages.length)
+      : 0;
+    setJustification(`Wniosek o przydzielenie pracownika do roli ${role.roleName} (śr. utylizacja: ${avgUtilization}%).`);
   };
 
   const submitAllocationRequest = () => {
@@ -73,7 +76,10 @@ export const ProjectRolesStatus = ({ projectId }: { projectId: string }) => {
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <h4 className="font-medium text-base">{role.roleName || 'Brak nazwy roli'}</h4>
-                    <p className="text-sm text-muted-foreground mt-1">Status obsady stanowiska</p>
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>Utylizacja: {role.utilizationPercentages.join('% / ')}%</span>
+                    </div>
                   </div>
                   {getStatusBadge(role.status)}
                 </div>
@@ -144,7 +150,7 @@ export const ProjectRolesStatus = ({ projectId }: { projectId: string }) => {
             </div>
 
             <div className="flex flex-col gap-2 mt-2">
-              <label className="text-sm font-medium">Uzasadnienie (opcjonalne)</label>
+              <label className="text-sm font-medium">Uzasadnienie wniosku</label>
               <textarea 
                 value={justification}
                 onChange={(e) => setJustification(e.target.value)}
