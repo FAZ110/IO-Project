@@ -18,7 +18,7 @@ export const CreateProjectForm = () => {
         defaultValues: {
             title: "",
             description: "",
-            projectGroupId: "",
+            projectGroupId: null,
             sponsors: [],
             committee: [],
             milestones: [

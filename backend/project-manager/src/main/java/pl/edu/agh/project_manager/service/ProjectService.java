@@ -10,9 +10,7 @@ import pl.edu.agh.project_manager.domain.entity.Project;
 import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.ProjectGroups;
 import pl.edu.agh.project_manager.domain.entity.User;
-import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
 import pl.edu.agh.project_manager.domain.entity.*;
-import pl.edu.agh.project_manager.domain.enums.MembershipStatus;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
@@ -26,9 +24,7 @@ import pl.edu.agh.project_manager.service.command.project.RoleCommand;
 import pl.edu.agh.project_manager.service.command.project.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -195,6 +191,10 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find provided project - " + projectId));
 
+        if (!project.getProjectManager().getId().equals(projectManager.getId())) {
+            throw new ApplicationException(ApiErrorCode.ACCESS_DENIED, "Only project manager can add project risks");
+        }
+
         ProjectRisk risk = buildRisk(command);
         project.addRisk(risk);
 
@@ -241,11 +241,21 @@ public class ProjectService {
 
     private void addSponsorsToProject(Project project, List<UUID> sponsors) {
         List<User> sponsorUsers = userRepository.findAllById(sponsors);
+
+        if (sponsorUsers.size() != sponsors.size()) {
+            throw new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find one or more provided sponsors");
+        }
+
         sponsorUsers.forEach(project::addSponsor);
     }
 
     private void addCommitteesToProject(Project project, List<UUID> committee) {
-        List<User> sponsorUsers = userRepository.findAllById(committee);
-        sponsorUsers.forEach(project::addCommittee);
+        List<User> committeeUsers = userRepository.findAllById(committee);
+
+        if (committee.size() != committeeUsers.size()) {
+            throw new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find one or more provided committee members");
+        }
+
+        committeeUsers.forEach(project::addCommittee);
     }
 }

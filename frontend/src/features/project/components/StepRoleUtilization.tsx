@@ -100,7 +100,7 @@ export const StepRoleUtilization = ({
                     <tbody>
                         {roleFields.map((role, roleIndex) => {
                             const currentRole = watchedRoles[roleIndex];
-                            const totalUtilization = currentRole?.utilizationPercentages.reduce((sum, val) => sum + (val || 0), 0);
+                            const totalUtilization = currentRole?.utilizationPercentages.reduce((sum, val) => sum + (val || 0), 0) ?? 0;
                             const isOverallocated = totalUtilization > 100;
 
                             return (

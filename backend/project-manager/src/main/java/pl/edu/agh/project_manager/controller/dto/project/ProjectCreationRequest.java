@@ -3,7 +3,6 @@ package pl.edu.agh.project_manager.controller.dto.project;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 
 import java.util.List;
@@ -18,10 +17,10 @@ public record ProjectCreationRequest(
 
         UUID projectGroupId,
 
-        @NotNull(message = "Lista sponsorów nie może być pusta")
+        @NotEmpty(message = "Lista sponsorów nie może być pusta")
         List<UUID> sponsors,
 
-        @NotNull(message = "Lista członków komitetu sterującego nie może być pusta")
+        @NotEmpty(message = "Lista członków komitetu sterującego nie może być pusta")
         List<UUID> committee,
 
         @Valid
@@ -34,7 +33,7 @@ public record ProjectCreationRequest(
         List<@Valid MilestoneRequest> milestones
 ) {
     public ProjectCreationRequest {
-        if (risks.isEmpty()) risks = List.of();
+        if (risks == null || risks.isEmpty()) risks = List.of();
     }
 
     public ProjectCreationCommand toCommand(UUID creatorId) {

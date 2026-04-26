@@ -3,7 +3,7 @@ import {z} from "zod";
 export const CreateProjectFormSchema = z.object({
     title: z.string().min(1, "Tytuł jest wymagany"),
     description: z.string().min(1, "Opis jest wymagany"),
-    projectGroupId: z.string().optional().nullable(),
+    projectGroupId: z.uuid().nullable().optional(),
     sponsors: z.array(z.string()).min(1, "Dodaj co najmniej jednego sponsora"),
     committee: z.array(z.string()).min(1, "Dodaj co najmniej jedną osobę z komitetu"),
     milestones: z.array(z.object({

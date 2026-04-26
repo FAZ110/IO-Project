@@ -10,7 +10,7 @@ export const StepProgressTracker = ({
     steps
 }: StepProgressTrackerProps) => {
     return (
-        <div className="flex items-center mb-10 w-full px-4 px-15">
+        <div className="flex items-center mb-10 w-full px-15">
             {steps.map((label, index) => {
                 const stepNumber = index + 1;
                 const isCompleted = stepNumber < currentStep;
