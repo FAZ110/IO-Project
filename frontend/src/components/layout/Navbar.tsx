@@ -2,7 +2,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthContext';
 import { useAuthActions } from '@/features/auth/auth.hooks';
 import { PATHS } from '@/routes/paths';
-import { UserRole } from '@/features/auth/auth.types';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -16,16 +15,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
-  LayoutDashboard,
-  FolderPlus,
-  ShieldAlert,
   LogOut,
   Briefcase,
   Bell,
-  UserCircle,
-  Users
+  UserCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { NAV_ITEMS } from '@/routes/navigation';
 
 export const Navbar = () => {
   const { user } = useAuth();
@@ -40,6 +36,12 @@ export const Navbar = () => {
 
   const initials = `${user?.firstName?.charAt(0) || ''}${user?.lastName?.charAt(0) || ''}`.toUpperCase();
 
+  const visibleNavItems = NAV_ITEMS.filter((item) => {
+    if (!item.roles) return true;
+    if (!user) return false;
+    return item.roles.includes(user.role);
+  });
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -51,64 +53,29 @@ export const Navbar = () => {
           </Link>
 
           <div className="hidden md:flex gap-1">
-            <Link
-              to={PATHS.ROOT}
-              className={cn(
-                "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                isActive(PATHS.ROOT) && location.pathname === PATHS.ROOT
-                  ? "bg-slate-100 text-slate-900"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-              )}
-            >
-              <LayoutDashboard className="h-4 w-4" />
-              Dashboard
-            </Link>
+            {visibleNavItems.map((item) => {
+              const active = location.pathname === item.path && isActive(item.path);
 
-            {user?.role === UserRole.PROJECT_MANAGER && (
-              <Link
-                to={PATHS.CREATE_PROJECT}
-                className={cn(
-                  "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                  isActive(PATHS.CREATE_PROJECT)
-                    ? "bg-slate-100 text-slate-900"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                )}
-              >
-                <FolderPlus className="h-4 w-4" />
-                Nowy Projekt
-              </Link>
-            )}
-
-            {user?.role === UserRole.LINEAR_MANAGER && (
-              <Link
-                to="/my-team"
-                className={cn(
-                  "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                  isActive('/my-team')
-                    ? "bg-slate-100 text-slate-900"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                )}
-              >
-                <Users className="h-4 w-4" />
-                Mój Zespół
-              </Link>
-            )}
-
-            {user?.role === UserRole.ADMINISTRATOR && (
-              <Link
-                to={PATHS.ADMIN_USERS}
-                className={cn(
-                  "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                  isActive(PATHS.ADMIN_USERS)
-                    ? "bg-red-50 text-red-700"
-                    : "text-red-600 hover:bg-red-50 hover:text-red-700"
-                )}
-              >
-                <ShieldAlert className="h-4 w-4" />
-                Panel Admina
-              </Link>
-            )}
-          </div>
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                    !item.isCritical && (active 
+                      ? "bg-slate-100 text-slate-900" 
+                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"),
+                    item.isCritical && (active 
+                      ? "bg-red-50 text-red-700" 
+                      : "text-red-600 hover:bg-red-50 hover:text-red-700")
+                  )}
+                >
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                </Link>
+              );
+            })}
+         </div>
         </div>
 
         <div className="flex items-center gap-2">

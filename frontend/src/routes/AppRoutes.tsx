@@ -1,5 +1,4 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { ProtectedRoute } from './ProtectedRoute';
 import { GuestRoute } from './GuestRoute';
 import { PATHS } from './paths';
 import { RegisterPage } from '../pages/RegisterPage';
@@ -13,6 +12,9 @@ import { UserRole } from '@/features/auth/auth.types';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ProfilePage } from "@/pages/ProfilePage";
 import { DashboardPage } from "@/pages/DashboardPage";
+import { AuthenticatedRoute } from '@/routes/AuthenticatedRoute';
+import { AuthorizedRoute } from '@/routes/AuthorizedRoute';
+import { RequestsPage } from '@/pages/RequestsPage';
 
 export const AppRoutes = () => {
   return (
@@ -24,21 +26,31 @@ export const AppRoutes = () => {
       </Route>
 
       {/* PROTECTED ROUTES */}
-      <Route element={<ProtectedRoute redirectTo={PATHS.LOGIN} />}>
+      <Route element={<AuthenticatedRoute />}>
         <Route element={<MainLayout/>}>
-          <Route path={PATHS.ROOT} element={<DashboardPage/>} />
-          <Route path={PATHS.PROFILE} element={<ProfilePage/>} />
+          <Route path={PATHS.ROOT} element={<DashboardPage />} />
+          <Route path={PATHS.PROFILE} element={<ProfilePage />} />
 
-          <Route element={<ProtectedRoute redirectTo={PATHS.ROOT} allowedRoles={[UserRole.PROJECT_MANAGER]} />}>
+          <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER]} />}>
             <Route path={PATHS.CREATE_PROJECT} element={<CreateProjectPage/>} />
           </Route>
           <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
 
+          {/* LINEAR MANAGER ROUTES */}
+          <Route element={<AuthorizedRoute allowedRoles={[UserRole.LINEAR_MANAGER]} />}>
+            <Route path={PATHS.REQUESTS} element={<RequestsPage />} />
+          </Route>
+
+          {/* PROJECT MANAGER ROUTES */}
+          <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER]} />}>
+              <Route path={PATHS.CREATE_PROJECT} element={<CreateProjectPage />} />
+              <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
+          </Route>
 
           {/* ADMIN ROUTES */}
-          <Route element={<ProtectedRoute redirectTo={PATHS.LOGIN} allowedRoles={[UserRole.ADMINISTRATOR]} />}>
+          <Route element={<AuthorizedRoute allowedRoles={[UserRole.ADMINISTRATOR]} />}>
             <Route path={PATHS.ADMIN_USERS} element={<AdminUsersPage />} />
-            <Route path={`${PATHS.ADMIN_USERS}/:${ROUTE_PARAMS.USER_ID}`} element={<AdminUserDetailsPage />} />
+            <Route path={PATHS.ADMIN_USER_DETAILS(`:${ROUTE_PARAMS.USER_ID}`)} element={<AdminUserDetailsPage />} />
           </Route>
         </Route>
       </Route>
