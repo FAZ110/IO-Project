@@ -13,7 +13,7 @@ import pl.edu.agh.project_manager.service.UserService;
 @RestController
 @RequestMapping("/api/me")
 @RequiredArgsConstructor
-public class MeController {
+public class ProfileController {
 
     private final UserService userService;
 
