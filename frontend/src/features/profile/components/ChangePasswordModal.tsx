@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { toast } from 'sonner';
 import { useChangePasswordMutation } from '../profile.hooks';
 import type { ChangePasswordRequest } from '../profile.types';
@@ -14,7 +14,7 @@ type FormValues = ChangePasswordRequest & { confirmPassword: string };
 
 export const ChangePasswordModal = ({ open, onOpenChange }: ChangePasswordModalProps) => {
   const [serverError, setServerError] = useState<string | null>(null);
-  const { register, handleSubmit, reset, watch, formState: { errors } } = useForm<FormValues>();
+  const { register, handleSubmit, reset, control, formState: { errors } } = useForm<FormValues>();
   const mutation = useChangePasswordMutation();
 
   const handleClose = (isOpen: boolean) => {
@@ -43,7 +43,7 @@ export const ChangePasswordModal = ({ open, onOpenChange }: ChangePasswordModalP
     );
   });
 
-  const newPassword = watch('newPassword');
+  const newPassword = useWatch({ control, name: 'newPassword' });
 
   const confirmPasswordRegister = register('confirmPassword', {
     required: 'Potwierdzenie hasła jest wymagane',
