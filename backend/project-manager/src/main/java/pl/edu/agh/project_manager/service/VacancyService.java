@@ -57,8 +57,6 @@ public class VacancyService {
         Vacancy vacancy = Vacancy.builder()
                 .project(project)
                 .projectRole(role)
-                .startDate(command.startDate())
-                .endDate(command.endDate())
                 .status(VacancyStatus.OPEN)
                 .build();
 

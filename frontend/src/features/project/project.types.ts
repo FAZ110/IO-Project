@@ -8,12 +8,24 @@ export interface ProjectCreationRequest {
     walletId?: number;
     programId?: number;
     risks?: Risk[];
+    milestones?: Milestone[];
+    roles?: Role[];
 }
 
 export interface Risk {
     name: string;
     description: string;
     probability: number;
+}
+
+export interface Milestone {
+    name: string;
+    date: string;
+}
+
+export interface Role {
+    name: string;
+    utilizationPercentages: number[];
 }
 
 export interface RiskResponse {
@@ -32,3 +44,29 @@ export interface ProjectDetailsResponse {
   manager: UserResponse
 }
 
+export interface VacancyResponse {
+  id: string;
+  projectId: string;
+  roleId: string;
+  roleName: string;
+  status: 'OPEN' | 'PENDING_REQUEST' | 'FILLED' | 'CANCELLED';
+}
+
+export interface CreateVacancyRequest {
+  roleId: string;
+}
+
+export interface CreateAllocationRequest {
+  requestedEmployeeId: string;
+  justification: string;
+}
+
+export interface AllocationRequestResponse {
+  id: string;
+  vacancyId: string;
+  requestedEmployeeId: string;
+  createdById: string;
+  justification: string;
+  status: 'SUBMITTED' | 'APPROVED' | 'REJECTED';
+  createdAt: string;
+}

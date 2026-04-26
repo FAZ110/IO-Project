@@ -20,7 +20,6 @@ import pl.edu.agh.project_manager.repository.VacancyRepository;
 import pl.edu.agh.project_manager.service.command.vacancy.CreateAllocationRequestCommand;
 import pl.edu.agh.project_manager.service.command.vacancy.CreateVacancyCommand;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,8 +81,6 @@ class VacancyServiceTest {
         UUID projectId = UUID.randomUUID();
         UUID managerId = UUID.randomUUID();
         UUID roleId = UUID.randomUUID();
-        LocalDate startDate = LocalDate.now();
-        LocalDate endDate = LocalDate.now().plusMonths(6);
 
         User manager = User.builder().id(managerId).build();
         ProjectRole role = ProjectRole.builder().id(roleId).roleName("Dev").build();
@@ -94,7 +91,7 @@ class VacancyServiceTest {
                 .vacancies(new ArrayList<>())
                 .build();
 
-        CreateVacancyCommand command = new CreateVacancyCommand(projectId, roleId, startDate, endDate);
+        CreateVacancyCommand command = new CreateVacancyCommand(projectId, roleId);
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(vacancyRepository.save(any(Vacancy.class))).thenAnswer(invocation -> {
@@ -126,7 +123,7 @@ class VacancyServiceTest {
                 .projectManager(manager)
                 .build();
 
-        CreateVacancyCommand command = new CreateVacancyCommand(projectId, UUID.randomUUID(), LocalDate.now(), LocalDate.now());
+        CreateVacancyCommand command = new CreateVacancyCommand(projectId, UUID.randomUUID());
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
@@ -146,10 +143,10 @@ class VacancyServiceTest {
         Project project = Project.builder()
                 .id(projectId)
                 .projectManager(manager)
-                .roles(new ArrayList<>())
+                .roles(new ArrayList<>()) // No roles
                 .build();
 
-        CreateVacancyCommand command = new CreateVacancyCommand(projectId, UUID.randomUUID(), LocalDate.now(), LocalDate.now());
+        CreateVacancyCommand command = new CreateVacancyCommand(projectId, UUID.randomUUID());
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
@@ -208,7 +205,7 @@ class VacancyServiceTest {
 
         Vacancy vacancy = Vacancy.builder()
                 .id(vacancyId)
-                .status(VacancyStatus.FILLED)
+                .status(VacancyStatus.FILLED) // Invalid status
                 .build();
 
         CreateAllocationRequestCommand command = new CreateAllocationRequestCommand(
@@ -246,7 +243,7 @@ class VacancyServiceTest {
 
         when(vacancyRepository.findById(vacancyId)).thenReturn(Optional.of(vacancy));
         when(userRepository.findById(intruderId)).thenReturn(Optional.of(intruder));
-        
+
         assertThatExceptionOfType(ApplicationException.class)
                 .isThrownBy(() -> vacancyService.createAllocationRequest(command))
                 .extracting(ApplicationException::getErrorCode)

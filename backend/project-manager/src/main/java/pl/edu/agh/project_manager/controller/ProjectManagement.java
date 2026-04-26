@@ -15,6 +15,7 @@ import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.ProjectService;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -34,6 +35,15 @@ public class ProjectManagement {
 
         // Return ID of project
         return ResponseEntity.status(HttpStatus.CREATED).body(newProjectId);
+    }
+
+    @GetMapping("/projects")
+    @PreAuthorize("hasRole('PROJECT_MANAGER')")
+    public ResponseEntity<List<ProjectResponse>> getProjects(
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        List<ProjectResponse> projects = projectService.getProjectsForManager(userPrincipal.userId());
+        return ResponseEntity.ok(projects);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectSecurity.canAccessProject(#projectId, authentication.principal)")

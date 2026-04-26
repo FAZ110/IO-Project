@@ -14,10 +14,18 @@ export const ENDPOINTS = {
     INVITATIONS: '/admin/invitations',
   },
   PROJECT: {
+    LIST: '/projects',
     CREATE: '/project',
     DETAIL: (id: string) => `/project/${id}`,
     RISK: {
       LIST: (projectId: string) => `/project/${projectId}/risk`
+    },
+    VACANCIES: {
+      LIST: (projectId: string) => `/project/${projectId}/vacancies`,
+      CREATE: (projectId: string) => `/project/${projectId}/vacancies`,
     }
+  },
+  VACANCIES: {
+    ALLOCATE: (vacancyId: string) => `/vacancies/${vacancyId}/allocation-requests`
   }
 } as const;

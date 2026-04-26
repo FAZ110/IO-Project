@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import pl.edu.agh.project_manager.domain.enums.VacancyStatus;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -29,12 +28,6 @@ public class Vacancy {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "role_id", nullable = false)
     private ProjectRole projectRole;
-    
-    @Column(name = "start_date")
-    private LocalDate startDate;
-    
-    @Column(name = "end_date")
-    private LocalDate endDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)

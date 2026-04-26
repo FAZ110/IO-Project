@@ -11,6 +11,10 @@ interface CreateProjectViewProps {
   appendRisk: UseFieldArrayAppend<ProjectCreationRequest, "risks">;
   removeRisk: UseFieldArrayRemove;
   
+  roleFields: FieldArrayWithId<ProjectCreationRequest, "roles", "id">[];
+  appendRole: UseFieldArrayAppend<ProjectCreationRequest, "roles">;
+  removeRole: UseFieldArrayRemove;
+  
   message?: string;
 }
 
@@ -23,7 +27,10 @@ export const CreateProjectView = ({
   errors, 
   riskFields,
   appendRisk, 
-  removeRisk, 
+  removeRisk,
+  roleFields,
+  appendRole,
+  removeRole,
   message 
 }: CreateProjectViewProps) => (
   <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
@@ -82,6 +89,47 @@ export const CreateProjectView = ({
             />
             <label className="ml-2 block text-sm text-gray-900">Projekt aktywny</label>
           </div>
+        </div>
+      </div>
+
+      {/* --- SEKCJA WAKATÓW (Ról) --- */}
+      <div className="pt-6 border-t border-gray-200">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-gray-800">Potrzebni pracownicy (Wakaty)</h3>
+          <button
+            type="button"
+            onClick={() => appendRole({ name: '', utilizationPercentages: [100] })}
+            className="bg-blue-600 text-white px-3 py-1 text-sm rounded hover:bg-blue-700 cursor-pointer shadow-sm"
+          >
+            + Dodaj Stanowisko
+          </button>
+        </div>
+
+        {roleFields.length === 0 && (
+          <p className="text-sm text-gray-500 mb-4">Nie dodano jeszcze żadnych stanowisk. Użyj przycisku powyżej, aby zaplanować wakaty w projekcie.</p>
+        )}
+
+        <div className="space-y-4">
+          {roleFields.map((field, index) => (
+            <div key={field.id} className="p-4 border border-gray-200 rounded-lg bg-gray-50 relative flex gap-4 items-center">
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">Nazwa roli / stanowiska (np. Senior Frontend Developer)</label>
+                <input
+                  {...register(`roles.${index}.name` as const, { required: "Nazwa roli jest wymagana" })}
+                  type="text"
+                  placeholder="Wpisz nazwę stanowiska..."
+                  className="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <button 
+                type="button" 
+                onClick={() => removeRole(index)} 
+                className="mt-4 text-red-500 hover:text-red-700 text-sm font-bold cursor-pointer"
+              >
+                X Usuń
+              </button>
+            </div>
+          ))}
         </div>
       </div>
 

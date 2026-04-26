@@ -10,6 +10,7 @@ import pl.edu.agh.project_manager.domain.entity.Project;
 import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.ProjectGroups;
 import pl.edu.agh.project_manager.domain.entity.User;
+import pl.edu.agh.project_manager.domain.enums.VacancyStatus;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -72,6 +74,15 @@ public class ProjectService {
 
         return ProjectResponse.from(project);
     }
+    
+    public List<ProjectResponse> getProjectsForManager(UUID managerId) {
+        User projectManager = userRepository.findById(managerId)
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_MANAGER_NOT_FOUND));
+        
+        return projectManager.getProjects().stream()
+                .map(ProjectResponse::from)
+                .collect(Collectors.toList());
+    }
 
     private void addRolesAndBindWithSegments(Project project, List<ProjectSegment> segments, List<RoleCommand> roles) {
         for (RoleCommand role : roles) {
@@ -99,6 +110,14 @@ public class ProjectService {
             }
 
             project.addRole(projectRole);
+            
+            // Automatically create a Vacancy for each Role defined at project creation
+            Vacancy vacancy = Vacancy.builder()
+                    .project(project)
+                    .projectRole(projectRole)
+                    .status(VacancyStatus.OPEN)
+                    .build();
+            project.addVacancy(vacancy);
         }
     }
 

@@ -1,6 +1,7 @@
 import {useProjectDetails} from "@/features/project/project.hooks.ts";
 import {useParams} from "react-router-dom";
 import {ProjectHeader} from "@/features/project/components/ProjectHeader.tsx";
+import {ProjectVacancies} from "@/features/project/components/ProjectVacancies.tsx";
 
 export const ProjectDetailsPage = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -10,7 +11,7 @@ export const ProjectDetailsPage = () => {
     return <div className="p-8 text-center text-gray-500">Ładowanie danych projektu...</div>;
   }
 
-  if (isError || !project) {
+  if (isError || !project || !projectId) {
     return <div className="p-8 text-center text-red-500">Nie udało się znaleźć tego projektu.</div>;
   }
 
@@ -22,10 +23,12 @@ export const ProjectDetailsPage = () => {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
         <div className="space-y-6 lg:col-span-2">
-
+          {/* Main content area */}
+          <ProjectVacancies projectId={projectId} />
         </div>
 
         <div className="space-y-6">
+          {/* Sidebar / Risks / Info area */}
         </div>
 
       </div>
