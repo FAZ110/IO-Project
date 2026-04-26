@@ -4,8 +4,7 @@ import type {
   ProjectCreationRequest, 
   ProjectDetailsResponse, 
   RiskResponse,
-  VacancyResponse,
-  CreateVacancyRequest,
+  ProjectRoleStatusResponse,
   AllocationRequestResponse,
   CreateAllocationRequest
 } from './project.types';
@@ -31,18 +30,13 @@ export const projectService = {
     return response.data;
   },
 
-  getVacancies: async (projectId: string): Promise<VacancyResponse[]> => {
-    const response = await api.get<VacancyResponse[]>(ENDPOINTS.PROJECT.VACANCIES.LIST(projectId));
+  getProjectRolesStatus: async (projectId: string): Promise<ProjectRoleStatusResponse[]> => {
+    const response = await api.get<ProjectRoleStatusResponse[]>(ENDPOINTS.PROJECT.ROLES.STATUS_LIST(projectId));
     return response.data;
   },
 
-  createVacancy: async (projectId: string, data: CreateVacancyRequest): Promise<VacancyResponse> => {
-    const response = await api.post<VacancyResponse>(ENDPOINTS.PROJECT.VACANCIES.CREATE(projectId), data);
-    return response.data;
-  },
-
-  createAllocationRequest: async (vacancyId: string, data: CreateAllocationRequest): Promise<AllocationRequestResponse> => {
-    const response = await api.post<AllocationRequestResponse>(ENDPOINTS.VACANCIES.ALLOCATE(vacancyId), data);
+  createAllocationRequest: async (roleId: string, data: CreateAllocationRequest): Promise<AllocationRequestResponse> => {
+    const response = await api.post<AllocationRequestResponse>(ENDPOINTS.PROJECT.ROLES.ALLOCATE(roleId), data);
     return response.data;
   }
 };

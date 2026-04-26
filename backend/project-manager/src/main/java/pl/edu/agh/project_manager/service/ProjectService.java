@@ -1,6 +1,6 @@
 package pl.edu.agh.project_manager.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
@@ -10,7 +10,6 @@ import pl.edu.agh.project_manager.domain.entity.Project;
 import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.ProjectGroups;
 import pl.edu.agh.project_manager.domain.entity.User;
-import pl.edu.agh.project_manager.domain.enums.VacancyStatus;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
@@ -65,6 +64,7 @@ public class ProjectService {
         return savedProject.getId();
     }
 
+    @Transactional(readOnly = true)
     public ProjectResponse getProject(UUID projectId) {
         Project project = projectRepository.findByIdWithManager(projectId)
                 .orElseThrow(() -> new ApplicationException(
@@ -75,6 +75,7 @@ public class ProjectService {
         return ProjectResponse.from(project);
     }
     
+    @Transactional(readOnly = true)
     public List<ProjectResponse> getProjectsForManager(UUID managerId) {
         User projectManager = userRepository.findById(managerId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_MANAGER_NOT_FOUND));
@@ -110,14 +111,6 @@ public class ProjectService {
             }
 
             project.addRole(projectRole);
-            
-            // Automatically create a Vacancy for each Role defined at project creation
-            Vacancy vacancy = Vacancy.builder()
-                    .project(project)
-                    .projectRole(projectRole)
-                    .status(VacancyStatus.OPEN)
-                    .build();
-            project.addVacancy(vacancy);
         }
     }
 

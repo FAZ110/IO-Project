@@ -21,8 +21,8 @@ public class AllocationRequest {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "vacancy_id", nullable = false)
-    private Vacancy vacancy;
+    @JoinColumn(name = "role_id", nullable = false)
+    private ProjectRole projectRole;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requested_employee_id")

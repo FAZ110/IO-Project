@@ -44,16 +44,10 @@ export interface ProjectDetailsResponse {
   manager: UserResponse
 }
 
-export interface VacancyResponse {
+export interface ProjectRoleStatusResponse {
   id: string;
-  projectId: string;
-  roleId: string;
   roleName: string;
-  status: 'OPEN' | 'PENDING_REQUEST' | 'FILLED' | 'CANCELLED';
-}
-
-export interface CreateVacancyRequest {
-  roleId: string;
+  status: 'OPEN' | 'PENDING' | 'FILLED';
 }
 
 export interface CreateAllocationRequest {
@@ -63,7 +57,7 @@ export interface CreateAllocationRequest {
 
 export interface AllocationRequestResponse {
   id: string;
-  vacancyId: string;
+  projectRoleId: string;
   requestedEmployeeId: string;
   createdById: string;
   justification: string;

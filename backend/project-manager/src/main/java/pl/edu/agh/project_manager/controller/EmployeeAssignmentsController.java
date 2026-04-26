@@ -26,7 +26,7 @@ public class EmployeeAssignmentsController {
     private final EmployeeAssignmentsService employeeAssignmentsService;
 
     @PostMapping
-    @PreAuthorize("hasRole('PROJECT_MANAGER') and @projectSecurity.isProjectManagerForProject(#projectId, authentication.principal)")
+    @PreAuthorize("hasRole('PROJECT_MANAGER') and @projectSecurity.isProjectManagerForProject(#request.projectId, authentication.principal)")
     public ResponseEntity<Void> createEmployeeAssignment(@Valid @RequestBody EmployeeAssignmentRequest request) {
         employeeAssignmentsService.createEmployeeAssignment(new EmployeeRequestCommand(
                 request.userId(),

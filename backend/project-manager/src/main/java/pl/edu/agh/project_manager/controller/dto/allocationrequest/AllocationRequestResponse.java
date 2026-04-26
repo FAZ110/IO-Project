@@ -1,4 +1,4 @@
-package pl.edu.agh.project_manager.controller.dto.vacancy;
+package pl.edu.agh.project_manager.controller.dto.allocationrequest;
 
 import pl.edu.agh.project_manager.domain.entity.AllocationRequest;
 import pl.edu.agh.project_manager.domain.enums.AllocationRequestStatus;
@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public record AllocationRequestResponse(
         UUID id,
-        UUID vacancyId,
+        UUID projectRoleId,
         UUID requestedEmployeeId,
         UUID createdById,
         String justification,
@@ -18,7 +18,7 @@ public record AllocationRequestResponse(
     public static AllocationRequestResponse from(AllocationRequest request) {
         return new AllocationRequestResponse(
                 request.getId(),
-                request.getVacancy().getId(),
+                request.getProjectRole().getId(),
                 request.getRequestedEmployee() != null ? request.getRequestedEmployee().getId() : null,
                 request.getCreatedBy().getId(),
                 request.getJustification(),

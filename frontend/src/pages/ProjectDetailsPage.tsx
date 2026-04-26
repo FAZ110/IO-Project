@@ -1,7 +1,7 @@
 import {useProjectDetails} from "@/features/project/project.hooks.ts";
 import {useParams} from "react-router-dom";
 import {ProjectHeader} from "@/features/project/components/ProjectHeader.tsx";
-import {ProjectVacancies} from "@/features/project/components/ProjectVacancies.tsx";
+import {ProjectRolesStatus} from "@/features/project/components/ProjectVacancies.tsx";
 
 export const ProjectDetailsPage = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -24,7 +24,7 @@ export const ProjectDetailsPage = () => {
 
         <div className="space-y-6 lg:col-span-2">
           {/* Main content area */}
-          <ProjectVacancies projectId={projectId} />
+          <ProjectRolesStatus projectId={projectId} />
         </div>
 
         <div className="space-y-6">

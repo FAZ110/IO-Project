@@ -9,6 +9,6 @@ import java.util.UUID;
 
 @Repository
 public interface AllocationRequestRepository extends JpaRepository<AllocationRequest, UUID> {
-    List<AllocationRequest> findByVacancyId(UUID vacancyId);
+    List<AllocationRequest> findByProjectRoleId(UUID projectRoleId);
     List<AllocationRequest> findByCreatedById(UUID createdById);
 }

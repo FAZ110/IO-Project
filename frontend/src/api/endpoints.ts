@@ -20,12 +20,9 @@ export const ENDPOINTS = {
     RISK: {
       LIST: (projectId: string) => `/project/${projectId}/risk`
     },
-    VACANCIES: {
-      LIST: (projectId: string) => `/project/${projectId}/vacancies`,
-      CREATE: (projectId: string) => `/project/${projectId}/vacancies`,
+    ROLES: {
+      STATUS_LIST: (projectId: string) => `/projects/${projectId}/roles/status`,
+      ALLOCATE: (roleId: string) => `/roles/${roleId}/allocation-requests`
     }
-  },
-  VACANCIES: {
-    ALLOCATE: (vacancyId: string) => `/vacancies/${vacancyId}/allocation-requests`
   }
 } as const;
