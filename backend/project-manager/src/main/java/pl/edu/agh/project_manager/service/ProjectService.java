@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import pl.edu.agh.project_manager.domain.enums.UserRole;
 
 @Service
 @RequiredArgsConstructor
@@ -236,13 +237,13 @@ public class ProjectService {
 
     public List<ProjectResponse> getAllProjects(UserPrincipal userPrincipal) {
 
-        String role = userPrincipal.userRole().name();
+        UserRole role = userPrincipal.userRole();
 
         List<Project> projects = switch (role) {
-            case "ADMINISTRATOR", "AUTHORITY" -> projectRepository.findAll();
-            case "PROJECT_MANAGER"            -> projectRepository.findAllByProjectManagerId(userPrincipal.userId());
-            case "LINEAR_MANAGER", "COMMON"   -> projectRepository.findAllByMemberId(userPrincipal.userId());
-            default                           -> List.of();
+            case ADMINISTRATOR, AUTHORITY -> projectRepository.findAll();
+            case PROJECT_MANAGER          -> projectRepository.findAllByProjectManagerId(userPrincipal.userId());
+            case LINEAR_MANAGER, COMMON   -> projectRepository.findAllByMemberId(userPrincipal.userId());
+            default                       -> List.of();
         };
 
         return projects.stream()
