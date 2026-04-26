@@ -20,4 +20,11 @@ public interface ProjectMemberRepository extends JpaRepository<ProjectMember, UU
             "JOIN FETCH m.user " +
             "JOIN FETCH m.role")
     List<ProjectMember> findAllWithDetails();
+
+    @Query("SELECT m FROM ProjectMember m " +
+            "JOIN FETCH m.project " +
+            "JOIN FETCH m.user " +
+            "JOIN FETCH m.role " +
+            "WHERE m.membershipStatus = :status")
+    List<ProjectMember> findAllWithDetailsByMembershipStatus(MembershipStatus status);
 }

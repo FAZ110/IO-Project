@@ -69,8 +69,12 @@ public class EmployeeAssignmentsService {
     }
 
     @Transactional(readOnly = true)
-    public List<EmployeeAssignmentResponse> getEmployeeAssignments() {
-        return projectMemberRepository.findAllWithDetails().stream()
+    public List<EmployeeAssignmentResponse> getEmployeeAssignments(EmployeeAssignmentRequestStatus status) {
+        List<ProjectMember> members = status == null
+                ? projectMemberRepository.findAllWithDetails()
+                : projectMemberRepository.findAllWithDetailsByMembershipStatus(mapToMembershipStatus(status));
+
+        return members.stream()
                 .map(member -> {
                     var project = member.getProject();
                     var user = member.getUser();
@@ -91,6 +95,14 @@ public class EmployeeAssignmentsService {
                     );
                 })
                 .toList();
+    }
+
+    private MembershipStatus mapToMembershipStatus(EmployeeAssignmentRequestStatus status) {
+        return switch (status) {
+            case PENDING -> MembershipStatus.PENDING;
+            case ACCEPTED -> MembershipStatus.ACCEPTED;
+            case REJECTED -> MembershipStatus.REJECTED;
+        };
     }
 
     @Transactional
