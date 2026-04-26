@@ -269,7 +269,7 @@ class ProjectServiceTest {
         RiskCommand command = new RiskCommand("Title", "Desc", 50);
 
         User manager = User.builder().id(managerId).build();
-        Project project = Project.builder().id(projectId).risks(new ArrayList<>()).build();
+        Project project = Project.builder().id(projectId).projectManager(manager).risks(new ArrayList<>()).build();
         ProjectRisk savedRisk = ProjectRisk.builder().id(UUID.randomUUID()).name("Title").build();
 
         when(userRepository.findById(managerId)).thenReturn(Optional.of(manager));
