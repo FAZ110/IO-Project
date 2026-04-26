@@ -62,7 +62,8 @@ public class AuthService {
                 user.getPassword(),
                 user.getName(),
                 user.getSurname(),
-                List.of(new SimpleGrantedAuthority("ROLE_" + user.getUserRole().name()))
+                List.of(new SimpleGrantedAuthority("ROLE_" + user.getUserRole().name())),
+                user.getUserRole()
         );
 
         return jwtService.generateTokenPair(userDetails);
@@ -91,7 +92,8 @@ public class AuthService {
                 user.getPassword(),
                 user.getName(),
                 user.getSurname(),
-                List.of(new SimpleGrantedAuthority("ROLE_" + user.getUserRole().name()))
+                List.of(new SimpleGrantedAuthority("ROLE_" + user.getUserRole().name())),
+                user.getUserRole()
         );
 
         return jwtService.generateTokenPair(userDetails);

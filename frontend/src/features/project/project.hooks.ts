@@ -1,7 +1,14 @@
-import {useMutation, useQuery} from "@tanstack/react-query";
-import {projectService} from "@/features/project/project.service.ts";
-import {toast} from "sonner";
-import {PROJECT_KEYS} from "@/features/project/project.keys.ts";
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { projectService } from '@/features/project/project.service.ts';
+import { toast } from 'sonner';
+import { PROJECT_KEYS } from '@/features/project/project.keys.ts';
+
+export const useProjects = () => {
+  return useQuery({
+    queryKey: PROJECT_KEYS.all,
+    queryFn: projectService.getAllProjects,
+  });
+};
 
 export const useProjectDetails = (id: string) => {
   return useQuery({
@@ -9,7 +16,7 @@ export const useProjectDetails = (id: string) => {
     queryFn: () => projectService.getDetails(id),
     enabled: !!id
   });
-}
+};
 
 export const useCreateProject = () => {
   return useMutation({
@@ -17,6 +24,8 @@ export const useCreateProject = () => {
     onSuccess: () => {
       toast.success('Dodano projekt.');
     },
-
   });
 };
+
+
+

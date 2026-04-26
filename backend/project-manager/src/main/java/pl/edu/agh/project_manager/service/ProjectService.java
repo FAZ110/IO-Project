@@ -10,21 +10,23 @@ import pl.edu.agh.project_manager.domain.entity.Project;
 import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.ProjectGroups;
 import pl.edu.agh.project_manager.domain.entity.User;
-import pl.edu.agh.project_manager.domain.entity.*;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
 import pl.edu.agh.project_manager.repository.ProjectRepository;
 import pl.edu.agh.project_manager.repository.RiskRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
+import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.command.project.MilestoneCommand;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
 import pl.edu.agh.project_manager.service.command.project.RoleCommand;
-import pl.edu.agh.project_manager.service.command.project.*;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import pl.edu.agh.project_manager.domain.enums.UserRole;
 
 @Service
 @RequiredArgsConstructor
@@ -237,6 +239,22 @@ public class ProjectService {
 
             project.addRisk(risk);
         });
+    }
+
+    public List<ProjectResponse> getAllProjects(UserPrincipal userPrincipal) {
+
+        UserRole role = userPrincipal.userRole();
+
+        List<Project> projects = switch (role) {
+            case ADMINISTRATOR, AUTHORITY -> projectRepository.findAll();
+            case PROJECT_MANAGER          -> projectRepository.findAllByProjectManagerId(userPrincipal.userId());
+            case LINEAR_MANAGER, COMMON   -> projectRepository.findAllByMemberId(userPrincipal.userId());
+            default                       -> List.of();
+        };
+
+        return projects.stream()
+                .map(ProjectResponse::from)
+                .toList();
     }
 
     private void addSponsorsToProject(Project project, List<UUID> sponsors) {

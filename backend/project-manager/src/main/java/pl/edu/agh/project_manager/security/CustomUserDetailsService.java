@@ -30,7 +30,8 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getPassword(),
                 user.getName(),
                 user.getSurname(),
-                List.of(authority)
+                List.of(authority),
+                user.getUserRole()
         );
     }
 }

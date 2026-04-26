@@ -16,12 +16,17 @@ export const ENDPOINTS = {
   },
   PROJECT: {
     CREATE: '/project',
-    DETAIL: (id: string) => `/project/${id}`,
-    RISK: {
-      LIST: (projectId: string) => `/project/${projectId}/risk`
-    },
+    BASE: '/projects',
+          DETAIL: (id: string) => `/projects/${id}`,
+          RISK: {
+            LIST: (projectId: string) => `/projects/${projectId}/risk`
+          },
   },
   PROJECT_GROUP: {
-    ALL_GROUPS: '/groups'
+    LIST_ALL: '/groups',
+    WALLETS: '/groups/wallets',
+    PROGRAMS: '/groups/programs',
+    DETAIL: (groupId: string) => `/groups/${groupId}`,
+    CREATE: '/groups',
   }
 } as const;
