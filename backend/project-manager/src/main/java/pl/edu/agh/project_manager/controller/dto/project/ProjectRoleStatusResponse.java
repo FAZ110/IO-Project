@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public record ProjectRoleStatusResponse(
         UUID id,
         String roleName,
-        String status, // OPEN, PENDING, FILLED
+        String status,
         List<Integer> utilizationPercentages
 ) {
     public static ProjectRoleStatusResponse from(ProjectRole role) {
