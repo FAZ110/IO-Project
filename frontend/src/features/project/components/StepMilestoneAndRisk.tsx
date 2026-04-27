@@ -6,6 +6,7 @@ import {
     type UseFormRegister,
 } from "react-hook-form";
 import type { ProjectCreationRequest } from "../project.types";
+import { getNextDateFromToday } from "../project.utils.ts";
 
 interface StepMilestonesAndRisksProps {
     register: UseFormRegister<ProjectCreationRequest>;
@@ -20,8 +21,6 @@ interface StepMilestonesAndRisksProps {
     appendRisk: UseFieldArrayAppend<ProjectCreationRequest, "risks">;
     removeRisk: UseFieldArrayRemove;
 }
-
-const today = new Date().toISOString().split("T")[0];
 
 export const StepMilestonesAndRisks = ({
     register,
@@ -59,7 +58,7 @@ export const StepMilestonesAndRisks = ({
                 <div className="space-y-4">
                     {milestonesFields.map((field, index) => {
                         const lastMilestone = milestones[index - 1];
-                        const minDate = lastMilestone?.date ?? today;
+                        const minDate = lastMilestone?.date ?? getNextDateFromToday(0);
 
                         return (
                             <div key={field.id} className="p-4 border border-gray-200 rounded-lg bg-gray-50 relative">

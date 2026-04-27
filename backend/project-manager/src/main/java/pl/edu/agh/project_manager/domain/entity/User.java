@@ -55,11 +55,11 @@ public class User {
 
     @ManyToMany(mappedBy = "sponsors")
     @Builder.Default
-    private Set<Project> sponsorProjects = new HashSet<>();
+    private List<Project> sponsorProjects = new ArrayList<>();
 
     @ManyToMany(mappedBy = "committees")
     @Builder.Default
-    private Set<Project> committeeProjects = new HashSet<>();
+    private List<Project> committeeProjects = new ArrayList<>();
 
     public void addProject(Project project) {
         this.projects.add(project);

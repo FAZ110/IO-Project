@@ -180,32 +180,11 @@ class ProjectServiceTest {
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
         // When
-        projectService.deleteProjectRisk(projectId, riskId, managerId);
+        projectService.deleteProjectRisk(projectId, riskId);
 
         // Then
         assertThat(project.getRisks()).isEmpty();
     }
-
-
-    @Test
-    @DisplayName("Should throw exception when someone else tries to delete risk")
-    void deleteProjectRisk_AccessDenied() {
-        // Given
-        UUID projectId = UUID.randomUUID();
-        UUID managerId = UUID.randomUUID();
-        UUID intruderId = UUID.randomUUID();
-
-        User manager = User.builder().id(managerId).build();
-        Project project = Project.builder().id(projectId).projectManager(manager).build();
-
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-
-        // When & Then
-        assertThatThrownBy(() -> projectService.deleteProjectRisk(projectId, UUID.randomUUID(), intruderId))
-                .isInstanceOf(ApplicationException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ApiErrorCode.ACCESS_DENIED);
-    }
-
 
     @Test
     @DisplayName("Should update risk fields correctly")
@@ -227,36 +206,12 @@ class ProjectServiceTest {
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
         // When
-        RiskResponse response = projectService.updateProjectRisk(projectId, riskId, managerId, command);
+        RiskResponse response = projectService.updateProjectRisk(projectId, riskId, command);
 
         // Then
         assertThat(response.name()).isEqualTo("New Name");
         assertThat(risk.getName()).isEqualTo("New Name");
         assertThat(risk.getProbability()).isEqualTo(90);
-    }
-
-
-    @Test
-    @DisplayName("Should throw exception when someone else tries to update risk")
-    void updateProjectRisk_AccessDenied() {
-        UUID projectId = UUID.randomUUID();
-        UUID riskId = UUID.randomUUID();
-        UUID managerId = UUID.randomUUID();
-
-        RiskCommand command = new RiskCommand("New Name", "New Desc", 90);
-        User manager = User.builder().id(managerId).build();
-        ProjectRisk risk = ProjectRisk.builder().id(riskId).name("Old").build();
-        Project project = Project.builder()
-                .id(projectId)
-                .projectManager(manager)
-                .risks(new ArrayList<>(java.util.List.of(risk)))
-                .build();
-
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-
-        assertThatThrownBy(() -> projectService.updateProjectRisk(projectId, riskId, UUID.randomUUID(), command))
-                .isInstanceOf(ApplicationException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ApiErrorCode.ACCESS_DENIED);
     }
 
 
@@ -272,12 +227,11 @@ class ProjectServiceTest {
         Project project = Project.builder().id(projectId).projectManager(manager).risks(new ArrayList<>()).build();
         ProjectRisk savedRisk = ProjectRisk.builder().id(UUID.randomUUID()).name("Title").build();
 
-        when(userRepository.findById(managerId)).thenReturn(Optional.of(manager));
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(riskRepository.save(any(ProjectRisk.class))).thenReturn(savedRisk);
 
         // When
-        RiskResponse response = projectService.createProjectRisk(command, managerId, projectId);
+        RiskResponse response = projectService.createProjectRisk(command, projectId);
 
         // Then
         assertThat(response.id()).isEqualTo(savedRisk.getId());

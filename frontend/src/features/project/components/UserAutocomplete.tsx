@@ -109,10 +109,10 @@ export const UserAutocomplete = ({
           )}
           
           <div className="flex flex-wrap gap-2 mt-2">
-            {selectedUsers.map(userId => (
-                <span key={userId.id} className="flex items-center bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">
-                  {userId.name} {userId.surname}
-                  <button type="button" onClick={() => handleRemoveUser(userId.id)} className="ml-1 text-blue-500 hover:text-blue-800 cursor-pointer">
+            {selectedUsers.map(user => (
+                <span key={user.id} className="flex items-center bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">
+                  {user.name} {user.surname}
+                  <button type="button" onClick={() => handleRemoveUser(user.id)} className="ml-1 text-blue-500 hover:text-blue-800 cursor-pointer">
                     <span aria-hidden="true" className="text-sm leading-none">×</span>
                   </button>
                 </span>

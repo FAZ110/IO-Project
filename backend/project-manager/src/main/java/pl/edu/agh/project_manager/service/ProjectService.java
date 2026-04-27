@@ -136,13 +136,9 @@ public class ProjectService {
     }
 
     @Transactional
-    public void deleteProjectRisk(UUID projectId, UUID riskId, UUID projectManagerId) {
+    public void deleteProjectRisk(UUID projectId, UUID riskId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find provided project - " + projectId));
-
-        if (!project.getProjectManager().getId().equals(projectManagerId)) {
-            throw new ApplicationException(ApiErrorCode.ACCESS_DENIED, "Only project manager can delete project");
-        }
 
         ProjectRisk removedRisk = project.getRisks().stream()
                 .filter(risk -> risk.getId().equals(riskId))
@@ -153,13 +149,9 @@ public class ProjectService {
     }
 
     @Transactional
-    public RiskResponse updateProjectRisk(UUID projectId, UUID riskId, UUID projectManagerId, RiskCommand command) {
+    public RiskResponse updateProjectRisk(UUID projectId, UUID riskId, RiskCommand command) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find provided project - " + projectId));
-
-        if (!project.getProjectManager().getId().equals(projectManagerId)) {
-            throw new ApplicationException(ApiErrorCode.ACCESS_DENIED, "Only project manager can update project risks");
-        }
 
         ProjectRisk risk = project.getRisks()
                 .stream()
@@ -186,16 +178,9 @@ public class ProjectService {
     }
 
     @Transactional
-    public RiskResponse createProjectRisk(RiskCommand command,  UUID projectManagerId, UUID projectId) {
-        User projectManager = userRepository.findById(projectManagerId)
-                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_MANAGER_NOT_FOUND, "Cannot find provided project manager - " + projectManagerId));
-
+    public RiskResponse createProjectRisk(RiskCommand command, UUID projectId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find provided project - " + projectId));
-
-        if (!project.getProjectManager().getId().equals(projectManager.getId())) {
-            throw new ApplicationException(ApiErrorCode.ACCESS_DENIED, "Only project manager can add project risks");
-        }
 
         ProjectRisk risk = buildRisk(command);
         project.addRisk(risk);

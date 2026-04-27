@@ -10,6 +10,7 @@ import { PATHS } from "@/routes/paths.ts";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CreateProjectFormSchema } from "../project.schema.ts";
+import { getNextDateFromToday } from "../project.utils.ts";
 
 export const CreateProjectForm = () => {
     const methods = useForm<ProjectCreationRequest>({
@@ -23,12 +24,12 @@ export const CreateProjectForm = () => {
             committee: [],
             milestones: [
                 {
-                    name: "",
-                    date: "",
+                    name: "Start",
+                    date: getNextDateFromToday(0),
                 },
                 {
-                    name: "",
-                    date: "",
+                    name: "End",
+                    date: getNextDateFromToday(30),
                 }
             ],
             roles: [],
