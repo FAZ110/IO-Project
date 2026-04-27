@@ -13,10 +13,6 @@ export const CreateProjectFormSchema = z.object({
     roles: z.array(z.object({
         name: z.string().min(1, "Nazwa roli jest wymagana"),
         utilizationPercentages: z.array(z.number().min(0, "Utilizacja musi być liczbą dodatnią").max(100, "Utilizacja nie może przekraczać 100"))
-            .refine((arr) => {
-                const sum = arr.reduce((acc, val) => acc + val, 0);
-                return sum <= 100;
-            }, { message: "Suma procentów wykorzystania dla tej roli nie może przekraczać 100" })
     })).min(1, "Dodaj co najmniej jedną rolę"),
     risks: z.array(z.object({
         name: z.string().min(1, "Nazwa ryzyka jest wymagana"),
