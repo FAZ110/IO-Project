@@ -35,5 +35,13 @@ export const useProjectRisks = (id: string) => {
   })
 }
 
+export const useProjectMembers = (id: string) => {
+  return useQuery({
+    queryKey: PROJECT_KEYS.members(id),
+    queryFn: () => projectService.getProjectMembers(id),
+    enabled: !!id
+  })
+}
+
 
 

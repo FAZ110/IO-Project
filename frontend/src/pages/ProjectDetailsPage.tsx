@@ -2,6 +2,7 @@ import {useProjectDetails} from "@/features/project/project.hooks.ts";
 import {useParams} from "react-router-dom";
 import {ProjectHeader} from "@/features/project/components/ProjectHeader.tsx";
 import {ProjectRisks} from "@/features/project/components/ProjectRisks.tsx";
+import {ProjectMembersSideBar} from "@/features/project/components/ProjectMembersSideBar.tsx";
 
 export const ProjectDetailsPage = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -32,9 +33,7 @@ export const ProjectDetailsPage = () => {
 
 
         <div className="space-y-6">
-          <div className="p-6 border rounded-xl bg-white shadow-sm h-96 flex items-center justify-center text-slate-400">
-            [Pasek użytkowników]
-          </div>
+          <ProjectMembersSideBar projectId={project.id} />
         </div>
       </div>
 

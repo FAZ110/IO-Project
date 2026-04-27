@@ -22,6 +22,10 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     @Query("SELECT p FROM Project p JOIN FETCH p.projectManager WHERE p.id = :id")
     Optional<Project> findByIdWithManager(@Param("id") UUID id);
 
+    @EntityGraph(attributePaths = {"sponsors", "committees", "members", "members.user", "members.role"})
+    @Query("SELECT p FROM Project p WHERE p.id = :id")
+    Optional<Project> findByIdWithAllMembers(@Param("id") UUID id);
+
     boolean existsByIdAndProjectManagerId(UUID id, UUID projectManagerId);
 
     @Query("SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END FROM Project p JOIN p.members m WHERE p.id = :projectId AND m.user.id = :userId")
