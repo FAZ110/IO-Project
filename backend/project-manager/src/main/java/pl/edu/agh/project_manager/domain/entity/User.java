@@ -61,11 +61,6 @@ public class User {
     @Builder.Default
     private Set<Project> committeeProjects = new HashSet<>();
 
-    public void addProject(Project project) {
-        this.projects.add(project);
-        project.setProjectManager(this);
-    }
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Qualification> qualifications = new ArrayList<>();
