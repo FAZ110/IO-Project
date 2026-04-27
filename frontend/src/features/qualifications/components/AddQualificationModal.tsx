@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useAddQualificationsMutation } from '../qualifications.hooks';
-import type { QualificationResponse } from '../qualifications.types';
+import { toast } from 'sonner';
+import { useAddQualificationsMutation, useSkillSuggestionsQuery } from '../qualifications.hooks';
+import type { PendingSkill, QualificationResponse, SkillSuggestion } from '../qualifications.types';
 import { AddQualificationModalView } from './AddQualificationModal.view';
 
 interface AddQualificationModalProps {
@@ -15,35 +16,34 @@ export const AddQualificationModal = ({
   existingQualifications,
 }: AddQualificationModalProps) => {
   const [input, setInput] = useState('');
-  const [pendingSkills, setPendingSkills] = useState<string[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [pendingSkills, setPendingSkills] = useState<PendingSkill[]>([]);
+  const [inputFocused, setInputFocused] = useState(false);
 
   const addMutation = useAddQualificationsMutation();
+  const { data: suggestions = [] } = useSkillSuggestionsQuery(input);
 
   const resetAndClose = () => {
     setInput('');
     setPendingSkills([]);
-    setErrorMessage(null);
     onOpenChange(false);
   };
 
-  const handleAddPending = () => {
-    const name = input.trim();
+  const handleAddPending = (skill?: PendingSkill) => {
+    const name = skill?.name ?? input.trim();
     if (!name) return;
 
-    const duplicateLocally = pendingSkills.some((skill) => skill.toLowerCase() === name.toLowerCase());
+    const duplicateLocally = pendingSkills.some((s) => s.name.toLowerCase() === name.toLowerCase());
     const duplicateExisting = existingQualifications.some(
-      (qualification) => qualification.name.toLowerCase() === name.toLowerCase(),
+      (q) => q.name.toLowerCase() === name.toLowerCase(),
     );
 
     if (duplicateLocally || duplicateExisting) {
-      setErrorMessage(`Kompetencja „${name}” znajduje się już na liście.`);
+      toast.error(`Kompetencja „${name}” znajduje się już na liście.`);
       return;
     }
 
-    setPendingSkills((previous) => [...previous, name]);
+    setPendingSkills((previous) => [...previous, skill ?? { name }]);
     setInput('');
-    setErrorMessage(null);
   };
 
   const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -53,20 +53,19 @@ export const AddQualificationModal = ({
     }
   };
 
+  const handleSuggestionSelect = (suggestion: SkillSuggestion) => {
+    handleAddPending({ name: suggestion.name, id: suggestion.id });
+  };
+
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (pendingSkills.length === 0) {
-      setErrorMessage('Dodaj co najmniej jedną kompetencję przed zapisem.');
-      return;
-    }
+    const skillNames = pendingSkills.filter((s) => !s.id).map((s) => s.name);
+    const skillIds = pendingSkills.filter((s) => s.id).map((s) => s.id!);
 
     addMutation.mutate(
-      { skillNames: pendingSkills },
-      {
-        onSuccess: resetAndClose,
-        onError: () => setErrorMessage('Nie udało się zapisać kompetencji. Spróbuj ponownie.'),
-      },
+      { skillNames, skillIds },
+      { onSuccess: resetAndClose },
     );
   };
 
@@ -79,12 +78,16 @@ export const AddQualificationModal = ({
       onInputKeyDown={handleInputKeyDown}
       pendingSkills={pendingSkills}
       onAddPending={handleAddPending}
-      onRemovePending={(skill) =>
-        setPendingSkills((previous) => previous.filter((item) => item !== skill))
+      onRemovePending={(name) =>
+        setPendingSkills((previous) => previous.filter((s) => s.name !== name))
       }
       onSubmit={handleSubmit}
       isPending={addMutation.isPending}
-      errorMessage={errorMessage}
+      suggestions={suggestions}
+      showSuggestions={inputFocused && input.length >= 2}
+      onSuggestionMouseDown={handleSuggestionSelect}
+      onInputBlur={() => setInputFocused(false)}
+      onInputFocus={() => setInputFocused(true)}
     />
   );
 };

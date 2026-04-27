@@ -15,6 +15,7 @@ export const ENDPOINTS = {
     QUALIFICATION: (id: string) => `/me/qualifications/${id}`,
     PASSWORD: '/me/password',
   },
+  SKILLS: '/skills',
   ADMIN: {
     INVITATIONS: '/admin/invitations',
   },

@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import type { PendingSkill, SkillSuggestion } from '../qualifications.types';
 
 interface AddQualificationModalViewProps {
   open: boolean;
@@ -17,12 +18,16 @@ interface AddQualificationModalViewProps {
   input: string;
   onInputChange: (value: string) => void;
   onInputKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
-  pendingSkills: string[];
-  onAddPending: () => void;
-  onRemovePending: (skill: string) => void;
+  pendingSkills: PendingSkill[];
+  onAddPending: (skill?: PendingSkill) => void;
+  onRemovePending: (name: string) => void;
   onSubmit: (event: React.FormEvent) => void;
   isPending: boolean;
-  errorMessage: string | null;
+  suggestions: SkillSuggestion[];
+  showSuggestions: boolean;
+  onSuggestionMouseDown: (suggestion: SkillSuggestion) => void;
+  onInputBlur: () => void;
+  onInputFocus: () => void;
 }
 
 export const AddQualificationModalView = ({
@@ -36,7 +41,11 @@ export const AddQualificationModalView = ({
   onRemovePending,
   onSubmit,
   isPending,
-  errorMessage,
+  suggestions,
+  showSuggestions,
+  onSuggestionMouseDown,
+  onInputBlur,
+  onInputFocus,
 }: AddQualificationModalViewProps) => (
   <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent className="sm:max-w-lg">
@@ -50,19 +59,37 @@ export const AddQualificationModalView = ({
       <form onSubmit={onSubmit} className="flex flex-col gap-5 pt-2">
         <div className="flex flex-col gap-3">
           <Label htmlFor="skill" className="text-sm font-medium">Nazwa kompetencji</Label>
-          <div className="flex gap-2">
-            <Input
-              id="skill"
-              value={input}
-              onChange={(event) => onInputChange(event.target.value)}
-              onKeyDown={onInputKeyDown}
-              placeholder="Czym się zajmujesz? np. React, Scrum Master, SQL..."
-              autoFocus
-            />
+          <div className="relative flex gap-2">
+            <div className="relative flex-1">
+              <Input
+                id="skill"
+                value={input}
+                onChange={(event) => onInputChange(event.target.value)}
+                onKeyDown={onInputKeyDown}
+                onBlur={onInputBlur}
+                onFocus={onInputFocus}
+                placeholder="Czym się zajmujesz? np. React, Scrum Master, SQL..."
+                autoFocus
+                autoComplete="off"
+              />
+              {showSuggestions && suggestions.length > 0 && (
+                <ul className="absolute z-50 mt-1 w-full rounded-md border border-border bg-popover shadow-md">
+                  {suggestions.map((s) => (
+                    <li
+                      key={s.id}
+                      onMouseDown={() => onSuggestionMouseDown(s)}
+                      className="cursor-pointer px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+                    >
+                      {s.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
             <Button
               type="button"
               variant="outline"
-              onClick={onAddPending}
+              onClick={() => onAddPending()}
               disabled={!input.trim()}
             >
               Dodaj
@@ -73,13 +100,13 @@ export const AddQualificationModalView = ({
         {pendingSkills.length > 0 && (
           <div className="flex flex-wrap gap-2 rounded-lg border border-dashed border-border p-3">
             {pendingSkills.map((skill) => (
-              <Badge key={skill} variant="secondary" className="gap-1 pr-1">
-                {skill}
+              <Badge key={skill.name} variant={skill.id ? 'default' : 'secondary'} className="gap-1 pr-1">
+                {skill.name}
                 <button
                   type="button"
-                  onClick={() => onRemovePending(skill)}
+                  onClick={() => onRemovePending(skill.name)}
                   className="ml-0.5 rounded-full p-0.5 transition-colors hover:bg-background"
-                  aria-label={`Usuń ${skill}`}
+                  aria-label={`Usuń ${skill.name}`}
                 >
                   <X className="size-3" />
                 </button>
@@ -87,8 +114,6 @@ export const AddQualificationModalView = ({
             ))}
           </div>
         )}
-
-        {errorMessage && <p className="text-sm text-destructive">{errorMessage}</p>}
 
         <div className="flex justify-end gap-3 pt-2">
           <Button

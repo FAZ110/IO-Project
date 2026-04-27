@@ -39,7 +39,8 @@ public class QualificationController {
     ) {
         List<QualificationResponse> added = qualificationService.addQualificationsToUser(
                 principal.userId(),
-                request.skillNames()
+                request.skillNames(),
+                request.skillIds()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(added);
     }

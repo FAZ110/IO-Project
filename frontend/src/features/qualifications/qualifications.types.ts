@@ -14,4 +14,15 @@ export interface QualificationResponse {
 
 export interface AddQualificationRequest {
   skillNames: string[];
+  skillIds: string[];
+}
+
+export interface SkillSuggestion {
+  id: string;
+  name: string;
+}
+
+export interface PendingSkill {
+  name: string;
+  id?: string;
 }

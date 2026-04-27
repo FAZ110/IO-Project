@@ -1,6 +1,6 @@
 import api from '@/api/client';
 import { ENDPOINTS } from '@/api/endpoints';
-import type { AddQualificationRequest, QualificationResponse } from './qualifications.types';
+import type { AddQualificationRequest, QualificationResponse, SkillSuggestion } from './qualifications.types';
 
 export const qualificationsService = {
   getMyQualifications: async (): Promise<QualificationResponse[]> => {
@@ -15,5 +15,10 @@ export const qualificationsService = {
 
   deleteQualification: async (id: string): Promise<void> => {
     await api.delete(ENDPOINTS.ME.QUALIFICATION(id));
+  },
+
+  searchSkills: async (query: string): Promise<SkillSuggestion[]> => {
+    const res = await api.get<SkillSuggestion[]>(ENDPOINTS.SKILLS, { params: { query } });
+    return res.data;
   },
 };
