@@ -1,15 +1,14 @@
-import type {UserResponse} from "@/features/user-management";
+import type { UserResponse } from "@/features/user-management";
 
 export interface ProjectCreationRequest {
     title: string;
     description: string;
-    startDate: string;
-    isActive: boolean;
-    walletId?: number;
-    programId?: number;
+    projectGroupId?: string | null;
+    sponsors: string[];
+    committee: string[];
+    milestones: Milestone[];
+    roles: ProjectRole[];
     risks?: Risk[];
-    milestones?: Milestone[];
-    roles?: Role[];
 }
 
 export interface Risk {
@@ -18,30 +17,40 @@ export interface Risk {
     probability: number;
 }
 
-export interface Milestone {
-    name: string;
-    date: string;
+export interface RiskResponse extends Risk {
+    id: string;
 }
 
-export interface Role {
+export interface SingleGroupResponse {
+    id: string;
     name: string;
-    utilizationPercentages: number[];
 }
 
 export interface ProjectResponse {
     id: string;
     title: string;
     description: string;
-    startDate: string;
     isActive: boolean;
+    startDate: string;
 }
+
+export interface Milestone {
+    date: string;
+    name: string;
+}
+
 export interface ProjectDetailsResponse {
     id: string;
     title: string;
     description: string;
     startDate: string;
     isActive: boolean;
-    manager: UserResponse
+    manager: UserResponse;
+}
+
+export interface ProjectRole {
+    name: string;
+    utilizationPercentages: number[];
 }
 
 export interface ProjectRoleStatusResponse {
@@ -55,11 +64,4 @@ export interface EmployeeAssignmentRequest {
     userId: string;
     projectId: string;
     roleId: string;
-}
-
-export interface RiskResponse {
-    id: string;
-    name: string;
-    description: string;
-    probability: number;
 }

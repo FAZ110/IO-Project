@@ -30,7 +30,8 @@ public class Project {
     private LocalDate startDate;
 
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive;
+    @Builder.Default
+    private Boolean isActive = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
@@ -56,6 +57,24 @@ public class Project {
     @Builder.Default
     private List<ProjectSegment> segments = new ArrayList<>();
 
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "project_sponsors",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @Builder.Default
+    private List<User> sponsors = new ArrayList<>();
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "project_committees",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @Builder.Default
+    private List<User> committees = new ArrayList<>();
+
     public void addRisk(ProjectRisk risk) {
         this.risks.add(risk);
         risk.setProject(this);
@@ -75,13 +94,23 @@ public class Project {
         this.members.add(member);
     }
 
-    public void addSegment(ProjectSegment segment) {
-        this.segments.add(segment);
-        segment.setProject(this);
+    public void addSegment(ProjectSegment projectSegment) {
+        this.segments.add(projectSegment);
+        projectSegment.setProject(this);
     }
 
     public void addRole(ProjectRole role) {
         this.roles.add(role);
         role.setProject(this);
+    }
+
+    public void addSponsor(User sponsor) {
+        this.sponsors.add(sponsor);
+        sponsor.getSponsorProjects().add(this);
+    }
+
+    public void addCommittee(User committee) {
+        this.committees.add(committee);
+        committee.getCommitteeProjects().add(this);
     }
 }

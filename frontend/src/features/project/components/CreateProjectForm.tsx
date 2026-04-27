@@ -1,84 +1,90 @@
-import { useForm, useFieldArray } from 'react-hook-form';
-import { CreateProjectView } from './CreateProjectForm.view.tsx';
-import type { ProjectCreationRequest } from '../project.types.ts';
-import { useCreateProject } from '../project.hooks.ts';
+import { useForm, FormProvider } from "react-hook-form";
+import { CreateProjectView } from "./CreateProjectForm.view.tsx";
+import type { ProjectCreationRequest } from "../project.types.ts";
+import { useCreateProject } from "../project.hooks.ts";
+import { useProjectGroups } from "@/features/project_group/project_group.hooks.ts";
+import { useState } from "react";
+import { useDebounce } from "use-debounce";
+import { useSearchUsers } from "@/features/user-management/user-management.hooks.ts";
 import { PATHS } from "@/routes/paths.ts";
 import { useNavigate } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CreateProjectFormSchema } from "../project.schema.ts";
+import { getNextDateFromToday } from "../project.utils.ts";
 
 export const CreateProjectForm = () => {
-
-  const { register, control, handleSubmit, formState: { errors }, reset } = useForm<ProjectCreationRequest>({
-    mode: 'all',
-    defaultValues: {
-      title: '',
-      description: '',
-      startDate: '',
-      isActive: true,
-      walletId: undefined,
-      programId: undefined,
-      risks: [],
-      roles: []
-    }
-  });
-
-  const { fields: riskFields, append: appendRisk, remove: removeRisk } = useFieldArray({
-    control,
-    name: "risks"
-  });
-
-  const { fields: roleFields, append: appendRole, remove: removeRole } = useFieldArray({
-    control,
-    name: "roles"
-  });
-
-  const mutation = useCreateProject();
-  const navigate = useNavigate();
-
-  const onSubmit = (data: ProjectCreationRequest) => {
-    
-    // Na razie nie ma jeszcze dodawania Milestonów, to jest żeby backend nie krzyczał
-    const startDate = new Date(data.startDate);
-    const endDate = new Date(startDate);
-    endDate.setMonth(endDate.getMonth() + 6);
-
-    const mappedRoles = (data.roles || []).map(r => ({
-      name: r.name,
-      utilizationPercentages: [100] //zhardkodowane caly etat na razie
-    }));
-
-    const payload = {
-      ...data,
-      walletId: data.walletId ? Number(data.walletId) : undefined,
-      programId: data.programId ? Number(data.programId) : undefined,
-      milestones: [
-        { name: 'Start', date: data.startDate },
-        { name: 'Koniec', date: endDate.toISOString().split('T')[0] }
-      ],
-      roles: mappedRoles
-    };
-
-    mutation.mutate(payload, {
-      onSuccess: (newProjectId) =>  {
-        reset();
-        navigate(PATHS.PROJECT(newProjectId));
-      }
+    const methods = useForm<ProjectCreationRequest>({
+        resolver: zodResolver(CreateProjectFormSchema),
+        mode: "all",
+        defaultValues: {
+            title: "",
+            description: "",
+            projectGroupId: null,
+            sponsors: [],
+            committee: [],
+            milestones: [
+                {
+                    name: "Start",
+                    date: getNextDateFromToday(0),
+                },
+                {
+                    name: "End",
+                    date: getNextDateFromToday(30),
+                }
+            ],
+            roles: [],
+            risks: [],
+        },
     });
-  };
 
-  return (
-    <CreateProjectView
-      register={register}
-      onSubmit={handleSubmit(onSubmit)} 
-      isPending={mutation.isPending}
-      errors={errors}
-      riskFields={riskFields}
-      appendRisk={appendRisk}
-      removeRisk={removeRisk}
-      roleFields={roleFields}
-      appendRole={appendRole}
-      removeRole={removeRole}
-    />
-  );
+    const { data: groups = [] } = useProjectGroups();
+
+    const [sponsorsQuery, setSponsorsQuery] = useState("");
+    const [sponsorsQueryValue] = useDebounce(sponsorsQuery, 300);
+
+    const [committeeQuery, setCommitteeQuery] = useState("");
+    const [committeeQueryValue] = useDebounce(committeeQuery, 300);
+
+    const { data: foundSponsors = [] } = useSearchUsers(sponsorsQueryValue);
+    const { data: foundCommittee = [] } = useSearchUsers(committeeQueryValue);
+
+    const mutation = useCreateProject();
+    const navigate = useNavigate();
+
+    const onSubmit = methods.handleSubmit((data) => {
+        const segmentsCount = Math.max(1, (data.milestones?.length || 2) - 1);
+
+        const mappedRoles = (data.roles || []).map(r => ({
+            name: r.name,
+            utilizationPercentages: Array(segmentsCount).fill(100)
+        }));
+
+        const payload = {
+            ...data,
+            roles: mappedRoles
+        };
+
+        mutation.mutate(payload, {
+            onSuccess: (newProjectId) => {
+                methods.reset();
+                navigate(PATHS.PROJECT(newProjectId));
+            },
+        });
+    });
+
+    return (
+        <FormProvider {...methods}>
+            <CreateProjectView
+                onSubmitProject={onSubmit}
+                isPending={mutation.isPending}
+                groups={groups}
+                foundSponsors={foundSponsors}
+                foundCommittee={foundCommittee}
+                onSponsorSearch={setSponsorsQuery}
+                onCommitteeSearch={setCommitteeQuery}
+            />
+        </FormProvider>
+    );
 };
 
 export default CreateProjectForm;
