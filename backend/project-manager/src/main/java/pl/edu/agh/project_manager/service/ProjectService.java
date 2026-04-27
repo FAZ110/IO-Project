@@ -6,26 +6,23 @@ import org.springframework.stereotype.Service;
 import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
 import pl.edu.agh.project_manager.domain.entity.*;
 import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
-import pl.edu.agh.project_manager.domain.entity.Project;
-import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
-import pl.edu.agh.project_manager.domain.entity.ProjectGroups;
-import pl.edu.agh.project_manager.domain.entity.User;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
 import pl.edu.agh.project_manager.repository.ProjectRepository;
 import pl.edu.agh.project_manager.repository.RiskRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
+import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.command.project.MilestoneCommand;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
 import pl.edu.agh.project_manager.service.command.project.RoleCommand;
+import pl.edu.agh.project_manager.domain.enums.UserRole;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -74,16 +71,6 @@ public class ProjectService {
 
         return ProjectResponse.from(project);
     }
-    
-    @Transactional(readOnly = true)
-    public List<ProjectResponse> getProjectsForManager(UUID managerId) {
-        User projectManager = userRepository.findById(managerId)
-                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_MANAGER_NOT_FOUND));
-        
-        return projectManager.getProjects().stream()
-                .map(ProjectResponse::from)
-                .collect(Collectors.toList());
-    }
 
     @Transactional
     public void createProjectRole(UUID projectId, UUID managerId, RoleCommand command) {
@@ -117,61 +104,21 @@ public class ProjectService {
         projectRepository.save(project);
     }
 
-    private void addRolesAndBindWithSegments(Project project, List<ProjectSegment> segments, List<RoleCommand> roles) {
-        for (RoleCommand role : roles) {
-            if (role.utilizationPercentages().size() != segments.size()) {
-                throw new ApplicationException(ApiErrorCode.INVALID_ROLE_UTILIZATION, "Role " + role.name() + " has invalid number of utilization percentages - expected: " + segments.size() + ", actual: " + role.utilizationPercentages().size());
-            }
+    @Transactional(readOnly = true)
+    public List<ProjectResponse> getAllProjects(UserPrincipal userPrincipal) {
 
-            ProjectRole projectRole = ProjectRole
-                    .builder()
-                    .roleName(role.name())
-                    .build();
+        UserRole role = userPrincipal.userRole();
 
-            for (int i = 0; i < segments.size(); i++) {
-                ProjectSegment currentSegment = segments.get(i);
-                int percentage = role.utilizationPercentages().get(i);
+        List<Project> projects = switch (role) {
+            case ADMINISTRATOR, AUTHORITY -> projectRepository.findAll();
+            case PROJECT_MANAGER          -> projectRepository.findAllByProjectManagerId(userPrincipal.userId());
+            case LINEAR_MANAGER, COMMON   -> projectRepository.findAllByMemberId(userPrincipal.userId());
+            default                       -> List.of();
+        };
 
-                ProjectRoleSegmentAllocation segmentAllocation = ProjectRoleSegmentAllocation
-                        .builder()
-                        .projectRole(projectRole)
-                        .segment(currentSegment)
-                        .utilizationPercentage(percentage)
-                        .build();
-
-                projectRole.addSegmentAllocation(segmentAllocation);
-            }
-
-            project.addRole(projectRole);
-        }
-    }
-
-    private List<ProjectSegment> createSegmentsFromMilestones(List<MilestoneCommand> milestones) {
-        if (milestones.size() < MINIMUM_MILESTONES) {
-            throw new ApplicationException(ApiErrorCode.INVALID_MILESTONES);
-        }
-
-        List<ProjectSegment> segments = new ArrayList<>();
-
-        for (int i = 1; i < milestones.size(); i++) {
-            MilestoneCommand endMilestone = milestones.get(i);
-            LocalDate startDate = milestones.get(i - 1).date();
-            LocalDate endDate = endMilestone.date();
-
-            if (!endDate.isAfter(startDate)) {
-                throw new ApplicationException(ApiErrorCode.INVALID_MILESTONE_ORDER);
-            }
-
-            ProjectSegment segment = ProjectSegment.builder()
-                    .startDate(startDate)
-                    .endDate(endDate)
-                    .label(endMilestone.name())
-                    .build();
-
-            segments.add(segment);
-        }
-
-        return segments;
+        return projects.stream()
+                .map(ProjectResponse::from)
+                .toList();
     }
 
     @Transactional
@@ -243,6 +190,63 @@ public class ProjectService {
                 savedRisk.getDescription(),
                 savedRisk.getProbability()
         );
+    }
+
+    private void addRolesAndBindWithSegments(Project project, List<ProjectSegment> segments, List<RoleCommand> roles) {
+        for (RoleCommand role : roles) {
+            if (role.utilizationPercentages().size() != segments.size()) {
+                throw new ApplicationException(ApiErrorCode.INVALID_ROLE_UTILIZATION, "Role " + role.name() + " has invalid number of utilization percentages - expected: " + segments.size() + ", actual: " + role.utilizationPercentages().size());
+            }
+
+            ProjectRole projectRole = ProjectRole
+                    .builder()
+                    .roleName(role.name())
+                    .build();
+
+            for (int i = 0; i < segments.size(); i++) {
+                ProjectSegment currentSegment = segments.get(i);
+                int percentage = role.utilizationPercentages().get(i);
+
+                ProjectRoleSegmentAllocation segmentAllocation = ProjectRoleSegmentAllocation
+                        .builder()
+                        .projectRole(projectRole)
+                        .segment(currentSegment)
+                        .utilizationPercentage(percentage)
+                        .build();
+
+                projectRole.addSegmentAllocation(segmentAllocation);
+            }
+
+            project.addRole(projectRole);
+        }
+    }
+
+    private List<ProjectSegment> createSegmentsFromMilestones(List<MilestoneCommand> milestones) {
+        if (milestones.size() < MINIMUM_MILESTONES) {
+            throw new ApplicationException(ApiErrorCode.INVALID_MILESTONES);
+        }
+
+        List<ProjectSegment> segments = new ArrayList<>();
+
+        for (int i = 1; i < milestones.size(); i++) {
+            MilestoneCommand endMilestone = milestones.get(i);
+            LocalDate startDate = milestones.get(i - 1).date();
+            LocalDate endDate = endMilestone.date();
+
+            if (!endDate.isAfter(startDate)) {
+                throw new ApplicationException(ApiErrorCode.INVALID_MILESTONE_ORDER);
+            }
+
+            ProjectSegment segment = ProjectSegment.builder()
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .label(endMilestone.name())
+                    .build();
+
+            segments.add(segment);
+        }
+
+        return segments;
     }
 
     private Project buildProject(ProjectCreationCommand command, User projectManager) {

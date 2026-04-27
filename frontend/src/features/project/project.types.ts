@@ -28,40 +28,47 @@ export interface Role {
     utilizationPercentages: number[];
 }
 
-export interface RiskResponse {
-  id: string
-  name: string;
-  description: string;
-  probability: number;
+export interface ProjectResponse {
+    id: string;
+    title: string;
+    description: string;
+    startDate: string;
+    isActive: boolean;
 }
-
 export interface ProjectDetailsResponse {
-  id: string;
-  title: string;
-  description: string;
-  startDate: string;
-  isActive: boolean;
-  manager: UserResponse
+    id: string;
+    title: string;
+    description: string;
+    startDate: string;
+    isActive: boolean;
+    manager: UserResponse
 }
 
 export interface ProjectRoleStatusResponse {
-  id: string;
-  roleName: string;
-  status: 'OPEN' | 'PENDING' | 'FILLED';
-  utilizationPercentages: number[];
+    id: string;
+    roleName: string;
+    status: 'OPEN' | 'PENDING' | 'FILLED';
+    utilizationPercentages: number[];
 }
 
 export interface CreateAllocationRequest {
-  requestedEmployeeId: string;
-  justification: string;
+    requestedEmployeeId: string;
+    justification: string;
 }
 
 export interface AllocationRequestResponse {
-  id: string;
-  projectRoleId: string;
-  requestedEmployeeId: string;
-  createdById: string;
-  justification: string;
-  status: 'SUBMITTED' | 'APPROVED' | 'REJECTED';
-  createdAt: string;
+    id: string;
+    projectRoleId: string;
+    requestedEmployeeId: string;
+    createdById: string;
+    justification: string;
+    status: 'SUBMITTED' | 'APPROVED' | 'REJECTED';
+    createdAt: string;
+}
+
+export interface RiskResponse {
+    id: string;
+    name: string;
+    description: string;
+    probability: number;
 }
