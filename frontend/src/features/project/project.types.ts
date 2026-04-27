@@ -3,24 +3,40 @@ import type {UserResponse} from "@/features/user-management";
 export interface ProjectCreationRequest {
     title: string;
     description: string;
-    startDate: string;
-    isActive: boolean;
-    walletId?: number;
-    programId?: number;
+    projectGroupId?: string | null;
+    sponsors: string[];
+    committee: string[];
+    milestones: Milestone[];
+    roles: ProjectRole[];
     risks?: Risk[];
 }
 
 export interface Risk {
-    name: string;
-    description: string;
-    probability: number;
-}
-
-export interface RiskResponse {
-  id: string
-  name: string;
+name: string;
   description: string;
   probability: number;
+}
+
+export interface RiskResponse extends Risk {
+  id: string;
+}
+
+export interface SingleGroupResponse {
+  id: string;
+  name: string;
+}
+
+export interface ProjectResponse {
+  id: string;
+  title: string;
+  description: string;
+  isActive: boolean;
+  startDate: string;
+}
+
+export interface Milestone {
+    date: string;
+    name: string;
 }
 
 export interface ProjectDetailsResponse {
@@ -28,7 +44,12 @@ export interface ProjectDetailsResponse {
   title: string;
   description: string;
   startDate: string;
-  isActive: boolean;
+  isActive: boolean,
   manager: UserResponse
+}
+
+export interface ProjectRole {
+  name: string,
+  utilizationPercentages: number[]
 }
 

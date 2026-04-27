@@ -15,15 +15,16 @@ import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.ProjectService;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/projects")
 @RequiredArgsConstructor
 public class ProjectManagement {
     private final ProjectService projectService;
 
-    @PostMapping("/project")
+    @PostMapping
     @PreAuthorize("hasRole('PROJECT_MANAGER')")
     public ResponseEntity<UUID> createProject(
             @Valid @RequestBody ProjectCreationRequest projectCreationRequest,
@@ -32,12 +33,11 @@ public class ProjectManagement {
         ProjectCreationCommand command = projectCreationRequest.toCommand(userPrincipal.userId());
         UUID newProjectId = projectService.createProject(command);
 
-        // Return ID of project
         return ResponseEntity.status(HttpStatus.CREATED).body(newProjectId);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectSecurity.canAccessProject(#projectId, authentication.principal)")
-    @GetMapping("/project/{projectId}")
+    @GetMapping("/{projectId}")
     public ResponseEntity<ProjectResponse> getProject(
             @PathVariable UUID projectId
     ) {
@@ -45,46 +45,55 @@ public class ProjectManagement {
         return ResponseEntity.ok(project);
     }
 
-    @DeleteMapping("/project/{projectId}/risk/{riskId}")
-    @PreAuthorize("hasRole('PROJECT_MANAGER')")
+    @DeleteMapping("/{projectId}/risk/{riskId}")
+    @PreAuthorize("@projectSecurity.isProjectManagerForProject(#projectId, authentication.principal)")
     public ResponseEntity<Void> deleteProjectRisk(
             @PathVariable UUID riskId,
-            @PathVariable UUID projectId,
-            @AuthenticationPrincipal UserPrincipal userPrincipal
+            @PathVariable UUID projectId
     ) {
-        projectService.deleteProjectRisk(projectId, riskId, userPrincipal.userId());
+        projectService.deleteProjectRisk(projectId, riskId);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/project/{projectId}/risk/{riskId}")
-    @PreAuthorize("hasRole('PROJECT_MANAGER')")
+    @PatchMapping("/{projectId}/risk/{riskId}")
+    @PreAuthorize("@projectSecurity.isProjectManagerForProject(#projectId, authentication.principal)")
     public ResponseEntity<RiskResponse> updateProjectRisk(
             @PathVariable UUID projectId,
             @PathVariable UUID riskId,
-            @Valid @RequestBody RiskRequest riskRequest,
-            @AuthenticationPrincipal UserPrincipal userPrincipal
+            @Valid @RequestBody RiskRequest riskRequest
     ) {
         RiskResponse updatedRisk = projectService.updateProjectRisk(
                 projectId,
                 riskId,
-                userPrincipal.userId(),
                 riskRequest.toCommand()
         );
 
         return ResponseEntity.ok(updatedRisk);
     }
 
-    @PostMapping("/project/{projectId}/risk")
-    @PreAuthorize("hasRole('PROJECT_MANAGER')")
+    @PostMapping("/{projectId}/risk")
+    @PreAuthorize("@projectSecurity.isProjectManagerForProject(#projectId, authentication.principal)")
     public ResponseEntity<RiskResponse> createProjectRisk(
             @PathVariable UUID projectId,
-            @Valid @RequestBody RiskRequest riskRequest,
-            @AuthenticationPrincipal UserPrincipal userPrincipal
+            @Valid @RequestBody RiskRequest riskRequest
     ) {
         RiskResponse createdRisk = projectService.createProjectRisk(
-                riskRequest.toCommand(), userPrincipal.userId(), projectId
+                riskRequest.toCommand(), projectId
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRisk);
     }
+
+
+    @GetMapping
+    @PreAuthorize("hasAnyRole('PROJECT_MANAGER', 'AUTHORITY', 'LINEAR_MANAGER', 'COMMON', 'ADMINISTRATOR')")
+    public ResponseEntity<List<ProjectResponse>> getAllProjects(
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        List<ProjectResponse> projects = projectService.getAllProjects(userPrincipal);
+        return ResponseEntity.ok(projects);
+    }
 }
+
+
+
