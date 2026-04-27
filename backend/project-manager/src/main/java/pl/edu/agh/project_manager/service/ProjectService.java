@@ -250,4 +250,16 @@ public class ProjectService {
                 .map(ProjectResponse::from)
                 .toList();
     }
+
+    public List<RiskResponse> getProjectRisks(UUID projectId) {
+        return riskRepository.findAllByProjectId(projectId)
+                .stream()
+                .map(risk -> new RiskResponse(
+                        risk.getId(),
+                        risk.getName(),
+                        risk.getDescription(),
+                        risk.getProbability()
+                ))
+                .toList();
+    }
 }

@@ -18,6 +18,7 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     @Query("UPDATE Project p SET p.projectManager = null WHERE p.projectManager.id = :managerId")
     void clearProjectManager(@Param("managerId") UUID managerId);
 
+    @EntityGraph(attributePaths = {"projectManager", "projectManager.qualifications"})
     @Query("SELECT p FROM Project p JOIN FETCH p.projectManager WHERE p.id = :id")
     Optional<Project> findByIdWithManager(@Param("id") UUID id);
 

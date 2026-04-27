@@ -46,6 +46,15 @@ public class ProjectManagement {
         return ResponseEntity.ok(project);
     }
 
+    @GetMapping("/{projectId}/risk")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectSecurity.canAccessProject(#projectId, authentication.principal)")
+    public ResponseEntity<List<RiskResponse>> getRisk(
+            @PathVariable UUID projectId
+    ) {
+        List<RiskResponse> risks = projectService.getProjectRisks(projectId);
+        return ResponseEntity.ok(risks);
+    }
+
     @DeleteMapping("/{projectId}/risk/{riskId}")
     @PreAuthorize("hasRole('PROJECT_MANAGER')")
     public ResponseEntity<Void> deleteProjectRisk(
