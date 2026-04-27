@@ -96,7 +96,7 @@ export const DashboardPage = () => {
                             {[1, 2, 3, 4].map(i => <div key={i} className="h-48 bg-gray-100 animate-pulse rounded-2xl" />)}
                         </div>
                     )}
-                    
+
                     {!isLoading && !isError && projects.length === 0 && (
                         <div className="text-center py-16 bg-white rounded-3xl border border-gray-100 shadow-sm">
                             <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">

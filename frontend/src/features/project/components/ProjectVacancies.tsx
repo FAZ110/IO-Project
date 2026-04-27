@@ -100,8 +100,7 @@ export const ProjectRolesStatus = ({ projectId }: { projectId: string }) => {
           </div>
         )}
       </div>
-
-      {/* Allocation Request Dialog */}
+        
       <Dialog open={isAllocationDialogOpen} onOpenChange={setIsAllocationDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>

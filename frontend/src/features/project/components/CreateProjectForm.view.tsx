@@ -44,7 +44,6 @@ export const CreateProjectView = ({
 
     <form onSubmit={onSubmit} className="space-y-6 text-left">
       <div className="space-y-4">
-        {/* Tytuł */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Nazwa *</label>
           <input
@@ -55,7 +54,6 @@ export const CreateProjectView = ({
           {errors.title && <span className="text-red-500 text-xs">{errors.title.message}</span>}
         </div>
 
-        {/* Opis */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Opis *</label>
           <textarea
@@ -66,7 +64,6 @@ export const CreateProjectView = ({
           {errors.description && <span className="text-red-500 text-xs">{errors.description.message}</span>}
         </div>
 
-        {/* Data i Aktywność */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Data Startu *</label>
@@ -92,7 +89,6 @@ export const CreateProjectView = ({
         </div>
       </div>
 
-      {/* --- SEKCJA WAKATÓW (Ról) --- */}
       <div className="pt-6 border-t border-gray-200">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-gray-800">Potrzebni pracownicy (Wakaty)</h3>
@@ -133,7 +129,6 @@ export const CreateProjectView = ({
         </div>
       </div>
 
-      {/* --- SEKCJA RYZYK --- */}
       <div className="pt-6 border-t border-gray-200">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-gray-800">Ryzyka Projektu</h3>
@@ -184,7 +179,6 @@ export const CreateProjectView = ({
         </div>
       </div>
 
-      {/* Submit */}
       <button disabled={isPending} type="submit" className={`w-full text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-200 mt-6 ${isPending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'}`}>
         {isPending ? 'Zapisywanie...' : 'Zapisz Projekt'}
       </button>
