@@ -1,6 +1,7 @@
 import { useEmployeeAssignmentDetails } from "../employee-assignments.hooks";
 import type { EmployeeAssignment } from "../employee-assignments.types";
 import { Badge } from "@/components/ui/badge";
+import { EmployeeWorkloadChart } from "./EmployeeWorkloadChart";
 
 interface EmployeeAssignmentDetailsProps {
   assignment: EmployeeAssignment
@@ -22,8 +23,10 @@ export const EmployeeAssignmentDetails = ({ assignment }: EmployeeAssignmentDeta
 
   const statusVariant = assignment.status === "ACCEPTED" ? "default" : assignment.status === "REJECTED" ? "destructive" : "secondary";
 
+  const { requestedWorkload, currentWorkload } = details;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0 max-w-full overflow-x-hidden">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold">{assignment.employeeName} {assignment.employeeSurname}</h3>
@@ -35,11 +38,19 @@ export const EmployeeAssignmentDetails = ({ assignment }: EmployeeAssignmentDeta
         </div>
       </div>
 
-      <div className="rounded-md border p-4">
-        <h4 className="text-sm font-medium text-muted-foreground">Szczegóły dodatkowe</h4>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Dane obciążenia są tymczasowo wyłączone.
-        </p>
+      <div className="rounded-lg border p-4 bg-card min-w-0 max-w-full overflow-hidden">
+        <h3 className="text-sm font-semibold mb-4">Wnioskowane obciążenie w czasie</h3>
+
+        {requestedWorkload?.length > 0 ? (
+          <div className="w-full min-w-0">
+            <h3 className="text-sm font-semibold mb-4">Wykres obciążenia</h3>
+            <EmployeeWorkloadChart data={requestedWorkload} />
+          </div>
+        ) : (
+          <div className="h-[200px] flex items-center justify-center text-muted-foreground border-2 border-dashed rounded">
+            Brak danych o interwałach
+          </div>
+        )}
       </div>
     </div>
   );

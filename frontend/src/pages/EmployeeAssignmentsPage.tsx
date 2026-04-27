@@ -46,7 +46,7 @@ export const EmployeeAssignmentsPage = () => {
         )}
 
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="w-[calc(100vw-2rem)] max-w-2xl overflow-x-hidden">
             <DialogHeader>
               <DialogTitle>Szczegóły weryfikacji</DialogTitle>
             </DialogHeader>
