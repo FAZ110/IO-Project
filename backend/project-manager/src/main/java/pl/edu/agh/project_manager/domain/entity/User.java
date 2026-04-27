@@ -5,9 +5,7 @@ import lombok.*;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @Setter
@@ -54,6 +52,14 @@ public class User {
     @OneToMany(mappedBy = "owner")
     @Builder.Default
     private List<ProjectGroups> projectGroups = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "sponsors")
+    @Builder.Default
+    private List<Project> sponsorProjects = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "committees")
+    @Builder.Default
+    private List<Project> committeeProjects = new ArrayList<>();
 
     public void addProject(Project project) {
         this.projects.add(project);
