@@ -12,9 +12,9 @@ interface StepRoleUtilizationProps {
 export const StepRoleUtilization = ({ 
     roleFields, 
     appendRole, 
-    removeRole 
+    removeRole
 }: StepRoleUtilizationProps) => {
-    const { register, getValues, watch, clearErrors } = useFormContext<ProjectCreationRequest>();
+    const { register, getValues, clearErrors, formState: { errors } } = useFormContext<ProjectCreationRequest>();
 
     const [roleInput, setRoleInput] = useState("");
 
@@ -29,7 +29,15 @@ export const StepRoleUtilization = ({
 
     const phases = generatePhasesFromMilestones(getValues("milestones"));
 
-    const watchedRoles = watch("roles");
+    const getUtilizationErrorMessage = (roleIndex: number, phaseIndex: number) => {
+        const error = errors.roles?.[roleIndex]?.utilizationPercentages?.[phaseIndex];
+
+        if (!error) {
+            return null;
+        }
+
+        return "message" in error ? error.message : null;
+    };
 
     return (
         <div className="relative">
@@ -94,15 +102,10 @@ export const StepRoleUtilization = ({
                                     </span>
                                 </th>
                             ))}
-                            <th>Suma</th>
                         </tr>
                     </thead>
                     <tbody>
                         {roleFields.map((role, roleIndex) => {
-                            const currentRole = watchedRoles[roleIndex];
-                            const totalUtilization = currentRole?.utilizationPercentages.reduce((sum, val) => sum + (val || 0), 0) ?? 0;
-                            const isOverallocated = totalUtilization > 100;
-
                             return (
                                 <tr key={role.id}>
                                     <td className="align-center border px-4 py-2 text-sm">{role.name}</td>
@@ -117,19 +120,28 @@ export const StepRoleUtilization = ({
                                                     max: 100
                                                     },
                                                 )}
-                                                className="w-full border border-gray-300 rounded p-1 text-sm focus:ring-2 focus:ring-blue-500"
+                                                className={`w-full rounded p-1 text-sm focus:ring-2 focus:ring-blue-500 ${getUtilizationErrorMessage(roleIndex, phaseIndex) ? "border border-red-500" : "border border-gray-300"}`}
                                             />
+                                            {getUtilizationErrorMessage(roleIndex, phaseIndex) && (
+                                                <p className="mt-1 text-xs text-red-500">
+                                                    {getUtilizationErrorMessage(roleIndex, phaseIndex)}
+                                                </p>
+                                            )}
                                         </td>
                                     ))}
-                                    <td
-                                        className={`border px-4 py-3 text-sm font-bold text-right ${isOverallocated ? "text-red-600" : "text-gray-800"}`}
-                                    >
-                                        {totalUtilization.toFixed(1)}%
-                                    </td>
                                 </tr>
                             );
                         })}
                     </tbody>
+                    {errors.roles && (
+                        <tfoot>
+                            <tr>
+                                <td colSpan={phases.length + 1} className="text-red-500 text-sm pt-2">
+                                    {errors.roles.message}
+                                </td>
+                            </tr>
+                        </tfoot>
+                    )}
                 </table>
             </div>
         </div>
