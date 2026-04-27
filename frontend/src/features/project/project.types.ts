@@ -51,19 +51,10 @@ export interface ProjectRoleStatusResponse {
     utilizationPercentages: number[];
 }
 
-export interface CreateAllocationRequest {
-    requestedEmployeeId: string;
-    justification: string;
-}
-
-export interface AllocationRequestResponse {
-    id: string;
-    projectRoleId: string;
-    requestedEmployeeId: string;
-    createdById: string;
-    justification: string;
-    status: 'SUBMITTED' | 'APPROVED' | 'REJECTED';
-    createdAt: string;
+export interface EmployeeAssignmentRequest {
+    userId: string;
+    projectId: string;
+    roleId: string;
 }
 
 export interface RiskResponse {

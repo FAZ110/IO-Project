@@ -4,10 +4,8 @@ import type {
     ProjectCreationRequest,
     ProjectResponse,
     ProjectDetailsResponse,
-    RiskResponse,
     ProjectRoleStatusResponse,
-    AllocationRequestResponse,
-    CreateAllocationRequest
+    EmployeeAssignmentRequest
 } from './project.types';
 
 export const projectService = {
@@ -26,18 +24,12 @@ export const projectService = {
         return response.data;
     },
 
-    getRisks: async (projectId: string): Promise<RiskResponse[]> => {
-        const response = await api.get<RiskResponse[]>(ENDPOINTS.PROJECT.RISK.LIST(projectId));
-        return response.data;
-    },
-
     getProjectRolesStatus: async (projectId: string): Promise<ProjectRoleStatusResponse[]> => {
         const response = await api.get<ProjectRoleStatusResponse[]>(ENDPOINTS.PROJECT.ROLES.STATUS_LIST(projectId));
         return response.data;
     },
 
-    createAllocationRequest: async (roleId: string, data: CreateAllocationRequest): Promise<AllocationRequestResponse> => {
-        const response = await api.post<AllocationRequestResponse>(ENDPOINTS.PROJECT.ROLES.ALLOCATE(roleId), data);
-        return response.data;
+    createEmployeeAssignment: async (data: EmployeeAssignmentRequest): Promise<void> => {
+        await api.post<void>('/employee/requests', data);
     }
 };

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useProjectRolesStatus, useCreateAllocationRequest } from '../project.hooks';
+import { useProjectRolesStatus, useCreateEmployeeAssignment } from '../project.hooks';
 import { useUsersQuery } from '@/features/user-management/user-management.hooks';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ import { Loader2, Search, User as UserIcon, Check, Clock } from 'lucide-react';
 
 export const ProjectRolesStatus = ({ projectId }: { projectId: string }) => {
   const { data: roles, isLoading, isError } = useProjectRolesStatus(projectId);
-  const createAllocationReq = useCreateAllocationRequest(projectId);
+  const createEmployeeAssignment = useCreateEmployeeAssignment(projectId);
   
   const [selectedRole, setSelectedRole] = useState<ProjectRoleStatusResponse | null>(null);
   const [isAllocationDialogOpen, setIsAllocationDialogOpen] = useState(false);
@@ -31,15 +31,13 @@ export const ProjectRolesStatus = ({ projectId }: { projectId: string }) => {
     setJustification(`Wniosek o przydzielenie pracownika do roli ${role.roleName} (śr. utylizacja: ${avgUtilization}%).`);
   };
 
-  const submitAllocationRequest = () => {
+  const submitEmployeeAssignment = () => {
     if (!selectedRole || !selectedUserId || !justification) return;
     
-    createAllocationReq.mutate({
+    createEmployeeAssignment.mutate({
+      userId: selectedUserId,
+      projectId: projectId,
       roleId: selectedRole.id,
-      data: {
-        requestedEmployeeId: selectedUserId,
-        justification
-      }
     }, {
       onSuccess: () => {
         setIsAllocationDialogOpen(false);
@@ -100,7 +98,7 @@ export const ProjectRolesStatus = ({ projectId }: { projectId: string }) => {
           </div>
         )}
       </div>
-        
+
       <Dialog open={isAllocationDialogOpen} onOpenChange={setIsAllocationDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
@@ -160,10 +158,10 @@ export const ProjectRolesStatus = ({ projectId }: { projectId: string }) => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAllocationDialogOpen(false)}>Anuluj</Button>
             <Button 
-              onClick={submitAllocationRequest} 
-              disabled={createAllocationReq.isPending || !selectedUserId}
+              onClick={submitEmployeeAssignment} 
+              disabled={createEmployeeAssignment.isPending || !selectedUserId}
             >
-              {createAllocationReq.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+              {createEmployeeAssignment.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               Złóż wniosek
             </Button>
           </DialogFooter>

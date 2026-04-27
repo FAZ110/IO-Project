@@ -2,7 +2,7 @@ import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {projectService} from "@/features/project/project.service.ts";
 import {toast} from "sonner";
 import {PROJECT_KEYS} from "@/features/project/project.keys.ts";
-import type {CreateAllocationRequest} from "./project.types";
+import type {EmployeeAssignmentRequest} from "./project.types";
 
 export const useProjects = () => {
     return useQuery({
@@ -39,12 +39,12 @@ export const useProjectRolesStatus = (projectId: string) => {
     });
 };
 
-export const useCreateAllocationRequest = (projectId: string) => {
+export const useCreateEmployeeAssignment = (projectId: string) => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ roleId, data }: { roleId: string; data: CreateAllocationRequest }) =>
-            projectService.createAllocationRequest(roleId, data),
+        mutationFn: (data: EmployeeAssignmentRequest) =>
+            projectService.createEmployeeAssignment(data),
         onSuccess: () => {
             toast.success('Złożono wniosek o pracownika.');
             queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.rolesStatus(projectId) });
