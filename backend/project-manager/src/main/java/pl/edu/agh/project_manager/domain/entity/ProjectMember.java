@@ -1,12 +1,13 @@
 package pl.edu.agh.project_manager.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import pl.edu.agh.project_manager.domain.enums.MembershipStatus;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -15,6 +16,9 @@ import java.util.UUID;
 @Table(name = "project_members", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"project_id", "user_id"})
 })
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProjectMember {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -37,4 +41,8 @@ public class ProjectMember {
     @Enumerated(EnumType.STRING)
     @Column(name = "membership_status", nullable = false)
     private MembershipStatus membershipStatus;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 }

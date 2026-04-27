@@ -15,7 +15,7 @@ import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
-import pl.edu.agh.project_manager.service.command.ProjectGroupCreationCommand;
+import pl.edu.agh.project_manager.service.command.project.ProjectGroupCreationCommand;
 
 import java.util.List;
 import java.util.Optional;

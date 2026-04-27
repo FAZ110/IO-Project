@@ -11,16 +11,26 @@ export interface ProjectCreationRequest {
 }
 
 export interface Risk {
-    name: string;
-    description: string;
-    probability: number;
-}
-
-export interface RiskResponse {
-  id: string
-  name: string;
+name: string;
   description: string;
   probability: number;
+}
+
+export interface RiskResponse extends Risk {
+  id: string;
+}
+
+export interface SingleGroupResponse {
+  id: string;
+  name: string;
+}
+
+export interface ProjectResponse {
+  id: string;
+  title: string;
+  description: string;
+  isActive: boolean;
+  startDate: string;
 }
 
 export interface ProjectDetailsResponse {
@@ -28,7 +38,6 @@ export interface ProjectDetailsResponse {
   title: string;
   description: string;
   startDate: string;
-  isActive: boolean;
+  isActive: boolean,
   manager: UserResponse
 }
-

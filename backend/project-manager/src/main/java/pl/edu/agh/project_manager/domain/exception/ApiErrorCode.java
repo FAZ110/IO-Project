@@ -13,11 +13,15 @@ public enum ApiErrorCode {
 
     USER_NOT_FOUND("USR_002", HttpStatus.NOT_FOUND, "Cannot found user"),
 
-    PROJECT_MANAGER_NOT_FOUND("PROJ_001", HttpStatus.NOT_FOUND, "Cannot found provided project manager"),
-    PROJECT_NOT_FOUND("PROJ_002", HttpStatus.NOT_FOUND, "Cannot found provided project"),
-    RISK_NOT_FOUND("RISK_001", HttpStatus.NOT_FOUND, "Cannot found provided risk in provided project"),
+    RISK_NOT_FOUND("RISK_001", HttpStatus.NOT_FOUND, "Cannot find provided risk in provided project"),
 
-    PROJECT_GROUP_NOT_FOUND("PROJ_002", HttpStatus.NOT_FOUND, "Cannot found project group"),
+    PROJECT_MANAGER_NOT_FOUND("PROJ_001", HttpStatus.NOT_FOUND, "Cannot find provided project manager"),
+    PROJECT_GROUP_NOT_FOUND("PROJ_002", HttpStatus.NOT_FOUND, "Cannot find project group"),
+    INVALID_MILESTONES("PROJ_003", HttpStatus.BAD_REQUEST, "Project must have at least start and end milestones defined"),
+    INVALID_MILESTONE_ORDER("PROJ_004", HttpStatus.BAD_REQUEST, "Milestones must be chronologically ordered"),
+    INVALID_ROLE_UTILIZATION("PROJ_005", HttpStatus.BAD_REQUEST, "Role utilization percentages must match timeline segments length"),
+    PROJECT_ROLE_NOT_FOUND("PROJ_006", HttpStatus.NOT_FOUND, "Cannot find provided project role"),
+    PROJECT_NOT_FOUND("PROJ_007", HttpStatus.NOT_FOUND, "Cannot find provided project"),
 
     ACTIVATION_TOKEN_NOT_FOUND("AUTH_001", HttpStatus.NOT_FOUND, "Activation token is invalid or does not exist"),
     ACTIVATION_TOKEN_EXPIRED("AUTH_002", HttpStatus.BAD_REQUEST, "Activation token has expired"),
@@ -26,11 +30,17 @@ public enum ApiErrorCode {
     INVALID_REFRESH_TOKEN("AUTH_005", HttpStatus.UNAUTHORIZED, "Refresh token is invalid"),
     USER_NOT_PENDING("USR_002", HttpStatus.BAD_REQUEST, "Cannot resend invitation — user is not in PENDING status"),
 
+    QUALIFICATION_NOT_FOUND("QUAL_001", HttpStatus.NOT_FOUND, "Qualification not found"),
+
+    ROLE_NOT_IN_PROJECT("REQ_001", HttpStatus.BAD_REQUEST, "Role must exist within the provided project"),
+    USER_ALREADY_IN_PROJECT("REQ_002", HttpStatus.CONFLICT, "User is already a member of this project"),
+    USER_HAS_ONGOING_REQUEST("REQ_003", HttpStatus.CONFLICT, "User already has a pending request for this project"),
+    EMPLOYEE_REQUEST_NOT_FOUND("REQ_004", HttpStatus.NOT_FOUND, "Employee request not found"),
+    INVALID_REQUEST_STATUS("REQ_005", HttpStatus.BAD_REQUEST, "Request is not in PENDING state"),
+
     VALIDATION_ERROR("GEN_001", HttpStatus.BAD_REQUEST, "Validation failed"),
     ACCESS_DENIED("GEN_002", HttpStatus.FORBIDDEN, "Access denied"),
-    INTERNAL_SERVER_ERROR("GEN_999", HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected internal server error"),
-
-    QUALIFICATION_NOT_FOUND("QUAL_001", HttpStatus.NOT_FOUND, "Qualification not found");
+    INTERNAL_SERVER_ERROR("GEN_999", HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected internal server error");
 
     private final String code;
     private final HttpStatus httpStatus;

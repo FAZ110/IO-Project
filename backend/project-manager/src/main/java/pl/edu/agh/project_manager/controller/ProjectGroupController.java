@@ -12,7 +12,7 @@ import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupDetail
 import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupResponse;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.ProjectGroupsService;
-import pl.edu.agh.project_manager.service.command.ProjectGroupCreationCommand;
+import pl.edu.agh.project_manager.service.command.project.ProjectGroupCreationCommand;
 
 import java.util.List;
 import java.util.Map;
