@@ -3,9 +3,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { CalendarDays, MapPin } from "lucide-react";
 
-interface ProjectTimelineProps {
-  projectId: string;
-}
+// interface ProjectTimelineProps {
+//   projectId: string;
+// }
 
 // Dane tymczasowe
 const MOCK_DATA = {
@@ -34,7 +34,7 @@ const calculatePositionAndWidth = (start: Date, end: Date, projectStart: Date, p
   return { left: `${leftPercent}%`, width: `${widthPercent}%` };
 };
 
-export const ProjectTimeline = ({ projectId }: ProjectTimelineProps) => {
+export const ProjectTimeline = (/*{ projectId }: ProjectTimelineProps*/) => {
   const { projectStart, projectEnd, milestones, assignments } = MOCK_DATA;
 
   const assignmentsByUser = assignments.reduce((acc, curr) => {
