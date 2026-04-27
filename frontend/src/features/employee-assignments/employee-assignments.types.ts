@@ -1,25 +1,24 @@
-export const EmployeeRequestStatus = {
+export const EmployeeAssignmentStatus = {
     PENDING: 'PENDING',
     ACCEPTED: 'ACCEPTED',
     REJECTED: 'REJECTED',
 } as const;
 
-export type EmployeeRequestStatus = typeof EmployeeRequestStatus[keyof typeof EmployeeRequestStatus];
+export type EmployeeAssignmentStatus = typeof EmployeeAssignmentStatus[keyof typeof EmployeeAssignmentStatus];
 
 
-export interface EmployeeRequest {
+export interface EmployeeAssignment {
     id: string;
     projectName: string;
     projectId: string;
     projectRoleName: string;
     employeeName: string;
     employeeSurname: string;
-    projectTitle: string;
-    status: EmployeeRequestStatus;
+    status: EmployeeAssignmentStatus;
     createdAt: string;
 }
 
-export interface EmployeeRequestDetails {
+export interface EmployeeAssignmentDetails {
     currentWorkload: ChartInterval[];
     requestedWorkload: ChartInterval[];
 }

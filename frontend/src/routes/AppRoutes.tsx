@@ -14,7 +14,7 @@ import { ProfilePage } from "@/pages/ProfilePage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { AuthenticatedRoute } from '@/routes/AuthenticatedRoute';
 import { AuthorizedRoute } from '@/routes/AuthorizedRoute';
-import { RequestsPage } from '@/pages/RequestsPage';
+import { EmployeeAssignmentsPage } from '@/pages/EmployeeAssignmentsPage';
 
 export const AppRoutes = () => {
   return (
@@ -28,23 +28,19 @@ export const AppRoutes = () => {
       {/* PROTECTED ROUTES */}
       <Route element={<AuthenticatedRoute />}>
         <Route element={<MainLayout/>}>
+          {/* GLOBAL ROUTES */}
           <Route path={PATHS.ROOT} element={<DashboardPage />} />
           <Route path={PATHS.PROFILE} element={<ProfilePage />} />
-
-          <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER]} />}>
-            <Route path={PATHS.CREATE_PROJECT} element={<CreateProjectPage/>} />
-          </Route>
           <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
 
           {/* LINEAR MANAGER ROUTES */}
           <Route element={<AuthorizedRoute allowedRoles={[UserRole.LINEAR_MANAGER]} />}>
-            <Route path={PATHS.REQUESTS} element={<RequestsPage />} />
+            <Route path={PATHS.REQUESTS} element={<EmployeeAssignmentsPage />} />
           </Route>
 
           {/* PROJECT MANAGER ROUTES */}
           <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER]} />}>
               <Route path={PATHS.CREATE_PROJECT} element={<CreateProjectPage />} />
-              <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
           </Route>
 
           {/* ADMIN ROUTES */}
@@ -56,9 +52,7 @@ export const AppRoutes = () => {
       </Route>
 
       {/* FALLBACK - 404 */}
-      <Route path="*" element={<Navigate to={PATHS.ROOT} replace />} />
-
-      
+      <Route path="*" element={<Navigate to={PATHS.ROOT} replace />} />      
     </Routes>
   );
 };
