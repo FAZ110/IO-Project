@@ -60,6 +60,9 @@ public class ProjectService {
         }
         addRolesAndBindWithSegments(project, segments, command.roles());
 
+        addSponsorsToProject(project, command.sponsors());
+        addCommitteesToProject(project, command.committee());
+
         Project savedProject = projectRepository.save(project);
 
         return savedProject.getId();
@@ -133,13 +136,9 @@ public class ProjectService {
     }
 
     @Transactional
-    public void deleteProjectRisk(UUID projectId, UUID riskId, UUID projectManagerId) {
+    public void deleteProjectRisk(UUID projectId, UUID riskId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find provided project - " + projectId));
-
-        if (!project.getProjectManager().getId().equals(projectManagerId)) {
-            throw new ApplicationException(ApiErrorCode.ACCESS_DENIED, "Only project manager can delete project");
-        }
 
         ProjectRisk removedRisk = project.getRisks().stream()
                 .filter(risk -> risk.getId().equals(riskId))
@@ -150,13 +149,9 @@ public class ProjectService {
     }
 
     @Transactional
-    public RiskResponse updateProjectRisk(UUID projectId, UUID riskId, UUID projectManagerId, RiskCommand command) {
+    public RiskResponse updateProjectRisk(UUID projectId, UUID riskId, RiskCommand command) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find provided project - " + projectId));
-
-        if (!project.getProjectManager().getId().equals(projectManagerId)) {
-            throw new ApplicationException(ApiErrorCode.ACCESS_DENIED, "Only project manager can update project risks");
-        }
 
         ProjectRisk risk = project.getRisks()
                 .stream()
@@ -183,14 +178,11 @@ public class ProjectService {
     }
 
     @Transactional
-    public RiskResponse createProjectRisk(RiskCommand command,  UUID projectManagerId, UUID projectId) {
-        User projectManager = userRepository.findById(projectManagerId)
-                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_MANAGER_NOT_FOUND, "Cannot find provided project manager - " + projectManagerId));
-
+    public RiskResponse createProjectRisk(RiskCommand command, UUID projectId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find provided project - " + projectId));
 
-        ProjectRisk risk = buildRisk(command, projectManager);
+        ProjectRisk risk = buildRisk(command);
         project.addRisk(risk);
 
         ProjectRisk savedRisk = riskRepository.save(risk);
@@ -209,11 +201,10 @@ public class ProjectService {
                 .description(command.description())
                 .projectManager(projectManager)
                 .startDate(command.startDate())
-                .isActive(command.isActive())
                 .build();
     }
 
-    private ProjectRisk buildRisk(RiskCommand command, User projectManager) {
+    private ProjectRisk buildRisk(RiskCommand command) {
         return ProjectRisk.builder()
                 .name(command.name())
                 .description(command.description())
@@ -249,5 +240,25 @@ public class ProjectService {
         return projects.stream()
                 .map(ProjectResponse::from)
                 .toList();
+    }
+
+    private void addSponsorsToProject(Project project, List<UUID> sponsors) {
+        List<User> sponsorUsers = userRepository.findAllById(sponsors);
+
+        if (sponsorUsers.size() != sponsors.size()) {
+            throw new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find one or more provided sponsors");
+        }
+
+        sponsorUsers.forEach(project::addSponsor);
+    }
+
+    private void addCommitteesToProject(Project project, List<UUID> committee) {
+        List<User> committeeUsers = userRepository.findAllById(committee);
+
+        if (committee.size() != committeeUsers.size()) {
+            throw new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find one or more provided committee members");
+        }
+
+        committeeUsers.forEach(project::addCommittee);
     }
 }

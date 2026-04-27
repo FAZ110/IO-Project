@@ -1,60 +1,79 @@
-import { useForm, useFieldArray } from 'react-hook-form';
-import { CreateProjectView } from './CreateProjectForm.view.tsx';
-import type { ProjectCreationRequest } from '../project.types.ts';
-import { useCreateProject } from '../project.hooks.ts';
-import {PATHS} from "@/routes/paths.ts";
-import {useNavigate} from "react-router-dom";
+import { useForm, FormProvider } from "react-hook-form";
+import { CreateProjectView } from "./CreateProjectForm.view.tsx";
+import type { ProjectCreationRequest } from "../project.types.ts";
+import { useCreateProject } from "../project.hooks.ts";
+import { useProjectGroups } from "@/features/project_group/project_group.hooks.ts";
+import { useState } from "react";
+import { useDebounce } from "use-debounce";
+import { useSearchUsers } from "@/features/user-management/user-management.hooks.ts";
+import { PATHS } from "@/routes/paths.ts";
+import { useNavigate } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CreateProjectFormSchema } from "../project.schema.ts";
+import { getNextDateFromToday } from "../project.utils.ts";
 
 export const CreateProjectForm = () => {
-
-  const { register, control, handleSubmit, formState: { errors }, reset } = useForm<ProjectCreationRequest>({
-    mode: 'all',
-    defaultValues: {
-      title: '',
-      description: '',
-      startDate: '',
-      isActive: true,
-      walletId: undefined,
-      programId: undefined,
-      risks: []
-    }
-  });
-
-  const { fields: riskFields, append: appendRisk, remove: removeRisk } = useFieldArray({
-    control,
-    name: "risks"
-  });
-
-  const mutation = useCreateProject();
-  const navigate = useNavigate();
-
-  const onSubmit = (data: ProjectCreationRequest) => {
-    
-    const payload = {
-      ...data,
-      walletId: data.walletId ? Number(data.walletId) : undefined,
-      programId: data.programId ? Number(data.programId) : undefined,
-    };
-
-    mutation.mutate(payload, {
-      onSuccess: (newProjectId) =>  {
-        reset();
-        navigate(PATHS.PROJECT(newProjectId));
-      }
+    const methods = useForm<ProjectCreationRequest>({
+        resolver: zodResolver(CreateProjectFormSchema),
+        mode: "all",
+        defaultValues: {
+            title: "",
+            description: "",
+            projectGroupId: null,
+            sponsors: [],
+            committee: [],
+            milestones: [
+                {
+                    name: "Start",
+                    date: getNextDateFromToday(0),
+                },
+                {
+                    name: "End",
+                    date: getNextDateFromToday(30),
+                }
+            ],
+            roles: [],
+            risks: [],
+        },
     });
-  };
 
-  return (
-    <CreateProjectView
-      register={register}
-      onSubmit={handleSubmit(onSubmit)} 
-      isPending={mutation.isPending}
-      errors={errors}
-      riskFields={riskFields}
-      appendRisk={appendRisk}
-      removeRisk={removeRisk}
-    />
-  );
+    const { data: groups = [] } = useProjectGroups();
+
+    const [sponsorsQuery, setSponsorsQuery] = useState("");
+    const [sponsorsQueryValue] = useDebounce(sponsorsQuery, 300);
+
+    const [committeeQuery, setCommitteeQuery] = useState("");
+    const [committeeQueryValue] = useDebounce(committeeQuery, 300);
+
+    const { data: foundSponsors = [] } = useSearchUsers(sponsorsQueryValue);
+    const { data: foundCommittee = [] } = useSearchUsers(committeeQueryValue);
+
+    const mutation = useCreateProject();
+    const navigate = useNavigate();
+
+    const onSubmit = methods.handleSubmit((data) => {
+
+        mutation.mutate(data, {
+            onSuccess: (newProjectId) => {
+                methods.reset();
+                navigate(PATHS.PROJECT(newProjectId));
+            },
+        });
+    });
+
+    return (
+        <FormProvider {...methods}>
+            <CreateProjectView
+                onSubmitProject={onSubmit}
+                isPending={mutation.isPending}
+                groups={groups}
+                foundSponsors={foundSponsors}
+                foundCommittee={foundCommittee}
+                onSponsorSearch={setSponsorsQuery}
+                onCommitteeSearch={setCommitteeQuery}
+            />
+        </FormProvider>
+    );
 };
 
 export default CreateProjectForm;

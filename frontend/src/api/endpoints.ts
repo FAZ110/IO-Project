@@ -9,6 +9,7 @@ export const ENDPOINTS = {
     LIST: '/users',
     DETAIL: (id: string) => `/users/${id}`,
     RESEND_INVITATION: '/users/invitation',
+    SEARCH_USERS: '/users/search'
   },
   ADMIN: {
     INVITATIONS: '/admin/invitations',

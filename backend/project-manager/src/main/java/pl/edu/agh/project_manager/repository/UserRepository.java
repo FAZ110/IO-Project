@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import pl.edu.agh.project_manager.domain.entity.User;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,4 +23,7 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
     @Override
     @EntityGraph(attributePaths = {"supervisor"})
     Page<User> findAll(Specification<User> spec, Pageable pageable);
+
+    @Query("SELECT u FROM User u WHERE LOWER(CONCAT(u.name, ' ', u.surname)) LIKE LOWER(CONCAT('%', :query, '%'))")
+    List<User> searchUserByFullName(@Param("query") String query);
 }

@@ -3,10 +3,11 @@ import type {UserResponse} from "@/features/user-management";
 export interface ProjectCreationRequest {
     title: string;
     description: string;
-    startDate: string;
-    isActive: boolean;
-    walletId?: number;
-    programId?: number;
+    projectGroupId?: string | null;
+    sponsors: string[];
+    committee: string[];
+    milestones: Milestone[];
+    roles: ProjectRole[];
     risks?: Risk[];
 }
 
@@ -33,6 +34,11 @@ export interface ProjectResponse {
   startDate: string;
 }
 
+export interface Milestone {
+    date: string;
+    name: string;
+}
+
 export interface ProjectDetailsResponse {
   id: string;
   title: string;
@@ -41,3 +47,9 @@ export interface ProjectDetailsResponse {
   isActive: boolean,
   manager: UserResponse
 }
+
+export interface ProjectRole {
+  name: string,
+  utilizationPercentages: number[]
+}
+
