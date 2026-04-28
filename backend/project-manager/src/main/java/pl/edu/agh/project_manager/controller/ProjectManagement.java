@@ -7,11 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.agh.project_manager.controller.dto.project.ProjectCreationRequest;
-import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
-import pl.edu.agh.project_manager.controller.dto.project.RiskRequest;
-import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
-import pl.edu.agh.project_manager.controller.dto.project.ProjectRoleRequest;
+import pl.edu.agh.project_manager.controller.dto.project.*;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.ProjectService;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
@@ -55,7 +51,25 @@ public class ProjectManagement {
         return ResponseEntity.ok(project);
     }
 
-    @DeleteMapping("/{projectId}/risk/{riskId}")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectSecurity.canAccessProject(#projectId, authentication.principal)")
+    @GetMapping("/{projectId}/members")
+    public ResponseEntity<ProjectMembersResponse> getProjectMembers(
+            @PathVariable UUID projectId
+    ) {
+        ProjectMembersResponse project = projectService.getProjectMembers(projectId);
+        return ResponseEntity.ok(project);
+    }
+
+    @GetMapping("/{projectId}/risks")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectSecurity.canAccessProject(#projectId, authentication.principal)")
+    public ResponseEntity<List<RiskResponse>> getRisks(
+            @PathVariable UUID projectId
+    ) {
+        List<RiskResponse> risks = projectService.getProjectRisks(projectId);
+        return ResponseEntity.ok(risks);
+    }
+
+    @DeleteMapping("/{projectId}/risks/{riskId}")
     @PreAuthorize("@projectSecurity.isProjectManagerForProject(#projectId, authentication.principal)")
     public ResponseEntity<Void> deleteProjectRisk(
             @PathVariable UUID riskId,
@@ -65,7 +79,7 @@ public class ProjectManagement {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{projectId}/risk/{riskId}")
+    @PatchMapping("/{projectId}/risks/{riskId}")
     @PreAuthorize("@projectSecurity.isProjectManagerForProject(#projectId, authentication.principal)")
     public ResponseEntity<RiskResponse> updateProjectRisk(
             @PathVariable UUID projectId,
@@ -81,7 +95,7 @@ public class ProjectManagement {
         return ResponseEntity.ok(updatedRisk);
     }
 
-    @PostMapping("/{projectId}/risk")
+    @PostMapping("/{projectId}/risks")
     @PreAuthorize("@projectSecurity.isProjectManagerForProject(#projectId, authentication.principal)")
     public ResponseEntity<RiskResponse> createProjectRisk(
             @PathVariable UUID projectId,

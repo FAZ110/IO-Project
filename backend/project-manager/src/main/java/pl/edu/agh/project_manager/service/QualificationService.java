@@ -1,9 +1,11 @@
 package pl.edu.agh.project_manager.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.project_manager.controller.dto.qualification.QualificationResponse;
+import pl.edu.agh.project_manager.controller.dto.qualification.SkillSuggestion;
 import pl.edu.agh.project_manager.domain.entity.Qualification;
 import pl.edu.agh.project_manager.domain.entity.Skill;
 import pl.edu.agh.project_manager.domain.entity.User;
@@ -26,33 +28,53 @@ public class QualificationService {
     private final UserRepository userRepository;
 
     @Transactional
-    public List<QualificationResponse> addQualificationsToUser(UUID userId, List<String> skillNames) {
+    public List<QualificationResponse> addQualificationsToUser(UUID userId, List<String> skillNames, List<UUID> skillIds) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.USER_NOT_FOUND));
 
         List<Qualification> savedQualifications = new ArrayList<>();
 
-        for (String skillName : skillNames) {
-            Skill skill = skillRepository.findByNameIgnoreCase(skillName)
-                    .orElseGet(() -> {
-                        Skill newSkill = new Skill();
-                        newSkill.setName(skillName);
-                        newSkill.setValid(false);
-                        return skillRepository.save(newSkill);
-                    });
+        if (skillNames != null) {
+            for (String skillName : skillNames) {
+                Skill skill = skillRepository.findByNameIgnoreCase(skillName)
+                        .orElseGet(() -> {
+                            Skill newSkill = new Skill();
+                            newSkill.setName(skillName);
+                            newSkill.setValid(false);
+                            return skillRepository.save(newSkill);
+                        });
+                savedQualifications.add(saveQualification(user, skill));
+            }
+        }
 
-            Qualification qualification = Qualification.builder()
-                    .user(user)
-                    .skill(skill)
-                    .status(QualificationStatus.WAITING)
-                    .build();
-
-            user.addQualification(qualification);
-            savedQualifications.add(qualificationRepository.save(qualification));
+        if (skillIds != null) {
+            for (UUID skillId : skillIds) {
+                Skill skill = skillRepository.findById(skillId)
+                        .orElseThrow(() -> new ApplicationException(ApiErrorCode.QUALIFICATION_NOT_FOUND));
+                savedQualifications.add(saveQualification(user, skill));
+            }
         }
 
         return savedQualifications.stream()
                 .map(q -> new QualificationResponse(q.getId(), q.getSkill().getName(), q.getStatus()))
+                .toList();
+    }
+
+    private Qualification saveQualification(User user, Skill skill) {
+        Qualification qualification = Qualification.builder()
+                .user(user)
+                .skill(skill)
+                .status(QualificationStatus.WAITING)
+                .build();
+        user.addQualification(qualification);
+        return qualificationRepository.save(qualification);
+    }
+
+    public List<SkillSuggestion> searchSkills(String query) {
+        return skillRepository
+                .findByNameContainingIgnoreCase(query, PageRequest.of(0, 10))
+                .stream()
+                .map(s -> new SkillSuggestion(s.getId(), s.getName()))
                 .toList();
     }
 

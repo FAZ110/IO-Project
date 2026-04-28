@@ -5,7 +5,9 @@ import type {
     ProjectResponse,
     ProjectDetailsResponse,
     ProjectRoleStatusResponse,
-    EmployeeAssignmentRequest
+    EmployeeAssignmentRequest,
+    RiskResponse,
+    ProjectMembersResponse
 } from './project.types';
 
 export const projectService = {
@@ -24,12 +26,22 @@ export const projectService = {
         return response.data;
     },
 
+    getProjectMembers: async (id: string): Promise<ProjectMembersResponse> => {
+        const response = await api.get<ProjectMembersResponse>(ENDPOINTS.PROJECT.MEMBERS(id));
+        return response.data;
+    },
+
+    getRisks: async (projectId: string): Promise<RiskResponse[]> => {
+        const response = await api.get<RiskResponse[]>(ENDPOINTS.PROJECT.RISK.LIST(projectId));
+        return response.data;
+    },
+
     getProjectRolesStatus: async (projectId: string): Promise<ProjectRoleStatusResponse[]> => {
         const response = await api.get<ProjectRoleStatusResponse[]>(ENDPOINTS.PROJECT.ROLES.STATUS_LIST(projectId));
         return response.data;
     },
 
     createEmployeeAssignment: async (data: EmployeeAssignmentRequest): Promise<void> => {
-        await api.post<void>('/employee/requests', data);
+        await api.post<void>(ENDPOINTS.EMPLOYEE.ASSIGNMENTS, data);
     }
 };

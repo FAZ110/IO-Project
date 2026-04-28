@@ -3,6 +3,7 @@ package pl.edu.agh.project_manager.service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import pl.edu.agh.project_manager.controller.dto.project.ProjectMembersResponse;
 import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
 import pl.edu.agh.project_manager.domain.entity.*;
 import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
@@ -75,6 +76,17 @@ public class ProjectService {
         return ProjectResponse.from(project);
     }
 
+    @Transactional(readOnly = true)
+    public ProjectMembersResponse getProjectMembers(UUID projectId) {
+        Project project = projectRepository.findByIdWithAllMembers(projectId)
+                .orElseThrow(() -> new ApplicationException(
+                        ApiErrorCode.PROJECT_NOT_FOUND,
+                        "Cannot find provided project - " + projectId
+                ));
+
+        return ProjectMembersResponse.from(project);
+    }
+
     @Transactional
     public void createProjectRole(UUID projectId, UUID managerId, RoleCommand command) {
         Project project = projectRepository.findById(projectId)
@@ -108,19 +120,10 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectResponse> getAllProjects(UserPrincipal userPrincipal) {
-
-        UserRole role = userPrincipal.userRole();
-
-        List<Project> projects = switch (role) {
-            case ADMINISTRATOR, AUTHORITY -> projectRepository.findAll();
-            case PROJECT_MANAGER          -> projectRepository.findAllByProjectManagerId(userPrincipal.userId());
-            case LINEAR_MANAGER, COMMON   -> projectRepository.findAllByMemberId(userPrincipal.userId());
-            default                       -> List.of();
-        };
-
-        return projects.stream()
-                .map(ProjectResponse::from)
+    public List<RiskResponse> getProjectRisks(UUID projectId) {
+        return riskRepository.findAllByProjectId(projectId)
+                .stream()
+                .map(RiskResponse::from)
                 .toList();
     }
 
@@ -182,6 +185,23 @@ public class ProjectService {
                 savedRisk.getDescription(),
                 savedRisk.getProbability()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProjectResponse> getAllProjects(UserPrincipal userPrincipal) {
+
+        UserRole role = userPrincipal.userRole();
+
+        List<Project> projects = switch (role) {
+            case ADMINISTRATOR, AUTHORITY -> projectRepository.findAll();
+            case PROJECT_MANAGER          -> projectRepository.findAllByProjectManagerId(userPrincipal.userId());
+            case LINEAR_MANAGER, COMMON   -> projectRepository.findAllByMemberId(userPrincipal.userId());
+            default                       -> List.of();
+        };
+
+        return projects.stream()
+                .map(ProjectResponse::from)
+                .toList();
     }
 
     private void addRolesAndBindWithSegments(Project project, List<ProjectSegment> segments, List<RoleCommand> roles) {
@@ -273,9 +293,10 @@ public class ProjectService {
     }
 
     private void addSponsorsToProject(Project project, List<UUID> sponsors) {
+        long uniqueSponsorsCount = sponsors.stream().distinct().count();
         List<User> sponsorUsers = userRepository.findAllById(sponsors);
 
-        if (sponsorUsers.size() != sponsors.size()) {
+        if (sponsorUsers.size() != uniqueSponsorsCount) {
             throw new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find one or more provided sponsors");
         }
 
@@ -283,9 +304,10 @@ public class ProjectService {
     }
 
     private void addCommitteesToProject(Project project, List<UUID> committee) {
+        long uniqueCommitteeCount = committee.stream().distinct().count();
         List<User> committeeUsers = userRepository.findAllById(committee);
 
-        if (committee.size() != committeeUsers.size()) {
+        if (committee.size() != uniqueCommitteeCount) {
             throw new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find one or more provided committee members");
         }
 

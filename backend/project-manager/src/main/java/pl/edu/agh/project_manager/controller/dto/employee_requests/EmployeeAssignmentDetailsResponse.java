@@ -4,6 +4,6 @@ import java.util.List;
 
 public record EmployeeAssignmentDetailsResponse(
         List<ChartIntervalResponse> currentWorkload,
-        List<ChartIntervalResponse> workloadAfterApproval
+        List<ChartIntervalResponse> requestedWorkload
 ) {
 }

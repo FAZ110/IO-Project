@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record EmployeeAssignmentResponse(
+        UUID id,
         String projectName,
         UUID projectId,
         String projectRoleName,

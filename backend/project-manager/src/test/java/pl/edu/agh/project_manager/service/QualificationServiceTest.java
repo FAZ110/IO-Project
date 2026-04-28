@@ -54,7 +54,7 @@ class QualificationServiceTest {
         when(skillRepository.findByNameIgnoreCase(skillName)).thenReturn(Optional.of(mockSkill));
         when(qualificationRepository.save(any(Qualification.class))).thenReturn(mockSavedQualification);
 
-        var responseList = qualificationService.addQualificationsToUser(userId, skillsToAdd);
+        var responseList = qualificationService.addQualificationsToUser(userId, skillsToAdd, List.of());
 
         assertNotNull(responseList);
         assertEquals(1, responseList.size(), "Lista powinna zawierać dokładnie jeden dodany element");

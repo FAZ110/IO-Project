@@ -11,6 +11,12 @@ export const ENDPOINTS = {
         RESEND_INVITATION: '/users/invitation',
         SEARCH_USERS: '/users/search'
     },
+    ME: {
+        QUALIFICATIONS: '/me/qualifications',
+        QUALIFICATION: (id: string) => `/me/qualifications/${id}`,
+        PASSWORD: '/me/password',
+    },
+    SKILLS: '/skills',
     ADMIN: {
         INVITATIONS: '/admin/invitations',
     },
@@ -20,8 +26,9 @@ export const ENDPOINTS = {
         CREATE: '/projects',
         DETAIL: (id: string) => `/projects/${id}`,
         RISK: {
-            LIST: (projectId: string) => `/projects/${projectId}/risk`
+            LIST: (projectId: string) => `/projects/${projectId}/risks`
         },
+        MEMBERS: (projectId: string) => `/projects/${projectId}/members`,
         ROLES: {
             STATUS_LIST: (projectId: string) => `/projects/${projectId}/roles/status`,
             ALLOCATE: (roleId: string) => `/roles/${roleId}/allocation-requests`
@@ -33,5 +40,11 @@ export const ENDPOINTS = {
         PROGRAMS: '/groups/programs',
         DETAIL: (groupId: string) => `/groups/${groupId}`,
         CREATE: '/groups',
+    },
+    EMPLOYEE: {
+        ASSIGNMENTS: '/employee/assignments',
+        ASSIGNMENT_DETAIL: (id: string) => `/employee/assignments/${id}`,
+        ACCEPT_ASSIGNMENT: (id: string) => `/employee/assignments/${id}/accept`,
+        REJECT_ASSIGNMENT: (id: string) => `/employee/assignments/${id}/reject`
     }
 } as const;

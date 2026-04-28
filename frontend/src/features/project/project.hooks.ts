@@ -1,13 +1,13 @@
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {projectService} from "@/features/project/project.service.ts";
-import {toast} from "sonner";
-import {PROJECT_KEYS} from "@/features/project/project.keys.ts";
-import type {EmployeeAssignmentRequest} from "./project.types";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { projectService } from '@/features/project/project.service.ts';
+import { toast } from 'sonner';
+import { PROJECT_KEYS } from '@/features/project/project.keys.ts';
+import type { EmployeeAssignmentRequest } from './project.types';
 
 export const useProjects = () => {
     return useQuery({
-        queryKey: PROJECT_KEYS.list(),
-        queryFn: () => projectService.getAllProjects(),
+        queryKey: PROJECT_KEYS.all,
+        queryFn: projectService.getAllProjects,
     });
 };
 
@@ -26,8 +26,24 @@ export const useCreateProject = () => {
         mutationFn: projectService.create,
         onSuccess: () => {
             toast.success('Dodano projekt.');
-            queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.list() });
+            queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.all });
         },
+    });
+};
+
+export const useProjectRisks = (id: string) => {
+    return useQuery({
+        queryKey: PROJECT_KEYS.risks(id),
+        queryFn: () => projectService.getRisks(id),
+        enabled: !!id
+    });
+};
+
+export const useProjectMembers = (id: string) => {
+    return useQuery({
+        queryKey: PROJECT_KEYS.members(id),
+        queryFn: () => projectService.getProjectMembers(id),
+        enabled: !!id
     });
 };
 
