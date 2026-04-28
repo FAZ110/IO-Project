@@ -38,6 +38,9 @@ public enum ApiErrorCode {
     EMPLOYEE_REQUEST_NOT_FOUND("REQ_004", HttpStatus.NOT_FOUND, "Employee request not found"),
     INVALID_REQUEST_STATUS("REQ_005", HttpStatus.BAD_REQUEST, "Request is not in PENDING state"),
 
+    INVALID_CURRENT_PASSWORD("USR_003", HttpStatus.UNAUTHORIZED, "Current password is incorrect"),
+    PASSWORD_SAME_AS_CURRENT("USR_004", HttpStatus.BAD_REQUEST, "New password must be different from current password"),
+
     VALIDATION_ERROR("GEN_001", HttpStatus.BAD_REQUEST, "Validation failed"),
     ACCESS_DENIED("GEN_002", HttpStatus.FORBIDDEN, "Access denied"),
     INTERNAL_SERVER_ERROR("GEN_999", HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected internal server error");

@@ -23,7 +23,7 @@ public class QualificationController {
     private final QualificationService qualificationService;
 
     @GetMapping
-    @PreAuthorize("hasRole('COMMON')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<QualificationResponse>> getMyQualifications(
             @AuthenticationPrincipal UserPrincipal principal
     ) {
@@ -32,20 +32,21 @@ public class QualificationController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('COMMON')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<QualificationResponse>> addQualification(
             @Valid @RequestBody AddQualificationRequest request,
             @AuthenticationPrincipal UserPrincipal principal
     ) {
         List<QualificationResponse> added = qualificationService.addQualificationsToUser(
                 principal.userId(),
-                request.skillNames()
+                request.skillNames(),
+                request.skillIds()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(added);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('COMMON')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> removeQualification(
             @PathVariable UUID id,
             @AuthenticationPrincipal UserPrincipal principal
