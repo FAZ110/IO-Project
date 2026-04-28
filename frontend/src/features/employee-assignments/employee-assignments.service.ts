@@ -3,7 +3,7 @@ import { ENDPOINTS } from "@/api/endpoints";
 import type { EmployeeAssignment, EmployeeAssignmentDetails } from "./employee-assignments.types";
 
 
-export const employeeRequestsService = {
+export const employeeAssignmentsService = {
     getEmployeeAssignments: async () => {
         const response = await api.get<EmployeeAssignment[]>(ENDPOINTS.EMPLOYEE.ASSIGNMENTS);
         return response.data;

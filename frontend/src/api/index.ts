@@ -1,8 +1,8 @@
 import { createQueryKeys, mergeQueryKeys } from '@lukemorales/query-key-factory'
 
-export const employeeRequestsKeys = createQueryKeys('employee-requests', {
+export const employeeAssignmentsKeys = createQueryKeys('employee-assignments', {
   detail: (requestId: string) => [requestId],
   list: null
 })
 
-export const queryKeys = mergeQueryKeys(employeeRequestsKeys)
+export const queryKeys = mergeQueryKeys(employeeAssignmentsKeys)

@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { employeeRequestsService } from "./employee-assignments.service"
-import { employeeRequestsKeys } from "@/api";
+import { employeeAssignmentsService } from "./employee-assignments.service"
+import { employeeAssignmentsKeys } from "@/api";
 
 export const useEmployeeAssignments = () => {
   const assignmentsQuery = useQuery({
-    queryKey: employeeRequestsKeys.list.queryKey,
-    queryFn: employeeRequestsService.getEmployeeAssignments,
+    queryKey: employeeAssignmentsKeys.list.queryKey,
+    queryFn: employeeAssignmentsService.getEmployeeAssignments,
   });
 
   return {
@@ -16,8 +16,8 @@ export const useEmployeeAssignments = () => {
 
 export const useEmployeeAssignmentDetails = (requestId: string) => {
   const detailsQuery = useQuery({
-    queryKey: employeeRequestsKeys.detail(requestId).queryKey,
-    queryFn: () => employeeRequestsService.getEmployeeAssignmentDetails(requestId)
+    queryKey: employeeAssignmentsKeys.detail(requestId).queryKey,
+    queryFn: () => employeeAssignmentsService.getEmployeeAssignmentDetails(requestId)
   });
 
   return {
@@ -30,19 +30,19 @@ export const useEmployeeAssignmentsActions = () => {
   const queryClient = useQueryClient();
 
   const refreshEmployeeRequests = (requestId: string) => {
-    queryClient.invalidateQueries({ queryKey: employeeRequestsKeys.list.queryKey });
-    queryClient.invalidateQueries({ queryKey: employeeRequestsKeys.detail(requestId).queryKey });
+    queryClient.invalidateQueries({ queryKey: employeeAssignmentsKeys.list.queryKey });
+    queryClient.invalidateQueries({ queryKey: employeeAssignmentsKeys.detail(requestId).queryKey });
   };
 
   const acceptMutation = useMutation({
-    mutationFn: employeeRequestsService.acceptEmployeeAssignment,
+    mutationFn: employeeAssignmentsService.acceptEmployeeAssignment,
     onSuccess: (_, requestId) => {
       refreshEmployeeRequests(requestId);
     },
   });
 
   const rejectMutation = useMutation({
-    mutationFn: employeeRequestsService.rejectEmployeeAssignment,
+    mutationFn: employeeAssignmentsService.rejectEmployeeAssignment,
     onSuccess: (_, requestId) => {
       refreshEmployeeRequests(requestId);
     },
