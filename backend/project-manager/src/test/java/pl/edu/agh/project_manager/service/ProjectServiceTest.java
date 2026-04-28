@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
 import pl.edu.agh.project_manager.domain.entity.Project;
+import pl.edu.agh.project_manager.domain.entity.ProjectMember;
 import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.User;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
@@ -158,6 +159,98 @@ class ProjectServiceTest {
                 .isThrownBy(() -> projectService.createProject(command))
                 .extracting(ApplicationException::getErrorCode)
                 .isEqualTo(ApiErrorCode.INVALID_MILESTONES);
+    }
+
+    @Test
+    @DisplayName("Should return project members successfully")
+    void getProjectMembers_Success() {
+        // Given
+        UUID projectId = UUID.randomUUID();
+        User sponsor = User.builder().id(UUID.randomUUID()).name("Sponsor").build();
+        User committee = User.builder().id(UUID.randomUUID()).name("Committee").build();
+        User employeeUser = User.builder().id(UUID.randomUUID()).name("Employee").build();
+
+        ProjectMember employeeMember = ProjectMember.builder()
+                .user(employeeUser)
+                .membershipStatus(pl.edu.agh.project_manager.domain.enums.MembershipStatus.ACCEPTED)
+                .build();
+
+        Project project = Project.builder()
+                .id(projectId)
+                .sponsors(new java.util.HashSet<>(List.of(sponsor)))
+                .committees(new java.util.HashSet<>(List.of(committee)))
+                .members(new java.util.HashSet<>(List.of(employeeMember)))
+                .build();
+
+        when(projectRepository.findByIdWithAllMembers(projectId)).thenReturn(Optional.of(project));
+
+        // When
+        pl.edu.agh.project_manager.controller.dto.project.ProjectMembersResponse response =
+                projectService.getProjectMembers(projectId);
+
+        // Then
+        assertThat(response).isNotNull();
+        assertThat(response.sponsors()).hasSize(1);
+        assertThat(response.sponsors().get(0).id()).isEqualTo(sponsor.getId());
+
+        assertThat(response.committees()).hasSize(1);
+        assertThat(response.committees().get(0).id()).isEqualTo(committee.getId());
+
+        assertThat(response.employees()).hasSize(1);
+        assertThat(response.employees().get(0).id()).isEqualTo(employeeUser.getId());
+
+        verify(projectRepository).findByIdWithAllMembers(projectId);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when getting members for non-existent project")
+    void getProjectMembers_ProjectNotFound() {
+        // Given
+        UUID projectId = UUID.randomUUID();
+        when(projectRepository.findByIdWithAllMembers(projectId)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatExceptionOfType(ApplicationException.class)
+                .isThrownBy(() -> projectService.getProjectMembers(projectId))
+                .extracting(ApplicationException::getErrorCode)
+                .isEqualTo(ApiErrorCode.PROJECT_NOT_FOUND);
+
+        verify(projectRepository).findByIdWithAllMembers(projectId);
+    }
+
+    @Test
+    @DisplayName("Should return list of project risks")
+    void getProjectRisks_Success() {
+        // Given
+        UUID projectId = UUID.randomUUID();
+
+        ProjectRisk risk1 = ProjectRisk.builder()
+                .id(UUID.randomUUID())
+                .name("Risk 1")
+                .description("Description 1")
+                .probability(30)
+                .build();
+
+        ProjectRisk risk2 = ProjectRisk.builder()
+                .id(UUID.randomUUID())
+                .name("Risk 2")
+                .description("Description 2")
+                .probability(80)
+                .build();
+
+        when(riskRepository.findAllByProjectId(projectId)).thenReturn(List.of(risk1, risk2));
+
+        // When
+        List<RiskResponse> responses = projectService.getProjectRisks(projectId);
+
+        // Then
+        assertThat(responses).hasSize(2);
+        assertThat(responses).extracting(RiskResponse::name)
+                .containsExactlyInAnyOrder("Risk 1", "Risk 2");
+        assertThat(responses).extracting(RiskResponse::probability)
+                .containsExactlyInAnyOrder(30, 80);
+
+        verify(riskRepository).findAllByProjectId(projectId);
     }
 
 

@@ -4,15 +4,15 @@ import pl.edu.agh.project_manager.domain.entity.User;
 
 import java.util.UUID;
 
-public record UserBasicResponse (
+public record BasicUserResponse(
         UUID id,
         String email,
         String name,
         String surname
 
 ) {
-    public static UserBasicResponse from(User user) {
-        return new UserBasicResponse(
+    public static BasicUserResponse from(User user) {
+        return new BasicUserResponse(
                 user.getId(),
                 user.getEmail(),
                 user.getName(),

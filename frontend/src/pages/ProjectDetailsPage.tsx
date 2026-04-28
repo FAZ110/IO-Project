@@ -1,6 +1,9 @@
 import {useProjectDetails} from "@/features/project/project.hooks.ts";
 import {useParams} from "react-router-dom";
 import {ProjectHeader} from "@/features/project/components/ProjectHeader.tsx";
+import {ProjectRisks} from "@/features/project/components/ProjectRisks.tsx";
+import {ProjectMembersSideBar} from "@/features/project/components/ProjectMembersSideBar.tsx";
+import {ProjectTimeline} from "@/features/project/components/ProjectTimeline.tsx";
 
 export const ProjectDetailsPage = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -20,14 +23,17 @@ export const ProjectDetailsPage = () => {
       <ProjectHeader details={project} />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-
         <div className="space-y-6 lg:col-span-2">
 
+          <ProjectTimeline /*projectId={project.id} *//>
+
+          <ProjectRisks projectId={project.id} />
         </div>
+
 
         <div className="space-y-6">
+          <ProjectMembersSideBar projectId={project.id} />
         </div>
-
       </div>
 
     </div>

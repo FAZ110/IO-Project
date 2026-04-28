@@ -47,7 +47,7 @@ public class Project {
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<ProjectMember> members = new ArrayList<>();
+    private Set<ProjectMember> members = new HashSet<>();
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -64,7 +64,7 @@ public class Project {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     @Builder.Default
-    private List<User> sponsors = new ArrayList<>();
+    private Set<User> sponsors = new HashSet<>();
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
@@ -73,7 +73,7 @@ public class Project {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     @Builder.Default
-    private List<User> committees = new ArrayList<>();
+    private Set<User> committees = new HashSet<>();
 
     public void addRisk(ProjectRisk risk) {
         this.risks.add(risk);

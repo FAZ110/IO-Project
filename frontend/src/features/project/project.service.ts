@@ -1,6 +1,12 @@
 import api from '@/api/client';
 import { ENDPOINTS } from '@/api/endpoints.ts';
-import type { ProjectCreationRequest, ProjectResponse, ProjectDetailsResponse, RiskResponse } from './project.types';
+import type {
+  ProjectCreationRequest,
+  ProjectResponse,
+  ProjectDetailsResponse,
+  RiskResponse,
+  ProjectMembersResponse
+} from './project.types';
 
 export const projectService = {
   getAllProjects: async () => {
@@ -15,6 +21,11 @@ export const projectService = {
 
   getDetails: async (id: string): Promise<ProjectDetailsResponse> => {
     const response = await api.get<ProjectDetailsResponse>(ENDPOINTS.PROJECT.DETAIL(id));
+    return response.data;
+  },
+
+  getProjectMembers: async (id: string): Promise<ProjectMembersResponse> => {
+    const response = await api.get<ProjectMembersResponse>(ENDPOINTS.PROJECT.MEMBERS(id));
     return response.data;
   },
 
