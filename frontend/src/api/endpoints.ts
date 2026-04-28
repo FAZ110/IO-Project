@@ -34,5 +34,11 @@ export const ENDPOINTS = {
     PROGRAMS: '/groups/programs',
     DETAIL: (groupId: string) => `/groups/${groupId}`,
     CREATE: '/groups',
+  },
+  EMPLOYEE: {
+    ASSIGNMENTS: '/employee/assignments',
+    ASSIGNMENT_DETAIL: (id: string) => `/employee/assignments/${id}`,
+    ACCEPT_ASSIGNMENT: (id: string) => `/employee/assignments/${id}/accept`,
+    REJECT_ASSIGNMENT: (id: string) => `/employee/assignments/${id}/reject`
   }
 } as const;

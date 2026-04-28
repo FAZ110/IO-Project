@@ -1,8 +1,10 @@
 package pl.edu.agh.project_manager.controller.dto.employee_requests;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record EmployeeAssignmentResponse(
+        UUID id,
         String projectName,
         String projectId,
         String projectRoleName,

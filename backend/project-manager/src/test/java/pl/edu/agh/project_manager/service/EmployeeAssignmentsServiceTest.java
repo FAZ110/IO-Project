@@ -212,7 +212,7 @@ class EmployeeAssignmentsServiceTest {
         assertEquals(LocalDate.of(2026, 1, 15), details.currentWorkload().get(2).endDate());
         assertEquals(30, details.currentWorkload().get(2).percentage());
 
-        assertEquals(List.of(), details.workloadAfterApproval());
+        assertEquals(List.of(), details.requestedWorkload());
         verify(segmentAllocationRepository).findAllUserAllocations(userId);
     }
 }
