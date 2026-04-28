@@ -1,5 +1,5 @@
 import { useMemo,  } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import { PATHS } from '@/routes/paths';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/providers/AuthContext';
@@ -87,7 +87,13 @@ export const DashboardPage = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {projects.map((project) => (
-                <ProjectCardView key={project.id} project={project} />
+                <Link
+                  key={project.id}
+                  to={PATHS.PROJECT(project.id)}
+                  className="block transition-transform hover:-translate-y-1"
+                >
+                  <ProjectCardView project={project} />
+                </Link>
               ))}
             </div>
           )}

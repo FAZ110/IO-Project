@@ -55,16 +55,11 @@ public class User {
 
     @ManyToMany(mappedBy = "sponsors")
     @Builder.Default
-    private List<Project> sponsorProjects = new ArrayList<>();
+    private Set<Project> sponsorProjects = new HashSet<>();
 
     @ManyToMany(mappedBy = "committees")
     @Builder.Default
-    private List<Project> committeeProjects = new ArrayList<>();
-
-    public void addProject(Project project) {
-        this.projects.add(project);
-        project.setProjectManager(this);
-    }
+    private Set<Project> committeeProjects = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

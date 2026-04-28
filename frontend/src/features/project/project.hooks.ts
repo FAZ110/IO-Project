@@ -27,5 +27,21 @@ export const useCreateProject = () => {
   });
 };
 
+export const useProjectRisks = (id: string) => {
+  return useQuery({
+    queryKey: PROJECT_KEYS.risks(id),
+    queryFn: () => projectService.getRisks(id),
+    enabled: !!id
+  })
+}
+
+export const useProjectMembers = (id: string) => {
+  return useQuery({
+    queryKey: PROJECT_KEYS.members(id),
+    queryFn: () => projectService.getProjectMembers(id),
+    enabled: !!id
+  })
+}
+
 
 
