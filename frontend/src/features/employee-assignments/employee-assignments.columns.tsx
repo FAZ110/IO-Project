@@ -1,6 +1,6 @@
 "use client"
 
-import type { ColumnDef, TableMeta } from "@tanstack/react-table"
+import type { ColumnDef } from "@tanstack/react-table"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"

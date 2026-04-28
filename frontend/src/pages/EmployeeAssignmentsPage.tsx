@@ -1,31 +1,28 @@
-import { useEmployeeAssignments } from "@/features/employee-assignments/employee-assignments.hooks";
-import { DataTable } from "@/components/ui/data-table";
+import { useEmployeeAssignments, useEmployeeAssignmentsActions } from "@/features/employee-assignments/employee-assignments.hooks";
 import { getColumns } from "@/features/employee-assignments/employee-assignments.columns";
 import { useState, useCallback, useMemo } from "react";
-import { Dialog, DialogContent, DialogTitle, DialogHeader } from "@/components/ui/dialog";
-import { EmployeeAssignmentDetails } from "@/features/employee-assignments/components/EmployeeAssignmentDetails";
 import type { EmployeeAssignment } from "@/features/employee-assignments/employee-assignments.types";
+import { EmployeeAssignmentDetails } from "@/features/employee-assignments/components/EmployeeAssignmentDetails";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DataTable } from "@/components/ui/data-table";
 
 export const EmployeeAssignmentsPage = () => {
   const { employeeAssignments, areAssignmentsLoading } = useEmployeeAssignments();
+  const { rejectRequest } = useEmployeeAssignmentsActions();
 
   const [selectedAssignment, setSelectedAssignment] = useState<EmployeeAssignment | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleVerify = useCallback((assignment: EmployeeAssignment) => {
-    console.log("Weryfikacja:", assignment.id);
-    setSelectedAssignment(assignment);
-    setIsModalOpen(true);
-  }, []);
+  const isModalOpen = !!selectedAssignment;
 
   const handleReject = useCallback((assignment: EmployeeAssignment) => {
-    console.log("Odrzucanie:", assignment.id);
-  }, []);
+    rejectRequest(assignment.id);
+  }, [rejectRequest]);
 
   const columns = useMemo(
-    () => getColumns({ onVerify: handleVerify, onReject: handleReject }),
-    [handleVerify, handleReject]
+    () => getColumns({ onVerify: setSelectedAssignment, onReject: handleReject }),
+    [handleReject]
   );
+
+  const handleCloseModal = () => setSelectedAssignment(null);
 
   return (
     <div className="container mx-auto py-10">
@@ -45,13 +42,17 @@ export const EmployeeAssignmentsPage = () => {
           <DataTable columns={columns} data={employeeAssignments ?? []} />
         )}
 
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <Dialog open={isModalOpen} onOpenChange={(open) => !open && handleCloseModal()}>
           <DialogContent className="w-[calc(100vw-2rem)] max-w-2xl overflow-x-hidden">
             <DialogHeader>
               <DialogTitle>Szczegóły weryfikacji</DialogTitle>
             </DialogHeader>
 
-            {selectedAssignment && <EmployeeAssignmentDetails assignment={selectedAssignment} />}
+            {selectedAssignment && <EmployeeAssignmentDetails
+              key={selectedAssignment.id}
+              assignment={selectedAssignment}
+              onClose={handleCloseModal}
+            />}
           </DialogContent>
         </Dialog>
       </div>

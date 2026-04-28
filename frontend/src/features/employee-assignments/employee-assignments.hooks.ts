@@ -49,8 +49,8 @@ export const useEmployeeAssignmentsActions = () => {
   });
 
   return {
-    acceptRequestAsync: acceptMutation.mutateAsync,
-    rejectRequestAsync: rejectMutation.mutateAsync,
+    acceptRequest: acceptMutation.mutate,
+    rejectRequest: rejectMutation.mutate,
     isAccepting: acceptMutation.isPending,
     isRejecting: rejectMutation.isPending,
   };
