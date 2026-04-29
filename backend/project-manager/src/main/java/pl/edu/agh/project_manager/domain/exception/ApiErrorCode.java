@@ -17,8 +17,8 @@ public enum ApiErrorCode {
 
     PROJECT_MANAGER_NOT_FOUND("PROJ_001", HttpStatus.NOT_FOUND, "Cannot find provided project manager"),
     PROJECT_GROUP_NOT_FOUND("PROJ_002", HttpStatus.NOT_FOUND, "Cannot find project group"),
-    INVALID_MILESTONES("PROJ_003", HttpStatus.BAD_REQUEST, "Project must have at least start and end milestones defined"),
-    INVALID_MILESTONE_ORDER("PROJ_004", HttpStatus.BAD_REQUEST, "Milestones must be chronologically ordered"),
+    INVALID_MILESTONE_DATE("PROJ_003", HttpStatus.BAD_REQUEST, "Milestone date must be between project start and end dates"),
+    MILESTONE_NOT_FOUND("PROJ_004", HttpStatus.NOT_FOUND, "Milestone does not exist"),
     INVALID_ROLE_UTILIZATION("PROJ_005", HttpStatus.BAD_REQUEST, "Role utilization percentages must match timeline segments length"),
     PROJECT_ROLE_NOT_FOUND("PROJ_006", HttpStatus.NOT_FOUND, "Cannot find provided project role"),
     PROJECT_NOT_FOUND("PROJ_007", HttpStatus.NOT_FOUND, "Cannot find provided project"),

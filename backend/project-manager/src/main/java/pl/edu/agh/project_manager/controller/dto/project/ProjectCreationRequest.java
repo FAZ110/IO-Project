@@ -3,8 +3,10 @@ package pl.edu.agh.project_manager.controller.dto.project;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +16,12 @@ public record ProjectCreationRequest(
 
         @NotBlank(message = "Opis projektu nie może być pusty")
         String description,
+
+        @NotNull(message = "Data rozpoczęcia projektu jest wymagana")
+        LocalDate startDate,
+
+        @NotNull(message = "Data zakończenia projektu jest wymagana")
+        LocalDate endDate,
 
         UUID projectGroupId,
 
@@ -29,7 +37,7 @@ public record ProjectCreationRequest(
         @Valid
         List<RoleRequest> roles,
 
-        @NotEmpty(message = "Lista kamieni milowych nie może być pusta")
+        @Valid
         List<@Valid MilestoneRequest> milestones
 ) {
     public ProjectCreationRequest {
@@ -41,7 +49,8 @@ public record ProjectCreationRequest(
                 creatorId,
                 this.title,
                 this.description,
-                this.milestones.get(0).date(),
+                this.startDate,
+                this.endDate,
                 this.projectGroupId,
                 this.risks.stream().map(RiskRequest::toCommand).toList(),
                 this.roles.stream().map(RoleRequest::toCommand).toList(),

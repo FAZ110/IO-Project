@@ -11,6 +11,7 @@ public record ProjectResponse(
         String title,
         String description,
         LocalDate startDate,
+        LocalDate endDate,
         Boolean isActive,
         UserResponse manager
 ) {
@@ -20,6 +21,7 @@ public record ProjectResponse(
                 project.getTitle(),
                 project.getDescription(),
                 project.getStartDate(),
+                project.getEndDate(),
                 project.getIsActive(),
                 UserResponse.from(project.getProjectManager())
         );

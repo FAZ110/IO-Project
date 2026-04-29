@@ -2,6 +2,7 @@ package pl.edu.agh.project_manager.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import pl.edu.agh.project_manager.domain.entity.project.ProjectMilestone;
 import pl.edu.agh.project_manager.domain.enums.MembershipStatus;
 
 import java.time.LocalDate;
@@ -28,6 +29,9 @@ public class Project {
 
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
+
+    @Column(name = "end_date", nullable = false)
+    private LocalDate endDate;
 
     @Column(name = "is_active", nullable = false)
     @Builder.Default
@@ -56,6 +60,10 @@ public class Project {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ProjectSegment> segments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProjectMilestone> milestones = new ArrayList<>();
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
@@ -92,6 +100,11 @@ public class Project {
         member.setRole(role);
         member.setMembershipStatus(MembershipStatus.PENDING);
         this.members.add(member);
+    }
+
+    public void addMilestone(ProjectMilestone milestone) {
+        this.milestones.add(milestone);
+        milestone.setProject(this);
     }
 
     public void addSegment(ProjectSegment projectSegment) {
