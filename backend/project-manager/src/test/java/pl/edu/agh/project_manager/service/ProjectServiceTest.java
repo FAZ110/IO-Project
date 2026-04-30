@@ -42,8 +42,6 @@ class ProjectServiceTest {
     private ProjectRepository projectRepository;
     @Mock
     private RiskRepository riskRepository;
-    @Mock
-    private ProjectGroupsRepository projectGroupsRepository;
 
     @InjectMocks
     private ProjectService projectService;
@@ -98,7 +96,7 @@ class ProjectServiceTest {
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
-        projectService.createProjectRole(projectId, managerId, command);
+        projectService.createProjectRole(projectId, command);
 
         assertThat(project.getRoles()).hasSize(1);
         assertThat(project.getRoles().get(0).getRoleName()).isEqualTo("Developer");
@@ -121,7 +119,7 @@ class ProjectServiceTest {
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
-        assertThatThrownBy(() -> projectService.createProjectRole(projectId, managerId, command))
+        assertThatThrownBy(() -> projectService.createProjectRole(projectId, command))
                 .isInstanceOf(ApplicationException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ApiErrorCode.INVALID_ROLE_UTILIZATION);
     }

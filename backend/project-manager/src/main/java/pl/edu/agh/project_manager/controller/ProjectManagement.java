@@ -107,15 +107,4 @@ public class ProjectManagement {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRisk);
     }
-
-    @PostMapping("/{projectId}/roles")
-    @PreAuthorize("hasRole('PROJECT_MANAGER')")
-    public ResponseEntity<Void> createProjectRole(
-            @PathVariable UUID projectId,
-            @Valid @RequestBody ProjectRoleRequest roleRequest,
-            @AuthenticationPrincipal UserPrincipal userPrincipal
-    ) {
-        projectService.createProjectRole(projectId, userPrincipal.userId(), roleRequest.toCommand());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
 }

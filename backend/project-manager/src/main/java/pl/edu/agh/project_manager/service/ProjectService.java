@@ -88,34 +88,11 @@ public class ProjectService {
     }
 
     @Transactional
-    public void createProjectRole(UUID projectId, UUID managerId, RoleCommand command) {
+    public void createProjectRole(UUID projectId, RoleCommand command) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find provided project - " + projectId));
 
-        if (!project.getProjectManager().getId().equals(managerId)) {
-            throw new ApplicationException(ApiErrorCode.ACCESS_DENIED, "Only project manager can add roles to the project");
-        }
-
-        List<ProjectSegment> segments = project.getSegments();
-        if (command.utilizationPercentages().size() != segments.size()) {
-            throw new ApplicationException(ApiErrorCode.INVALID_ROLE_UTILIZATION, "Expected " + segments.size() + " utilization values");
-        }
-
-        ProjectRole projectRole = ProjectRole.builder()
-                .roleName(command.name())
-                .project(project)
-                .build();
-
-        for (int i = 0; i < segments.size(); i++) {
-            ProjectRoleSegmentAllocation allocation = ProjectRoleSegmentAllocation.builder()
-                    .projectRole(projectRole)
-                    .segment(segments.get(i))
-                    .utilizationPercentage(command.utilizationPercentages().get(i))
-                    .build();
-            projectRole.addSegmentAllocation(allocation);
-        }
-
-        project.addRole(projectRole);
+        addRolesAndBindWithSegments(project, project.getSegments(), List.of(command));
         projectRepository.save(project);
     }
 
@@ -213,6 +190,7 @@ public class ProjectService {
             ProjectRole projectRole = ProjectRole
                     .builder()
                     .roleName(role.name())
+                    .project(project)
                     .build();
 
             for (int i = 0; i < segments.size(); i++) {

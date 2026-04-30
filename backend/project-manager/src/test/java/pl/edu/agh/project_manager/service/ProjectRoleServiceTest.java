@@ -58,7 +58,7 @@ class ProjectRoleServiceTest {
 
         assertThat(responses).hasSize(1);
         assertThat(responses.get(0).roleName()).isEqualTo("Developer");
-        
+
         assertThat(responses.get(0).status()).isEqualTo(ProjectRoleStatus.OPEN);
     }
 }
