@@ -2,7 +2,6 @@ package pl.edu.agh.project_manager.domain.entity.project;
 
 import jakarta.persistence.*;
 import lombok.*;
-import pl.edu.agh.project_manager.domain.entity.Project;
 
 import java.time.LocalDate;
 import java.util.UUID;

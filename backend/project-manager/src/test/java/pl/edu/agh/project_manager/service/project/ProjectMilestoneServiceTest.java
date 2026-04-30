@@ -6,12 +6,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.agh.project_manager.controller.dto.project.MilestoneResponse;
-import pl.edu.agh.project_manager.domain.entity.Project;
+import pl.edu.agh.project_manager.controller.dto.milestone.MilestoneResponse;
+import pl.edu.agh.project_manager.domain.entity.project.Project;
 import pl.edu.agh.project_manager.domain.entity.project.ProjectMilestone;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
-import pl.edu.agh.project_manager.repository.ProjectRepository;
+import pl.edu.agh.project_manager.repository.project.ProjectRepository;
 import pl.edu.agh.project_manager.repository.project.ProjectMilestoneRepository;
 import pl.edu.agh.project_manager.service.command.project.MilestoneCommand;
 

@@ -1,7 +1,7 @@
 package pl.edu.agh.project_manager.controller.dto.project;
 
 import pl.edu.agh.project_manager.controller.dto.user.UserResponse;
-import pl.edu.agh.project_manager.domain.entity.Project;
+import pl.edu.agh.project_manager.domain.entity.project.Project;
 
 import java.time.LocalDate;
 import java.util.UUID;

@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import pl.edu.agh.project_manager.controller.dto.milestone.MilestoneRequest;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 
 import java.time.LocalDate;
@@ -35,10 +36,7 @@ public record ProjectCreationRequest(
         List<RiskRequest> risks,
 
         @Valid
-        List<RoleRequest> roles,
-
-        @Valid
-        List<@Valid MilestoneRequest> milestones
+        List<MilestoneRequest> milestones
 ) {
     public ProjectCreationRequest {
         if (risks == null || risks.isEmpty()) risks = List.of();
@@ -53,7 +51,6 @@ public record ProjectCreationRequest(
                 this.endDate,
                 this.projectGroupId,
                 this.risks.stream().map(RiskRequest::toCommand).toList(),
-                this.roles.stream().map(RoleRequest::toCommand).toList(),
                 this.milestones.stream().map(MilestoneRequest::toCommand).toList(),
                 this.sponsors,
                 this.committee

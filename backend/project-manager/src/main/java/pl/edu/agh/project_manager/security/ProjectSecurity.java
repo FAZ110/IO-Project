@@ -2,8 +2,7 @@ package pl.edu.agh.project_manager.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import pl.edu.agh.project_manager.repository.ProjectRepository;
-import pl.edu.agh.project_manager.repository.ProjectRoleRepository;
+import pl.edu.agh.project_manager.repository.project.ProjectRepository;
 
 import java.util.UUID;
 
@@ -12,7 +11,6 @@ import java.util.UUID;
 public class ProjectSecurity {
 
     private final ProjectRepository projectRepository;
-    private final ProjectRoleRepository projectRoleRepository;
 
     public boolean canAccessProject(UUID projectId, UserPrincipal currentUser) {
         if (currentUser == null) {
@@ -39,15 +37,5 @@ public class ProjectSecurity {
         UUID userId = currentUser.userId();
 
         return projectRepository.existsByIdAndProjectManagerId(projectId, userId);
-    }
-
-    public boolean canManageRole(UUID roleId, UserPrincipal currentUser) {
-        if (currentUser == null) {
-            return false;
-        }
-
-        return projectRoleRepository.findByIdWithProjectAndManager(roleId)
-                .map(role -> role.getProject().getProjectManager().getId().equals(currentUser.userId()))
-                .orElse(false);
     }
 }

@@ -1,6 +1,6 @@
 package pl.edu.agh.project_manager.controller.dto.qualification;
 
-import pl.edu.agh.project_manager.domain.entity.Qualification;
+import pl.edu.agh.project_manager.domain.entity.user.Qualification;
 import pl.edu.agh.project_manager.domain.enums.QualificationStatus;
 
 import java.util.UUID;

@@ -8,14 +8,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.agh.project_manager.controller.dto.project_group.AllGroupsResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupDetailsResponse;
-import pl.edu.agh.project_manager.domain.entity.ProjectGroups;
-import pl.edu.agh.project_manager.domain.entity.User;
+import pl.edu.agh.project_manager.domain.entity.projectgroup.ProjectGroup;
+import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.enums.GroupType;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
-import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
-import pl.edu.agh.project_manager.repository.UserRepository;
-import pl.edu.agh.project_manager.service.ProjectGroupsService;
+import pl.edu.agh.project_manager.repository.projectgroup.ProjectGroupRepository;
+import pl.edu.agh.project_manager.repository.user.UserRepository;
 import pl.edu.agh.project_manager.service.command.project.ProjectGroupCreationCommand;
 
 import java.util.List;
@@ -31,7 +30,7 @@ import static org.mockito.Mockito.*;
 class ProjectGroupServiceTest {
 
     @Mock
-    private ProjectGroupsRepository projectGroupsRepository;
+    private ProjectGroupRepository projectGroupRepository;
 
     @Mock
     private UserRepository userRepository;
@@ -45,7 +44,7 @@ class ProjectGroupServiceTest {
         // Given
         UUID groupId = UUID.randomUUID();
         User owner = User.builder().name("John").surname("Doe").email("john@doe.com").build();
-        ProjectGroups group = ProjectGroups.builder()
+        ProjectGroup group = ProjectGroup.builder()
                 .id(groupId)
                 .name("Wallet Alpha")
                 .description("Description")
@@ -53,7 +52,7 @@ class ProjectGroupServiceTest {
                 .groupType(GroupType.WALLET)
                 .build();
 
-        when(projectGroupsRepository.findById(groupId)).thenReturn(Optional.of(group));
+        when(projectGroupRepository.findById(groupId)).thenReturn(Optional.of(group));
 
         // When
         SingleGroupDetailsResponse response = projectGroupsService.getGroupById(groupId);
@@ -62,7 +61,7 @@ class ProjectGroupServiceTest {
         assertThat(response.id()).isEqualTo(groupId);
         assertThat(response.name()).isEqualTo("Wallet Alpha");
         assertThat(response.owner().email()).isEqualTo("john@doe.com");
-        verify(projectGroupsRepository).findById(groupId);
+        verify(projectGroupRepository).findById(groupId);
     }
 
     @Test
@@ -72,7 +71,7 @@ class ProjectGroupServiceTest {
         UUID programId = UUID.randomUUID();
         User owner = User.builder().name("John").surname("Doe").email("john@doe.com").build();
 
-        ProjectGroups wallet = ProjectGroups.builder()
+        ProjectGroup wallet = ProjectGroup.builder()
                 .id(walletId)
                 .name("Wallet Alpha")
                 .description("Description")
@@ -80,7 +79,7 @@ class ProjectGroupServiceTest {
                 .groupType(GroupType.WALLET)
                 .build();
 
-        ProjectGroups program = ProjectGroups.builder()
+        ProjectGroup program = ProjectGroup.builder()
                 .id(programId)
                 .name("Program Betha")
                 .description("Description")
@@ -88,8 +87,8 @@ class ProjectGroupServiceTest {
                 .groupType(GroupType.PROGRAM)
                 .build();
 
-        when(projectGroupsRepository.getSingleGroupByGroupType(GroupType.WALLET)).thenReturn(List.of(wallet));
-        when(projectGroupsRepository.getSingleGroupByGroupType(GroupType.PROGRAM)).thenReturn(List.of(program));
+        when(projectGroupRepository.getSingleGroupByGroupType(GroupType.WALLET)).thenReturn(List.of(wallet));
+        when(projectGroupRepository.getSingleGroupByGroupType(GroupType.PROGRAM)).thenReturn(List.of(program));
 
         // When
         AllGroupsResponse  response = projectGroupsService.getAllGroups();
@@ -106,7 +105,7 @@ class ProjectGroupServiceTest {
     void getGroupById_NotFound() {
         // Given
         UUID groupId = UUID.randomUUID();
-        when(projectGroupsRepository.findById(groupId)).thenReturn(Optional.empty());
+        when(projectGroupRepository.findById(groupId)).thenReturn(Optional.empty());
 
         // When & Then
         assertThatThrownBy(() -> projectGroupsService.getGroupById(groupId))
@@ -123,17 +122,17 @@ class ProjectGroupServiceTest {
                 "New Program", "Desc", GroupType.PROGRAM, userId
         );
         User owner = User.builder().id(userId).build();
-        ProjectGroups savedGroup = ProjectGroups.builder().id(UUID.randomUUID()).build();
+        ProjectGroup savedGroup = ProjectGroup.builder().id(UUID.randomUUID()).build();
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(owner));
-        when(projectGroupsRepository.save(any(ProjectGroups.class))).thenReturn(savedGroup);
+        when(projectGroupRepository.save(any(ProjectGroup.class))).thenReturn(savedGroup);
 
         // When
         UUID resultId = projectGroupsService.createGroup(command);
 
         // Then
         assertThat(resultId).isEqualTo(savedGroup.getId());
-        verify(projectGroupsRepository).save(any(ProjectGroups.class));
+        verify(projectGroupRepository).save(any(ProjectGroup.class));
     }
 
     @Test
@@ -152,6 +151,6 @@ class ProjectGroupServiceTest {
                 .isInstanceOf(ApplicationException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ApiErrorCode.USER_NOT_FOUND);
 
-        verify(projectGroupsRepository, never()).save(any());
+        verify(projectGroupRepository, never()).save(any());
     }
 }

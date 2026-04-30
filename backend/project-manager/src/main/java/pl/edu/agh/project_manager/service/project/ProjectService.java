@@ -1,0 +1,166 @@
+package pl.edu.agh.project_manager.service.project;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import pl.edu.agh.project_manager.controller.dto.project.ProjectMembersResponse;
+import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
+import pl.edu.agh.project_manager.domain.entity.project.Project;
+import pl.edu.agh.project_manager.domain.entity.project.ProjectRisk;
+import pl.edu.agh.project_manager.domain.entity.projectgroup.ProjectGroup;
+import pl.edu.agh.project_manager.domain.entity.user.User;
+import pl.edu.agh.project_manager.domain.entity.project.ProjectMilestone;
+import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
+import pl.edu.agh.project_manager.domain.exception.ApplicationException;
+import pl.edu.agh.project_manager.repository.project.ProjectRepository;
+import pl.edu.agh.project_manager.security.UserPrincipal;
+import pl.edu.agh.project_manager.service.command.project.MilestoneCommand;
+import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
+import pl.edu.agh.project_manager.service.command.project.RiskCommand;
+
+import java.util.List;
+import java.util.UUID;
+import pl.edu.agh.project_manager.domain.enums.UserRole;
+import pl.edu.agh.project_manager.service.projectgroup.ProjectGroupsService;
+import pl.edu.agh.project_manager.service.user.UserService;
+
+@Service
+@RequiredArgsConstructor
+public class ProjectService {
+
+    private final UserService userService;
+    private final ProjectGroupsService projectGroupService;
+    private final ProjectRepository projectRepository;
+
+
+    @Transactional
+    public UUID createProject(ProjectCreationCommand command) {
+        User projectManager = userService.getUserEntityOrThrow(command.creatorId());
+
+        ProjectGroup projectGroup = null;
+        if (command.projectGroupId() != null) {
+            projectGroup = projectGroupService.getProjectGroupOrThrow(command.projectGroupId());
+        }
+
+        Project project = buildProject(command, projectManager);
+        project.setProjectGroup(projectGroup);
+
+        addRisksToProject(project, command.risks());
+        addMilestonesToProject(project, command.milestones());
+
+        addSponsorsToProject(project, command.sponsors());
+        addCommitteesToProject(project, command.committee());
+
+        Project savedProject = projectRepository.save(project);
+
+        return savedProject.getId();
+    }
+
+    @Transactional
+    public List<ProjectResponse> getAccessibleProjects(UserPrincipal userPrincipal) {
+
+        UserRole role = userPrincipal.userRole();
+
+        List<Project> projects = switch (role) {
+            case ADMINISTRATOR, AUTHORITY -> projectRepository.findAll();
+            case PROJECT_MANAGER          -> projectRepository.findAllByProjectManagerId(userPrincipal.userId());
+            case LINEAR_MANAGER, COMMON   -> projectRepository.findAllByMemberId(userPrincipal.userId());
+            default                       -> List.of();
+        };
+
+        return projects.stream()
+                .map(ProjectResponse::from)
+                .toList();
+    }
+
+    public ProjectResponse getProject(UUID projectId) {
+        Project project = projectRepository.findByIdWithManager(projectId)
+                .orElseThrow(() -> new ApplicationException(
+                        ApiErrorCode.PROJECT_NOT_FOUND,
+                        "Cannot find provided project - " + projectId
+                ));
+
+        return ProjectResponse.from(project);
+    }
+
+    public ProjectMembersResponse getProjectMembers(UUID projectId) {
+        Project project = projectRepository.findByIdWithAllMembers(projectId)
+                .orElseThrow(() -> new ApplicationException(
+                        ApiErrorCode.PROJECT_NOT_FOUND,
+                        "Cannot find provided project - " + projectId
+                ));
+
+        return ProjectMembersResponse.from(project);
+    }
+
+    private Project buildProject(ProjectCreationCommand command, User projectManager) {
+        return Project.builder()
+                .title(command.title())
+                .description(command.description())
+                .projectManager(projectManager)
+                .startDate(command.startDate())
+                .build();
+    }
+
+    private void addRisksToProject(Project project, List<RiskCommand> risks) {
+        if (risks == null) return;
+
+        risks.forEach(riskRequest -> {
+            ProjectRisk risk = ProjectRisk.builder()
+                    .name(riskRequest.name())
+                    .description(riskRequest.description())
+                    .probability(riskRequest.probability())
+                    .build();
+
+            project.addRisk(risk);
+        });
+    }
+
+    private void addMilestonesToProject(Project project, List<MilestoneCommand> milestones) {
+        if (milestones == null) return;
+
+        milestones.forEach(milestoneRequest -> {
+            ProjectMilestone milestone = ProjectMilestone.builder()
+                    .name(milestoneRequest.name())
+                    .description(milestoneRequest.description())
+                    .date(milestoneRequest.date())
+                    .build();
+
+            project.addMilestone(milestone);
+        });
+    }
+
+    private void addSponsorsToProject(Project project, List<UUID> sponsors) {
+        long uniqueSponsorsCount = sponsors.stream().distinct().count();
+        List<User> sponsorUsers = userService.getUsersByIdsOrThrow(sponsors, "Cannot find one or more provided sponsors");
+
+        if (sponsorUsers.size() != uniqueSponsorsCount) {
+            throw new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find one or more provided sponsors");
+        }
+
+        sponsorUsers.forEach(project::addSponsor);
+    }
+
+    private void addCommitteesToProject(Project project, List<UUID> committee) {
+        long uniqueCommitteeCount = committee.stream().distinct().count();
+        List<User> committeeUsers = userService.getUsersByIdsOrThrow(committee, "Cannot find one or more provided committee members");
+
+        if (committee.size() != uniqueCommitteeCount) {
+            throw new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find one or more provided committee members");
+        }
+
+        committeeUsers.forEach(project::addCommittee);
+    }
+
+    public void checkProjectExistsOrThrow(UUID projectId) {
+        if (!projectRepository.existsById(projectId)) {
+            throw new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find project: " + projectId);
+        }
+    }
+
+    public Project getProjectEntityOrThrow(UUID projectId) {
+        return projectRepository.findById(projectId)
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find project: " + projectId));
+    }
+
+}

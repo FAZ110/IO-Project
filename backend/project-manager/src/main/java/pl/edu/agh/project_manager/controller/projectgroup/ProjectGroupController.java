@@ -11,7 +11,7 @@ import pl.edu.agh.project_manager.controller.dto.project_group.ProjectGroupCreat
 import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupDetailsResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupResponse;
 import pl.edu.agh.project_manager.security.UserPrincipal;
-import pl.edu.agh.project_manager.service.ProjectGroupsService;
+import pl.edu.agh.project_manager.service.projectgroup.ProjectGroupsService;
 import pl.edu.agh.project_manager.service.command.project.ProjectGroupCreationCommand;
 
 import java.util.List;

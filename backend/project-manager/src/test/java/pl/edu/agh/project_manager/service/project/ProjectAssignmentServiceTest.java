@@ -7,15 +7,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.agh.project_manager.controller.dto.project.AssignmentResponse;
-import pl.edu.agh.project_manager.domain.entity.Project;
-import pl.edu.agh.project_manager.domain.entity.User;
+import pl.edu.agh.project_manager.domain.entity.project.Project;
+import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.entity.project.ProjectAssignment;
 import pl.edu.agh.project_manager.domain.enums.AssignmentStatus;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.project.ProjectAssignmentRepository;
-import pl.edu.agh.project_manager.service.ProjectService;
-import pl.edu.agh.project_manager.service.UserService;
+import pl.edu.agh.project_manager.service.user.UserService;
 import pl.edu.agh.project_manager.service.command.project.AssignmentCommand;
 
 import java.time.LocalDate;

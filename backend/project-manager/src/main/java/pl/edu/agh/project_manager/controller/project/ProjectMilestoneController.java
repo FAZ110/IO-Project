@@ -6,9 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.agh.project_manager.controller.dto.project.MilestoneRequest;
-import pl.edu.agh.project_manager.controller.dto.project.MilestoneResponse;
-import pl.edu.agh.project_manager.controller.dto.project.MilestoneUpdateRequest;
+import pl.edu.agh.project_manager.controller.dto.milestone.MilestoneRequest;
+import pl.edu.agh.project_manager.controller.dto.milestone.MilestoneResponse;
+import pl.edu.agh.project_manager.controller.dto.milestone.MilestoneUpdateRequest;
 import pl.edu.agh.project_manager.service.project.ProjectMilestoneService;
 
 import java.util.List;

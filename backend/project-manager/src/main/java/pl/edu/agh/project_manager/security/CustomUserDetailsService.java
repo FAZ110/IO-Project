@@ -6,8 +6,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import pl.edu.agh.project_manager.domain.entity.User;
-import pl.edu.agh.project_manager.repository.UserRepository;
+import pl.edu.agh.project_manager.domain.entity.user.User;
+import pl.edu.agh.project_manager.repository.user.UserRepository;
 
 import java.util.List;
 

@@ -1,6 +1,8 @@
 package pl.edu.agh.project_manager.domain.entity;
 
 import org.junit.jupiter.api.Test;
+import pl.edu.agh.project_manager.domain.entity.user.ActivationToken;
+
 import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
