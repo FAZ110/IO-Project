@@ -5,11 +5,6 @@ import { Button } from "@/components/ui/button";
 import { CalendarDays, MapPin, Plus } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-// interface ProjectTimelineProps {
-//   projectId: string;
-// }
-
-// Dane tymczasowe
 export const PROJECT_TIMELINE_MOCK_DATA = {
   projectStart: new Date("2026-04-01"),
   projectEnd: new Date("2026-07-31"),
@@ -40,6 +35,10 @@ export type TimelineAssignment = (typeof PROJECT_TIMELINE_MOCK_DATA.assignments)
 export type TimelineMilestone = (typeof PROJECT_TIMELINE_MOCK_DATA.milestones)[number];
 type Assignment = TimelineAssignment;
 type ResizeDirection = "start" | "end";
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const ONE_WEEK_MS = 7 * ONE_DAY_MS;
+const MILESTONE_AXIS_HEIGHT = 44;
+const ASSIGNMENT_ROW_HEIGHT = 40;
 
 interface ActiveResize {
   assignmentId: string;
@@ -53,16 +52,16 @@ interface ActiveResize {
 interface ActiveMove {
   assignmentId: string;
   initialX: number;
-  initialUserName: string;
+  initialRole: string;
   rowWidth: number;
   initialStart: number;
   initialEnd: number;
-  rowRects: Array<{ userName: string; top: number; bottom: number }>;
+  rowRects: Array<{ role: string; top: number; bottom: number }>;
 }
 
 interface MovePreview {
   assignmentId: string;
-  userName: string;
+  role: string;
   startMs: number;
   endMs: number;
 }
@@ -75,17 +74,19 @@ interface ActiveMilestoneMove {
 }
 
 interface IntervalAddPreview {
-  userName: string;
+  role: string;
   left: number;
   width: number;
   startMs: number;
   endMs: number;
 }
 
-export type SelectedElement =
-  | { type: "none" }
-  | { type: "milestone"; id: string }
-  | { type: "assignment"; id: string };
+export type SelectedElementType = "MILESTONE" | "ASSIGNMENT";
+
+export interface SelectedElement {
+  id: string;
+  type: SelectedElementType;
+}
 
 export interface ProjectTimelineProps {
   projectStart: Date;
@@ -94,9 +95,46 @@ export interface ProjectTimelineProps {
   assignments: TimelineAssignment[];
   setMilestones: React.Dispatch<React.SetStateAction<TimelineMilestone[]>>;
   setAssignments: React.Dispatch<React.SetStateAction<TimelineAssignment[]>>;
-  selectedElement: SelectedElement;
-  setSelectedElement: React.Dispatch<React.SetStateAction<SelectedElement>>;
+  selectedElement: SelectedElement | null;
+  setSelectedElement: React.Dispatch<React.SetStateAction<SelectedElement | null>>;
 }
+
+interface RoleRowData {
+  role: string;
+  assignments: TimelineAssignment[];
+  isPlaceholder: boolean;
+}
+
+const getAssignmentRole = (assignment: TimelineAssignment) => assignment.role || assignment.userName;
+
+const getRoleInitial = (role: string) => role.trim().charAt(0).toUpperCase();
+
+const getRowElements = () => Array.from(document.querySelectorAll("[data-assignment-row][data-role]")) as HTMLDivElement[];
+
+const buildRoleRows = (assignments: TimelineAssignment[], roleOrder: string[], placeholderRoles: string[]): RoleRowData[] => {
+  const groupedAssignments = assignments.reduce((acc, curr) => {
+    const role = getAssignmentRole(curr);
+    if (!acc[role]) acc[role] = [];
+    acc[role].push(curr);
+    return acc;
+  }, {} as Record<string, TimelineAssignment[]>);
+
+  const orderedRoles = Array.from(new Set([
+    ...roleOrder,
+    ...placeholderRoles,
+    ...Object.keys(groupedAssignments),
+  ]));
+
+  return orderedRoles.map((role) => ({
+    role,
+    assignments: groupedAssignments[role] ?? [],
+    isPlaceholder: placeholderRoles.includes(role),
+  }));
+};
+
+const getRoleRowClasses = (dragOverRole: string | null, role: string) => (
+  dragOverRole === role ? "bg-indigo-50 border-indigo-300" : "bg-slate-50 border-slate-100"
+);
 
 export const ProjectTimeline = ({
   projectStart,
@@ -113,31 +151,27 @@ export const ProjectTimeline = ({
   const [movePreview, setMovePreview] = useState<MovePreview | null>(null);
   const [activeMilestoneMove, setActiveMilestoneMove] = useState<ActiveMilestoneMove | null>(null);
   const [intervalAddPreview, setIntervalAddPreview] = useState<IntervalAddPreview | null>(null);
-  const [dragOverUserName, setDragOverUserName] = useState<string | null>(null);
+  const [dragOverRole, setDragOverRole] = useState<string | null>(null);
+  const [placeholderRoles, setPlaceholderRoles] = useState<string[]>([]);
+  const [roleOrder, setRoleOrder] = useState<string[]>(() => Array.from(new Set(assignments.map(getAssignmentRole))));
   const [isAddingMilestone, setIsAddingMilestone] = useState(false);
   const placementAreaRef = useRef<HTMLDivElement | null>(null);
 
   const projectStartMs = projectStart.getTime();
   const projectEndMs = projectEnd.getTime();
   const projectDurationMs = projectEndMs - projectStartMs;
-  const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-
-  const assignmentsByUser = useMemo(() => assignments.reduce((acc, curr) => {
-    if (!acc[curr.userName]) acc[curr.userName] = [];
-    acc[curr.userName].push(curr);
-    return acc;
-  }, {} as Record<string, TimelineAssignment[]>), [assignments]);
 
   const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
   const snapToDay = (timestamp: number) => Math.round(timestamp / ONE_DAY_MS) * ONE_DAY_MS;
   const intervalsOverlap = (startA: number, endA: number, startB: number, endB: number) => startA < endB && endA > startB;
+  const roleRows = useMemo(() => buildRoleRows(assignments, roleOrder, placeholderRoles), [assignments, placeholderRoles, roleOrder]);
 
   const getIntervalAddPlacement = (clientX: number, clientY: number) => {
     if (!isAddingMilestone || !placementAreaRef.current) {
       return null;
     }
 
-    const rowElements = Array.from(document.querySelectorAll("[data-assignment-row][data-user-name]")) as HTMLDivElement[];
+    const rowElements = getRowElements();
     const targetRow = rowElements.find((rowElement) => {
       const rowRect = rowElement.getBoundingClientRect();
       return clientY >= rowRect.top && clientY <= rowRect.bottom;
@@ -149,21 +183,21 @@ export const ProjectTimeline = ({
     }
 
     const rect = targetRow.getBoundingClientRect();
-    const previewWidth = rect.width * (7 * ONE_DAY_MS / projectDurationMs);
+    const previewWidth = rect.width * (ONE_WEEK_MS / projectDurationMs);
     const width = clamp(previewWidth, 24, rect.width);
     const centeredLeft = clientX - rect.left - width / 2;
     const left = clamp(centeredLeft, 0, rect.width - width);
-    const centeredStart = projectStartMs + ((left + width / 2) / rect.width) * projectDurationMs - (7 * ONE_DAY_MS) / 2;
-    const startMs = clamp(snapToDay(centeredStart), projectStartMs, projectEndMs - 7 * ONE_DAY_MS);
-    const endMs = startMs + 7 * ONE_DAY_MS;
+    const centeredStart = projectStartMs + ((left + width / 2) / rect.width) * projectDurationMs - ONE_WEEK_MS / 2;
+    const startMs = clamp(snapToDay(centeredStart), projectStartMs, projectEndMs - ONE_WEEK_MS);
+    const endMs = startMs + ONE_WEEK_MS;
 
     setIntervalAddPreview((prev) => {
-      if (prev && prev.userName === targetRow.dataset.userName && prev.left === left && prev.width === width && prev.startMs === startMs && prev.endMs === endMs) {
+      if (prev && prev.role === targetRow.dataset.role && prev.left === left && prev.width === width && prev.startMs === startMs && prev.endMs === endMs) {
         return prev;
       }
 
       return {
-        userName: targetRow.dataset.userName ?? "",
+        role: targetRow.dataset.role ?? "",
         left,
         width,
         startMs,
@@ -172,7 +206,7 @@ export const ProjectTimeline = ({
     });
 
     return {
-      userName: targetRow.dataset.userName ?? "",
+      role: targetRow.dataset.role ?? "",
       left,
       width,
       startMs,
@@ -183,14 +217,14 @@ export const ProjectTimeline = ({
   const getClosestNonOverlappingStart = (
     desiredStart: number,
     duration: number,
-    userName: string,
+    role: string,
     assignmentId: string,
     sourceAssignments: TimelineAssignment[],
   ) => {
     const minStart = projectStartMs;
     const maxStart = projectEndMs - duration;
     const others = sourceAssignments
-      .filter((item) => item.id !== assignmentId && item.userName === userName)
+      .filter((item) => item.id !== assignmentId && getAssignmentRole(item) === role)
       .map((item) => ({
         start: item.startDate.getTime(),
         end: item.endDate.getTime(),
@@ -273,31 +307,31 @@ export const ProjectTimeline = ({
     if (!row) return;
 
     const rowRect = row.getBoundingClientRect();
-    const rowElements = Array.from(document.querySelectorAll("[data-assignment-row][data-user-name]")) as HTMLDivElement[];
+    const rowElements = getRowElements();
     const rowRects = rowElements.map((element) => {
       const rect = element.getBoundingClientRect();
       return {
-        userName: element.dataset.userName ?? "",
+        role: element.dataset.role ?? "",
         top: rect.top,
         bottom: rect.bottom,
       };
-    }).filter((rowInfo) => !!rowInfo.userName);
+    }).filter((rowInfo) => !!rowInfo.role);
 
     setActiveMove({
       assignmentId: assignment.id,
       initialX: event.clientX,
-      initialUserName: assignment.userName,
+      initialRole: getAssignmentRole(assignment),
       rowWidth: rowRect.width,
       initialStart: assignment.startDate.getTime(),
       initialEnd: assignment.endDate.getTime(),
       rowRects,
     });
 
-    setSelectedElement({ type: "assignment", id: assignment.id });
+    setSelectedElement({ type: "ASSIGNMENT", id: assignment.id });
 
     setMovePreview({
       assignmentId: assignment.id,
-      userName: assignment.userName,
+      role: getAssignmentRole(assignment),
       startMs: assignment.startDate.getTime(),
       endMs: assignment.endDate.getTime(),
     });
@@ -315,15 +349,15 @@ export const ProjectTimeline = ({
       ...currentAssignments,
       {
         id: assignmentId,
-        userName: placement.userName,
-        role: "Nowy przedział",
+        userName: placement.role,
+        role: placement.role,
         startDate: new Date(placement.startMs),
         endDate: new Date(placement.endMs),
         utilization: 0,
       },
     ]);
 
-    setSelectedElement({ type: "assignment", id: assignmentId });
+    setSelectedElement({ type: "ASSIGNMENT", id: assignmentId });
 
     setIsAddingMilestone(false);
     setIntervalAddPreview(null);
@@ -346,7 +380,7 @@ export const ProjectTimeline = ({
       rowWidth: rect.width,
     });
 
-    setSelectedElement({ type: "milestone", id: milestoneId });
+    setSelectedElement({ type: "MILESTONE", id: milestoneId });
   };
 
   const handleIntervalAxisMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -356,6 +390,40 @@ export const ProjectTimeline = ({
   const handleIntervalAxisMouseLeave = () => {
     setIntervalAddPreview(null);
   };
+
+  const handleAddRolePlaceholder = () => {
+    setPlaceholderRoles((currentRoles) => {
+      const nextRole = `Nowa rola ${currentRoles.length + 1}`;
+      setRoleOrder((currentRoleOrder) => (currentRoleOrder.includes(nextRole) ? currentRoleOrder : [...currentRoleOrder, nextRole]));
+      return [...currentRoles, nextRole];
+    });
+  };
+
+  useEffect(() => {
+    setRoleOrder((currentRoleOrder) => {
+      const nextRoleOrder = [...currentRoleOrder];
+      const seenRoles = new Set(nextRoleOrder);
+      let hasChanges = false;
+
+      for (const role of assignments.map(getAssignmentRole)) {
+        if (!seenRoles.has(role)) {
+          seenRoles.add(role);
+          nextRoleOrder.push(role);
+          hasChanges = true;
+        }
+      }
+
+      for (const role of placeholderRoles) {
+        if (!seenRoles.has(role)) {
+          seenRoles.add(role);
+          nextRoleOrder.push(role);
+          hasChanges = true;
+        }
+      }
+
+      return hasChanges ? nextRoleOrder : currentRoleOrder;
+    });
+  }, [assignments, placeholderRoles]);
 
   useEffect(() => {
     if (!activeResize) return;
@@ -490,14 +558,14 @@ export const ProjectTimeline = ({
       }
 
       const targetRow = activeMove.rowRects.find((row) => clientY >= row.top && clientY <= row.bottom);
-      const nextUserName = targetRow?.userName ?? activeMove.initialUserName;
+      const nextRole = targetRow?.role ?? activeMove.initialRole;
 
-      nextStart = getClosestNonOverlappingStart(nextStart, duration, nextUserName, activeMove.assignmentId, assignments);
+      nextStart = getClosestNonOverlappingStart(nextStart, duration, nextRole, activeMove.assignmentId, assignments);
       nextEnd = nextStart + duration;
 
       return {
         assignmentId: activeMove.assignmentId,
-        userName: nextUserName,
+        role: nextRole,
         startMs: nextStart,
         endMs: nextEnd,
       } as MovePreview;
@@ -506,12 +574,12 @@ export const ProjectTimeline = ({
     const updateMovePreview = (clientX: number, clientY: number) => {
       const nextPreview = getNextMoveState(clientX, clientY);
 
-      setDragOverUserName((prev) => (prev === nextPreview.userName ? prev : nextPreview.userName));
+      setDragOverRole((prev) => (prev === nextPreview.role ? prev : nextPreview.role));
       setMovePreview((prev) => {
         if (
           prev
           && prev.assignmentId === nextPreview.assignmentId
-          && prev.userName === nextPreview.userName
+          && prev.role === nextPreview.role
           && prev.startMs === nextPreview.startMs
           && prev.endMs === nextPreview.endMs
         ) {
@@ -558,7 +626,7 @@ export const ProjectTimeline = ({
           if (
             currentStart === finalPreview.startMs
             && currentEnd === finalPreview.endMs
-            && assignment.userName === finalPreview.userName
+            && getAssignmentRole(assignment) === finalPreview.role
           ) {
             return assignment;
           }
@@ -566,7 +634,8 @@ export const ProjectTimeline = ({
           hasChanges = true;
           return {
             ...assignment,
-            userName: finalPreview.userName,
+            userName: finalPreview.role,
+            role: finalPreview.role,
             startDate: new Date(finalPreview.startMs),
             endDate: new Date(finalPreview.endMs),
           };
@@ -575,7 +644,7 @@ export const ProjectTimeline = ({
         return hasChanges ? updatedAssignments : currentAssignments;
       });
 
-      setDragOverUserName(null);
+      setDragOverRole(null);
       setMovePreview(null);
       setActiveMove(null);
     };
@@ -670,7 +739,7 @@ export const ProjectTimeline = ({
   }, [activeMilestoneMove, projectDurationMs, projectEndMs, projectStartMs]);
 
   return (
-    <Card className="w-full">
+    <Card className="w-full overflow-visible">
       <CardHeader className="pb-3 border-b">
         <div className="flex items-center justify-between gap-3">
           <CardTitle className="text-lg flex items-center gap-2 text-slate-800">
@@ -689,12 +758,12 @@ export const ProjectTimeline = ({
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="pt-6 relative">
+      <CardContent className="pt-6 relative overflow-visible">
         <TooltipProvider>
           <div className="absolute top-0 bottom-0 left-0 right-0 pointer-events-none mx-6">
             <div className="h-full border-l border-r border-slate-200 border-dashed relative">
-              <span className="absolute -top-5 left-0 text-xs text-slate-400 font-medium">{projectStart.toLocaleDateString()}</span>
-              <span className="absolute -top-5 right-0 text-xs text-slate-400 font-medium">{projectEnd.toLocaleDateString()}</span>
+              <span className="absolute top-1 left-0 text-xs text-slate-400 font-medium">{projectStart.toLocaleDateString()}</span>
+              <span className="absolute top-1 right-0 text-xs text-slate-400 font-medium">{projectEnd.toLocaleDateString()}</span>
             </div>
           </div>
 
@@ -703,60 +772,57 @@ export const ProjectTimeline = ({
             onClick={handlePlacementAreaClick}
             onMouseMove={handleIntervalAxisMouseMove}
             onMouseLeave={handleIntervalAxisMouseLeave}
-            className={`space-y-8 relative z-10 mx-6 ${isAddingMilestone ? "cursor-crosshair" : ""}`}
+            className={`space-y-5 relative z-10 mx-6 ${isAddingMilestone ? "cursor-crosshair" : ""}`}
           >
-            <div className="relative h-16">
+            <div className="relative" style={{ height: MILESTONE_AXIS_HEIGHT }}>
               {milestones.map((milestone) => {
                 const position = calculatePositionAndWidth(milestone.date, milestone.date, projectStart, projectEnd);
                 return (
-                  <Tooltip key={milestone.id}>
-                    <TooltipTrigger asChild>
-                      <div
-                        className={`absolute top-0 -ml-2 group ${activeMilestoneMove?.milestoneId === milestone.id ? "cursor-grabbing" : "cursor-grab"}`}
-                        style={{ left: position.left }}
-                        onMouseDown={(event) => handleMilestoneMoveStart(event, milestone.id, milestone.date)}
-                        onClick={() => setSelectedElement({ type: "milestone", id: milestone.id })}
-                      >
-                        <MapPin className="h-5 w-5 text-rose-500 fill-white group-hover:fill-rose-100 transition-colors" />
-                        <div className="w-px h-full bg-rose-200 absolute left-1/2 -ml-px top-5 pointer-events-none" style={{ height: '500px' }} /> {/* Pionowa linia w dół */}
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-[200px] z-50 bg-white border shadow-md text-slate-800">
-                      <p className="font-semibold">{milestone.name}</p>
-                      <p className="text-xs text-slate-500 mb-1">{milestone.date.toLocaleDateString()}</p>
-                      <p className="text-sm">{milestone.description}</p>
-                    </TooltipContent>
-                  </Tooltip>
+                  <div
+                    key={milestone.id}
+                    className={`absolute top-0 -ml-3 group ${activeMilestoneMove?.milestoneId === milestone.id ? "cursor-grabbing" : "cursor-grab"}`}
+                    style={{ left: position.left }}
+                    onMouseDown={(event) => handleMilestoneMoveStart(event, milestone.id, milestone.date)}
+                    onClick={() => setSelectedElement({ type: "MILESTONE", id: milestone.id })}
+                  >
+                    <MapPin className="h-6 w-6 text-rose-500 fill-white group-hover:fill-rose-100 transition-colors" />
+                    <div className="w-px h-8 bg-rose-200 absolute left-1/2 -ml-px top-6 pointer-events-none" />
+                  </div>
                 );
               })}
             </div>
 
-            {Object.entries(assignmentsByUser).map(([userName, userAssignments], index) => {
-              const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase();
+            {roleRows.map(({ role, assignments: roleAssignments, isPlaceholder }) => {
+              const initials = isPlaceholder ? "" : getRoleInitial(role);
               const movedAssignment = movePreview ? assignments.find((item) => item.id === movePreview.assignmentId) : null;
               const visibleAssignments = [
-                ...userAssignments.filter((assignment) => assignment.id !== activeMove?.assignmentId),
-                ...((movePreview?.userName === userName && movedAssignment) ? [movedAssignment] : []),
+                ...roleAssignments.filter((assignment) => assignment.id !== activeMove?.assignmentId),
+                ...((movePreview?.role === role && movedAssignment) ? [movedAssignment] : []),
               ];
 
               return (
-                <div key={index} className="relative flex items-center h-10 mt-4">
-                  <div className="absolute -left-12 z-20">
-                    <Avatar className="h-8 w-8 ring-2 ring-white">
-                      <AvatarFallback className="bg-slate-100 text-slate-600 text-[10px] font-bold">
-                        {initials}
-                      </AvatarFallback>
-                    </Avatar>
+                <div key={role} className="relative mt-2 flex items-center pl-12" style={{ height: ASSIGNMENT_ROW_HEIGHT }}>
+                  <div className="absolute left-0 z-20">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Avatar className="h-8 w-8 ring-2 ring-white">
+                          <AvatarFallback className="bg-slate-100 text-slate-600 text-[10px] font-bold">
+                            {initials}
+                          </AvatarFallback>
+                        </Avatar>
+                      </TooltipTrigger>
+                      <TooltipContent className="z-50 bg-white border shadow-md text-slate-800">
+                        <p className="font-semibold">{role}</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
 
                   <div
-                    className={`relative w-full h-full rounded-md border transition-colors ${
-                      dragOverUserName === userName ? "bg-indigo-50 border-indigo-300" : "bg-slate-50 border-slate-100"
-                    }`}
+                    className={`relative h-full w-full rounded-md border transition-colors ${getRoleRowClasses(dragOverRole, role)}`}
                     data-assignment-row
-                    data-user-name={userName}
+                    data-role={role}
                   >
-                    {isAddingMilestone && intervalAddPreview?.userName === userName && (
+                    {isAddingMilestone && intervalAddPreview?.role === role && (
                       <div
                         className="absolute top-1 bottom-1 rounded-sm border-2 border-dashed border-indigo-300 bg-white/80 shadow-sm pointer-events-none flex items-center justify-center"
                         style={{ left: intervalAddPreview.left, width: intervalAddPreview.width }}
@@ -772,48 +838,56 @@ export const ProjectTimeline = ({
                       const position = calculatePositionAndWidth(displayStartDate, displayEndDate, projectStart, projectEnd);
 
                       return (
-                        <Tooltip key={assignment.id}>
-                          <TooltipTrigger asChild>
-                            <div
-                              className={`group absolute top-1 bottom-1 bg-indigo-500 hover:bg-indigo-600 rounded-sm cursor-move transition-colors border border-indigo-700/20 flex items-center justify-center overflow-visible ${
-                                activeMove?.assignmentId === assignment.id ? "opacity-60" : "opacity-100"
-                              } ${selectedElement.type === "assignment" && selectedElement.id === assignment.id ? "ring-2 ring-indigo-300" : ""}`}
-                              style={{ left: position.left, width: position.width }}
-                              data-assignment-block
-                              draggable={false}
-                              onMouseDown={(event) => handleMoveStart(event, assignment)}
-                              onClick={() => setSelectedElement({ type: "assignment", id: assignment.id })}
-                            >
-                              <div
-                                className="absolute left-0 top-0 h-full w-2 bg-indigo-700/35 opacity-0 group-hover:opacity-100 cursor-ew-resize"
-                                onMouseDown={(event) => handleResizeStart(event, assignment, "start")}
-                              />
+                        <div
+                          key={assignment.id}
+                          className={`group absolute top-1 bottom-1 bg-indigo-500 hover:bg-indigo-600 rounded-sm cursor-move transition-colors border border-indigo-700/20 flex items-center justify-center overflow-visible ${
+                            activeMove?.assignmentId === assignment.id ? "opacity-60" : "opacity-100"
+                          } ${selectedElement?.type === "ASSIGNMENT" && selectedElement.id === assignment.id ? "ring-2 ring-indigo-300" : ""}`}
+                          style={{ left: position.left, width: position.width }}
+                          data-assignment-block
+                          draggable={false}
+                          onMouseDown={(event) => handleMoveStart(event, assignment)}
+                          onClick={() => setSelectedElement({ type: "ASSIGNMENT", id: assignment.id })}
+                        >
+                          <div
+                            className="absolute left-0 top-0 h-full w-2 bg-indigo-700/35 opacity-0 group-hover:opacity-100 cursor-ew-resize"
+                            onMouseDown={(event) => handleResizeStart(event, assignment, "start")}
+                          />
 
-                              {/* Jeśli pasek jest dostatecznie szeroki, pokazujemy procent w środku */}
-                              {parseFloat(position.width) > 10 && (
-                                <span className="text-[10px] font-bold text-white/90">{assignment.utilization}%</span>
-                              )}
+                          {parseFloat(position.width) > 10 && (
+                            <span className="text-[10px] font-bold text-white/90">{assignment.utilization}%</span>
+                          )}
 
-                              <div
-                                className="absolute right-0 top-0 h-full w-2 bg-indigo-700/35 opacity-0 group-hover:opacity-100 cursor-ew-resize"
-                                onMouseDown={(event) => handleResizeStart(event, assignment, "end")}
-                              />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent className="z-50 bg-white border shadow-md text-slate-800">
-                            <p className="font-semibold">{assignment.role}</p>
-                            <p className="text-xs text-slate-500 mb-1">
-                              {assignment.startDate.toLocaleDateString()} - {assignment.endDate.toLocaleDateString()}
-                            </p>
-                            <p className="text-sm">Zaangażowanie: <span className="font-bold">{assignment.utilization}%</span></p>
-                          </TooltipContent>
-                        </Tooltip>
+                          <div
+                            className="absolute right-0 top-0 h-full w-2 bg-indigo-700/35 opacity-0 group-hover:opacity-100 cursor-ew-resize"
+                            onMouseDown={(event) => handleResizeStart(event, assignment, "end")}
+                          />
+                        </div>
                       );
                     })}
+
                   </div>
                 </div>
               );
             })}
+
+            <button
+              type="button"
+              className="relative mt-2 flex w-full items-center gap-3 pl-12 text-left"
+              style={{ height: ASSIGNMENT_ROW_HEIGHT }}
+              onClick={handleAddRolePlaceholder}
+              aria-label="Dodaj nową rolę"
+            >
+              <div className="absolute left-0 z-20">
+                <Avatar className="h-8 w-8 border-2 border-dashed border-slate-300 bg-white shadow-none ring-0">
+                  <AvatarFallback className="bg-white" />
+                </Avatar>
+              </div>
+
+              <div className="flex h-full flex-1 items-center justify-center rounded-md border-2 border-dashed border-slate-300 bg-white/80 shadow-none transition-colors hover:bg-slate-50">
+                <Plus className="h-4 w-4 text-slate-400" />
+              </div>
+            </button>
           </div>
         </TooltipProvider>
       </CardContent>
