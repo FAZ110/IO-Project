@@ -99,6 +99,7 @@ public class ProjectService {
                 .description(command.description())
                 .projectManager(projectManager)
                 .startDate(command.startDate())
+                .endDate(command.endDate())
                 .build();
     }
 
