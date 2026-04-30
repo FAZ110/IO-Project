@@ -7,9 +7,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.agh.project_manager.controller.dto.project.ProjectRoleStatusResponse;
-import pl.edu.agh.project_manager.domain.entity.*;
-import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
-import pl.edu.agh.project_manager.domain.exception.ApplicationException;
+import pl.edu.agh.project_manager.domain.entity.Project;
+import pl.edu.agh.project_manager.domain.entity.ProjectRole;
+import pl.edu.agh.project_manager.domain.enums.ProjectRoleStatus;
 import pl.edu.agh.project_manager.repository.ProjectRepository;
 
 import java.util.ArrayList;
@@ -18,9 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectRoleServiceTest {
@@ -40,14 +38,14 @@ class ProjectRoleServiceTest {
         projectId = UUID.randomUUID();
         project = new Project();
         project.setId(projectId);
-        
+
         role = ProjectRole.builder()
                 .id(UUID.randomUUID())
                 .roleName("Developer")
                 .project(project)
                 .members(new ArrayList<>())
                 .build();
-                
+
         project.setRoles(List.of(role));
     }
 
@@ -55,10 +53,12 @@ class ProjectRoleServiceTest {
     void getProjectRolesStatus_ShouldReturnRolesWithStatus() {
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
-        List<ProjectRoleStatusResponse> responses = projectRoleService.getProjectRolesStatus(projectId);
+        List<ProjectRoleStatusResponse> responses =
+                projectRoleService.getProjectRolesStatus(projectId);
 
         assertThat(responses).hasSize(1);
         assertThat(responses.get(0).roleName()).isEqualTo("Developer");
-        assertThat(responses.get(0).status()).isEqualTo("OPEN");
+        
+        assertThat(responses.get(0).status()).isEqualTo(ProjectRoleStatus.OPEN);
     }
 }
