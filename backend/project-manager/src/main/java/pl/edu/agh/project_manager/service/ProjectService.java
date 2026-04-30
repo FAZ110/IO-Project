@@ -188,7 +188,7 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectResponse> getAllProjects(UserPrincipal userPrincipal) {
+    public List<ProjectResponse> getAccessibleProjects(UserPrincipal userPrincipal) {
 
         UserRole role = userPrincipal.userRole();
 

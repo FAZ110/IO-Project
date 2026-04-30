@@ -59,10 +59,18 @@ export interface ProjectRole {
     utilizationPercentages: number[];
 }
 
+export const ProjectRoleStatus = {
+    OPEN: 'OPEN',
+    PENDING: 'PENDING',
+    FILLED: 'FILLED'
+} as const;
+
+export type ProjectRoleStatus = typeof ProjectRoleStatus[keyof typeof ProjectRoleStatus];
+
 export interface ProjectRoleStatusResponse {
     id: string;
     roleName: string;
-    status: 'OPEN' | 'PENDING' | 'FILLED';
+    status: ProjectRoleStatus;
     utilizationPercentages: number[];
 }
 

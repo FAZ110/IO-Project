@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { projectService } from '@/features/project/project.service.ts';
 import { toast } from 'sonner';
-import { PROJECT_KEYS } from '@/features/project/project.keys.ts';
+import {PROJECT_KEYS, ROLES_KEYS} from '@/features/project/project.keys.ts';
 import type { EmployeeAssignmentRequest } from './project.types';
 
 export const useProjects = () => {
@@ -49,7 +49,7 @@ export const useProjectMembers = (id: string) => {
 
 export const useProjectRolesStatus = (projectId: string) => {
     return useQuery({
-        queryKey: PROJECT_KEYS.rolesStatus(projectId),
+        queryKey: ROLES_KEYS.status(projectId),
         queryFn: () => projectService.getProjectRolesStatus(projectId),
         enabled: !!projectId
     });
@@ -63,7 +63,7 @@ export const useCreateEmployeeAssignment = (projectId: string) => {
             projectService.createEmployeeAssignment(data),
         onSuccess: () => {
             toast.success('Złożono wniosek o pracownika.');
-            queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.rolesStatus(projectId) });
+            queryClient.invalidateQueries({ queryKey: ROLES_KEYS.status(projectId) });
         },
         onError: () => {
             toast.error('Wystąpił błąd podczas składania wniosku.');

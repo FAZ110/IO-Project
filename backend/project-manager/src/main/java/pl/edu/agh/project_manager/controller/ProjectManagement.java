@@ -38,7 +38,7 @@ public class ProjectManagement {
     public ResponseEntity<List<ProjectResponse>> getAllProjects(
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        List<ProjectResponse> projects = projectService.getAllProjects(userPrincipal);
+        List<ProjectResponse> projects = projectService.getAccessibleProjects(userPrincipal);
         return ResponseEntity.ok(projects);
     }
 

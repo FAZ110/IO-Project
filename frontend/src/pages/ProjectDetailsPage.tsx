@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useProjectDetails } from "@/features/project/project.hooks.ts";
 import { ProjectHeader } from "@/features/project/components/ProjectHeader.tsx";
-import { ProjectRolesStatus } from "@/features/project/components/ProjectVacancies.tsx";
+import { ProjectRolesStatus } from "@/features/project/components/ProjectRolesStatus.tsx";
 import { ProjectRisks } from "@/features/project/components/ProjectRisks.tsx";
 import { ProjectMembersSideBar } from "@/features/project/components/ProjectMembersSideBar.tsx";
 import { ProjectTimeline } from "@/features/project/components/ProjectTimeline.tsx";
