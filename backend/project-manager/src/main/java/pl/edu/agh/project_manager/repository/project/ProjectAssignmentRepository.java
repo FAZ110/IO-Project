@@ -9,5 +9,8 @@ import java.util.UUID;
 
 public interface ProjectAssignmentRepository extends JpaRepository<ProjectAssignment, UUID> {
     List<ProjectAssignment> findAllByProjectIdOrderByStartDateAsc(UUID projectId);
+
     List<ProjectAssignment> findAllByUserSupervisorIdAndStatus(UUID supervisorId, AssignmentStatus status);
+
+    List<ProjectAssignment> findAllByUserIdAndStatus(UUID userId, AssignmentStatus assignmentStatus);
 }

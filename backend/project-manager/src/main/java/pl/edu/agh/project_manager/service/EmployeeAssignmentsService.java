@@ -184,7 +184,7 @@ public class EmployeeAssignmentsService {
         for (int i = 1; i < steps.size(); i++) {
             ChartIntervalResponse next = steps.get(i);
 
-            if (current.percentage() == next.percentage()) {
+            if (current.percentage() == next.percentage() && current.endDate().equals(next.startDate())) {
                 current = new ChartIntervalResponse(current.startDate(), next.endDate(), current.percentage());
             } else {
                 merged.add(current);

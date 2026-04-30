@@ -103,4 +103,14 @@ public class UserService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find user: " + userId));
     }
+
+    public List<User> getUsersByIdsOrThrow(List<UUID> userIds, String errorMessage) {
+        long uniqueCount = userIds.stream().distinct().count();
+        List<User> users = userRepository.findAllById(userIds);
+
+        if (users.size() != uniqueCount) {
+            throw new ApplicationException(ApiErrorCode.USER_NOT_FOUND, errorMessage);
+        }
+        return users;
+    }
 }

@@ -20,6 +20,7 @@ import pl.edu.agh.project_manager.repository.ActivationTokenRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
 import pl.edu.agh.project_manager.security.JwtService;
 import pl.edu.agh.project_manager.security.TokenPair;
+import pl.edu.agh.project_manager.service.auth.AuthService;
 import pl.edu.agh.project_manager.service.command.auth.LoginCommand;
 import pl.edu.agh.project_manager.service.command.auth.RegisterCommand;
 

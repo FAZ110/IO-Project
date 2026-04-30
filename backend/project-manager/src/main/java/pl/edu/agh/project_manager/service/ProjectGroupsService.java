@@ -82,4 +82,9 @@ public class ProjectGroupsService {
                 .owner(owner)
                 .build();
     }
+
+    public ProjectGroups getProjectGroupOrThrow(UUID groupId) {
+        return projectGroupsRepository.findById(groupId)
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_GROUP_NOT_FOUND, "Cannot find group: " + groupId));
+    }
 }

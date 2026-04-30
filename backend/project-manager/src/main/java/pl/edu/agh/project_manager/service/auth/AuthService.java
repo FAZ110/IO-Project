@@ -1,4 +1,4 @@
-package pl.edu.agh.project_manager.service;
+package pl.edu.agh.project_manager.service.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;

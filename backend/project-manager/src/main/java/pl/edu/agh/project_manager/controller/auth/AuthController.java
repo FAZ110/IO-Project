@@ -14,7 +14,7 @@ import pl.edu.agh.project_manager.controller.dto.auth.RegisterRequest;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.security.TokenPair;
-import pl.edu.agh.project_manager.service.AuthService;
+import pl.edu.agh.project_manager.service.auth.AuthService;
 
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.HttpHeaders;

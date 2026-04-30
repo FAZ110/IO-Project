@@ -5,8 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeAssignmentDetailsResponse;
 import pl.edu.agh.project_manager.controller.dto.project.AssignmentResponse;
 import pl.edu.agh.project_manager.security.UserPrincipal;
+import pl.edu.agh.project_manager.service.inbox.AssignmentManagementService;
 import pl.edu.agh.project_manager.service.project.ProjectAssignmentService;
 
 import java.util.List;
@@ -15,9 +17,10 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/inbox")
 @RequiredArgsConstructor
-public class InboxController {
+public class AssignmentManagementController {
 
     private final ProjectAssignmentService assignmentService;
+    private final AssignmentManagementService assignmentManagementService;
     // TODO: miejsce na pobieranie wniosków o zatwierdzenie kwalifikacji i akceptacje ich
     // private final QualificationService qualificationService;
 
@@ -48,5 +51,16 @@ public class InboxController {
     ) {
         assignmentService.rejectAssignment(assignmentId, principal.userId());
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/assignments/{assignmentId}/details")
+    @PreAuthorize("hasRole('LINEAR_MANAGER')")
+    public ResponseEntity<EmployeeAssignmentDetailsResponse> getAssignmentDetails(
+            @PathVariable UUID assignmentId,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+
+        EmployeeAssignmentDetailsResponse details = assignmentManagementService.getEmployeeRequestDetails(assignmentId);
+        return ResponseEntity.ok(details);
     }
 }

@@ -52,55 +52,6 @@ public class ProjectManagement {
     }
 
 
-    @GetMapping("/{projectId}/risks")
-    @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectSecurity.canAccessProject(#projectId, authentication.principal)")
-    public ResponseEntity<List<RiskResponse>> getRisks(
-            @PathVariable UUID projectId
-    ) {
-        List<RiskResponse> risks = projectService.getProjectRisks(projectId);
-        return ResponseEntity.ok(risks);
-    }
-
-    @DeleteMapping("/{projectId}/risks/{riskId}")
-    @PreAuthorize("@projectSecurity.isProjectManagerForProject(#projectId, authentication.principal)")
-    public ResponseEntity<Void> deleteProjectRisk(
-            @PathVariable UUID riskId,
-            @PathVariable UUID projectId
-    ) {
-        projectService.deleteProjectRisk(projectId, riskId);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping("/{projectId}/risks/{riskId}")
-    @PreAuthorize("@projectSecurity.isProjectManagerForProject(#projectId, authentication.principal)")
-    public ResponseEntity<RiskResponse> updateProjectRisk(
-            @PathVariable UUID projectId,
-            @PathVariable UUID riskId,
-            @Valid @RequestBody RiskRequest riskRequest
-    ) {
-        RiskResponse updatedRisk = projectService.updateProjectRisk(
-                projectId,
-                riskId,
-                riskRequest.toCommand()
-        );
-
-        return ResponseEntity.ok(updatedRisk);
-    }
-
-    @PostMapping("/{projectId}/risks")
-    @PreAuthorize("@projectSecurity.isProjectManagerForProject(#projectId, authentication.principal)")
-    public ResponseEntity<RiskResponse> createProjectRisk(
-            @PathVariable UUID projectId,
-            @Valid @RequestBody RiskRequest riskRequest
-    ) {
-        RiskResponse createdRisk = projectService.createProjectRisk(
-                riskRequest.toCommand(), projectId
-        );
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdRisk);
-    }
-
-
     @GetMapping
     @PreAuthorize("hasAnyRole('PROJECT_MANAGER', 'AUTHORITY', 'LINEAR_MANAGER', 'COMMON', 'ADMINISTRATOR')")
     public ResponseEntity<List<ProjectResponse>> getAllProjects(

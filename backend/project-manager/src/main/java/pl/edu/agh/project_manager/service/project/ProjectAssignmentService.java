@@ -114,9 +114,13 @@ public class ProjectAssignmentService {
         assignment.setStatus(AssignmentStatus.REJECTED);
     }
 
-    private ProjectAssignment getAssignmentOrThrow(UUID assignmentId) {
+    public ProjectAssignment getAssignmentOrThrow(UUID assignmentId) {
         return assignmentRepository.findById(assignmentId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.EMPLOYEE_REQUEST_NOT_FOUND, "Cannot find assignment: " + assignmentId));
+    }
+
+    public List<ProjectAssignment> getAcceptedAssignmentsForUser(UUID userId) {
+        return assignmentRepository.findAllByUserIdAndStatus(userId, AssignmentStatus.ACCEPTED);
     }
 
     private void validatePendingStatus(ProjectAssignment assignment) {
