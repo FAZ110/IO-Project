@@ -31,6 +31,10 @@ public class ProjectRole {
     @Builder.Default
     private List<ProjectRoleSegmentAllocation> segmentAllocations = new ArrayList<>();
 
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProjectMember> members = new ArrayList<>();
+
     public void addSegmentAllocation(ProjectRoleSegmentAllocation allocation) {
         this.segmentAllocations.add(allocation);
         allocation.setProjectRole(this);

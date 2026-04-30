@@ -87,7 +87,7 @@ public class EmployeeAssignmentsService {
                     return new EmployeeAssignmentResponse(
                             member.getId(),
                             project.getTitle(),
-                            project.getId().toString(),
+                            project.getId(),
                             member.getRole().getRoleName(),
                             user.getName(),
                             user.getSurname(),

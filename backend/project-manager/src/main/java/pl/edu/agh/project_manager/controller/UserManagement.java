@@ -33,7 +33,7 @@ class UserManagement {
     private final UserService userService;
 
     @GetMapping("/users")
-    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PagedResponse<UserResponse>> getUsers(
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "20") int pageSize,

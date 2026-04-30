@@ -33,6 +33,15 @@ public class ProjectManagement {
         return ResponseEntity.status(HttpStatus.CREATED).body(newProjectId);
     }
 
+    @GetMapping
+    @PreAuthorize("hasAnyRole('PROJECT_MANAGER', 'AUTHORITY', 'LINEAR_MANAGER', 'COMMON', 'ADMINISTRATOR')")
+    public ResponseEntity<List<ProjectResponse>> getAllProjects(
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        List<ProjectResponse> projects = projectService.getAccessibleProjects(userPrincipal);
+        return ResponseEntity.ok(projects);
+    }
+
     @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectSecurity.canAccessProject(#projectId, authentication.principal)")
     @GetMapping("/{projectId}")
     public ResponseEntity<ProjectResponse> getProject(

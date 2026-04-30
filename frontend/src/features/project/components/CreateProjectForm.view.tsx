@@ -96,10 +96,8 @@ export const CreateProjectView = ({ onSubmitProject, isPending, groups, foundSpo
             <form className="space-y-6 text-left">
                 {currentStep === 1 && (
                     <>
-                        {/* --- PODSTAWOWE INFORMACJE --- */}
                         <StepBasicInformation register={register} errors={errors} groups={groups} />
 
-                        {/* --- SPONSORZY --- */}
                         <UserAutocomplete
                             label="Sponsorzy"
                             foundUsers={foundSponsors}
@@ -114,7 +112,6 @@ export const CreateProjectView = ({ onSubmitProject, isPending, groups, foundSpo
 
                         {errors.sponsors?.message && <p className="text-red-500 text-sm mt-2">{errors.sponsors.message}</p>}
 
-                        {/* --- KKOMITET STERUJACY --- */}
                         <UserAutocomplete
                             label="Komitet Sterujący"
                             foundUsers={foundCommittee}
