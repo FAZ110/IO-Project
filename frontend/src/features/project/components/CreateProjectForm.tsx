@@ -52,8 +52,19 @@ export const CreateProjectForm = () => {
     const navigate = useNavigate();
 
     const onSubmit = methods.handleSubmit((data) => {
+        const segmentsCount = Math.max(1, (data.milestones?.length || 2) - 1);
 
-        mutation.mutate(data, {
+        const mappedRoles = (data.roles || []).map(r => ({
+            name: r.name,
+            utilizationPercentages: Array(segmentsCount).fill(100)
+        }));
+
+        const payload = {
+            ...data,
+            roles: mappedRoles
+        };
+
+        mutation.mutate(payload, {
             onSuccess: (newProjectId) => {
                 methods.reset();
                 navigate(PATHS.PROJECT(newProjectId));
