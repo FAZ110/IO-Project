@@ -11,6 +11,7 @@ import pl.edu.agh.project_manager.domain.entity.Project;
 import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.ProjectGroups;
 import pl.edu.agh.project_manager.domain.entity.User;
+import pl.edu.agh.project_manager.domain.entity.project.ProjectMilestone;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
@@ -32,7 +33,6 @@ import pl.edu.agh.project_manager.domain.enums.UserRole;
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
-    private static final int MINIMUM_MILESTONES = 2;
 
     private final UserService userService;
     private final ProjectGroupsService projectGroupService;
@@ -52,6 +52,7 @@ public class ProjectService {
         project.setProjectGroup(projectGroup);
 
         addRisksToProject(project, command.risks());
+        addMilestonesToProject(project, command.milestones());
 
         addSponsorsToProject(project, command.sponsors());
         addCommitteesToProject(project, command.committee());
@@ -101,6 +102,20 @@ public class ProjectService {
                     .build();
 
             project.addRisk(risk);
+        });
+    }
+
+    private void addMilestonesToProject(Project project, List<MilestoneCommand> milestones) {
+        if (milestones == null) return;
+
+        milestones.forEach(milestoneRequest -> {
+            ProjectMilestone milestone = ProjectMilestone.builder()
+                    .name(milestoneRequest.name())
+                    .description(milestoneRequest.description())
+                    .date(milestoneRequest.date())
+                    .build();
+
+            project.addMilestone(milestone);
         });
     }
 
