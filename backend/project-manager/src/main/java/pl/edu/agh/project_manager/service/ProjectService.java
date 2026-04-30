@@ -284,5 +284,15 @@ public class ProjectService {
         committeeUsers.forEach(project::addCommittee);
     }
 
+    public void checkProjectExistsOrThrow(UUID projectId) {
+        if (!projectRepository.existsById(projectId)) {
+            throw new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find project: " + projectId);
+        }
+    }
+
+    public Project getProjectEntityOrThrow(UUID projectId) {
+        return projectRepository.findById(projectId)
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find project: " + projectId));
+    }
 
 }

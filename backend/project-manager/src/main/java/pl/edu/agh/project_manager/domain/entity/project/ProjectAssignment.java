@@ -4,11 +4,15 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import pl.edu.agh.project_manager.domain.entity.Project;
 import pl.edu.agh.project_manager.domain.entity.User;
 import pl.edu.agh.project_manager.domain.enums.AssignmentStatus;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -19,6 +23,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProjectAssignment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
@@ -30,9 +35,10 @@ public class ProjectAssignment {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
-    @Column(name = "role_name", nullable = false)
+    @Column(name = "role_name", length = 100, nullable = false)
     private String roleName;
 
     @Column(name = "start_date", nullable = false)
@@ -42,11 +48,15 @@ public class ProjectAssignment {
     private LocalDate endDate;
 
     @Column(name = "utilization_percentage", nullable = false)
-    @Min(0)
-    @Max(100)
+    @Min(value = 0, message = "Utylizacja nie może być mniejsza niż 0%")
+    @Max(value = 100, message = "Utylizacja nie może być większa niż 100%")
     private Integer utilizationPercentage;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", length = 20, nullable = false)
     private AssignmentStatus status;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 }

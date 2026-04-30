@@ -1,4 +1,4 @@
-package pl.edu.agh.project_manager.controller;
+package pl.edu.agh.project_manager.controller.auth;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

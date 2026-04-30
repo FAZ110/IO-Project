@@ -93,12 +93,10 @@ public class Project {
         risk.setProject(null);
     }
 
-    public void addMember(User user, ProjectRole role) {
+    public void addMember(User user) {
         ProjectMember member = new ProjectMember();
         member.setProject(this);
         member.setUser(user);
-        member.setRole(role);
-        member.setMembershipStatus(MembershipStatus.PENDING);
         this.members.add(member);
     }
 

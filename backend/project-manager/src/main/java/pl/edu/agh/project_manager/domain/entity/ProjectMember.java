@@ -34,14 +34,6 @@ public class ProjectMember {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "role_id", nullable = false)
-    private ProjectRole role;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "membership_status", nullable = false)
-    private MembershipStatus membershipStatus;
-
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

@@ -1,0 +1,52 @@
+package pl.edu.agh.project_manager.controller.inbox;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import pl.edu.agh.project_manager.controller.dto.project.AssignmentResponse;
+import pl.edu.agh.project_manager.security.UserPrincipal;
+import pl.edu.agh.project_manager.service.project.ProjectAssignmentService;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/inbox")
+@RequiredArgsConstructor
+public class InboxController {
+
+    private final ProjectAssignmentService assignmentService;
+    // TODO: miejsce na pobieranie wniosków o zatwierdzenie kwalifikacji i akceptacje ich
+    // private final QualificationService qualificationService;
+
+    @GetMapping("/assignments/pending")
+    @PreAuthorize("hasRole('LINEAR_MANAGER')")
+    public ResponseEntity<List<AssignmentResponse>> getPendingAssignments(
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        List<AssignmentResponse> pending = assignmentService.getPendingAssignmentsForManager(principal.userId());
+        return ResponseEntity.ok(pending);
+    }
+
+    @PostMapping("/assignments/{assignmentId}/accept")
+    @PreAuthorize("hasRole('LINEAR_MANAGER')")
+    public ResponseEntity<Void> acceptAssignment(
+            @PathVariable UUID assignmentId,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        assignmentService.acceptAssignment(assignmentId, principal.userId());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/assignments/{assignmentId}/reject")
+    @PreAuthorize("hasRole('LINEAR_MANAGER')")
+    public ResponseEntity<Void> rejectAssignment(
+            @PathVariable UUID assignmentId,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        assignmentService.rejectAssignment(assignmentId, principal.userId());
+        return ResponseEntity.noContent().build();
+    }
+}

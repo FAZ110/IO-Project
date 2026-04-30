@@ -106,28 +106,7 @@ public class EmployeeAssignmentsService {
         };
     }
 
-    @Transactional
-    public void acceptEmployeeAssignment(UUID requestId) {
-        ProjectMember projectRequest = projectMemberRepository.findById(requestId)
-                .orElseThrow(() -> new ApplicationException(ApiErrorCode.EMPLOYEE_REQUEST_NOT_FOUND));
 
-        // TODO: zarówno tutaj jak i ponizej trzeba sprawdzic
-        //  czy uzytkownik akceptujacy wniosek jest supervisorem
-
-        validatePendingStatus(projectRequest);
-
-        projectRequest.setMembershipStatus(MembershipStatus.ACCEPTED);
-    }
-
-    @Transactional
-    public void rejectEmployeeAssignment(UUID requestId) {
-        ProjectMember projectRequest = projectMemberRepository.findById(requestId)
-                .orElseThrow(() -> new ApplicationException(ApiErrorCode.EMPLOYEE_REQUEST_NOT_FOUND));
-
-        validatePendingStatus(projectRequest);
-
-        projectRequest.setMembershipStatus(MembershipStatus.REJECTED);
-    }
 
     private void validatePendingStatus(ProjectMember request) {
         if (request.getMembershipStatus() != MembershipStatus.PENDING) {

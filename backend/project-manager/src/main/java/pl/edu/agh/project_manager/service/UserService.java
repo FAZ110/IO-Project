@@ -98,4 +98,9 @@ public class UserService {
                 .map(SimpleUserResponse::fromUser)
                 .toList();
     }
+
+    public User getUserEntityOrThrow(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find user: " + userId));
+    }
 }
