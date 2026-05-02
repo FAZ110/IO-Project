@@ -42,7 +42,7 @@ public class ProjectController {
         return ResponseEntity.ok(projects);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectSecurity.canAccessProject(#projectId, authentication.principal)")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectAccess.canAccessProject(#projectId, authentication.principal)")
     @GetMapping("/{projectId}")
     public ResponseEntity<ProjectResponse> getProject(
             @PathVariable UUID projectId
@@ -51,7 +51,7 @@ public class ProjectController {
         return ResponseEntity.ok(project);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectSecurity.canAccessProject(#projectId, authentication.principal)")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectAccess.canAccessProject(#projectId, authentication.principal)")
     @GetMapping("/{projectId}/members")
     public ResponseEntity<ProjectMembersResponse> getProjectMembers(
             @PathVariable UUID projectId

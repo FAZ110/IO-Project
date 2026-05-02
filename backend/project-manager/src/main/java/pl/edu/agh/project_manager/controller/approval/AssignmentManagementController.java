@@ -1,4 +1,4 @@
-package pl.edu.agh.project_manager.controller.inbox;
+package pl.edu.agh.project_manager.controller.approval;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeAssignmentDetailsResponse;
 import pl.edu.agh.project_manager.controller.dto.project.AssignmentResponse;
 import pl.edu.agh.project_manager.security.UserPrincipal;
-import pl.edu.agh.project_manager.service.inbox.AssignmentManagementService;
+import pl.edu.agh.project_manager.service.approval.AssignmentManagementService;
 import pl.edu.agh.project_manager.service.project.ProjectAssignmentService;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/inbox")
+@RequestMapping("/api/approvals")
 @RequiredArgsConstructor
 public class AssignmentManagementController {
 
@@ -34,27 +34,27 @@ public class AssignmentManagementController {
     }
 
     @PostMapping("/assignments/{assignmentId}/accept")
-    @PreAuthorize("hasRole('LINEAR_MANAGER')")
+    @PreAuthorize("hasRole('LINEAR_MANAGER') and @assignmentAccess.canManageAssignment(#assignmentId, authentication.principal)")
     public ResponseEntity<Void> acceptAssignment(
             @PathVariable UUID assignmentId,
             @AuthenticationPrincipal UserPrincipal principal
     ) {
-        assignmentService.acceptAssignment(assignmentId, principal.userId());
+        assignmentService.acceptAssignment(assignmentId);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/assignments/{assignmentId}/reject")
-    @PreAuthorize("hasRole('LINEAR_MANAGER')")
+    @PreAuthorize("hasRole('LINEAR_MANAGER') and @assignmentAccess.canManageAssignment(#assignmentId, authentication.principal)")
     public ResponseEntity<Void> rejectAssignment(
             @PathVariable UUID assignmentId,
             @AuthenticationPrincipal UserPrincipal principal
     ) {
-        assignmentService.rejectAssignment(assignmentId, principal.userId());
+        assignmentService.rejectAssignment(assignmentId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/assignments/{assignmentId}/details")
-    @PreAuthorize("hasRole('LINEAR_MANAGER')")
+    @PreAuthorize("hasRole('LINEAR_MANAGER') and @assignmentAccess.canManageAssignment(#assignmentId, authentication.principal)")
     public ResponseEntity<EmployeeAssignmentDetailsResponse> getAssignmentDetails(
             @PathVariable UUID assignmentId,
             @AuthenticationPrincipal UserPrincipal principal

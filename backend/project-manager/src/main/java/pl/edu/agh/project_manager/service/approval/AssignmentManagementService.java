@@ -1,9 +1,8 @@
-package pl.edu.agh.project_manager.service.inbox;
+package pl.edu.agh.project_manager.service.approval;
 
-import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.project_manager.controller.dto.employee_requests.ChartIntervalResponse;
 import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeAssignmentDetailsResponse;
 import pl.edu.agh.project_manager.domain.entity.project.ProjectAssignment;
@@ -21,7 +20,7 @@ public class AssignmentManagementService {
 
     private final ProjectAssignmentService projectAssignmentService;
 
-    @Transactional()
+    @Transactional(readOnly = true)
     public EmployeeAssignmentDetailsResponse getEmployeeRequestDetails(UUID assignmentId) {
         ProjectAssignment requestedAssignment = projectAssignmentService.getAssignmentOrThrow(assignmentId);
 

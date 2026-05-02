@@ -48,10 +48,19 @@ public class ProjectAssignmentService {
         return AssignmentResponse.from(savedAssignment);
     }
 
+    @Transactional(readOnly = true)
     public List<AssignmentResponse> getAssignments(UUID projectId) {
         projectService.checkProjectExistsOrThrow(projectId);
 
         return assignmentRepository.findAllByProjectIdOrderByStartDateAsc(projectId)
+                .stream()
+                .map(AssignmentResponse::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<AssignmentResponse> getPendingAssignmentsForManager(UUID supervisorId) {
+        return assignmentRepository.findAllByUserSupervisorIdAndStatus(supervisorId, AssignmentStatus.PENDING)
                 .stream()
                 .map(AssignmentResponse::from)
                 .toList();
@@ -83,10 +92,8 @@ public class ProjectAssignmentService {
     }
 
     @Transactional
-    public void acceptAssignment(UUID assignmentId, UUID managerId) {
+    public void acceptAssignment(UUID assignmentId) {
         ProjectAssignment assignment = getAssignmentOrThrow(assignmentId);
-
-        validateManagerAccess(assignment, managerId);
 
         validatePendingStatus(assignment);
 
@@ -104,10 +111,9 @@ public class ProjectAssignmentService {
     }
 
     @Transactional
-    public void rejectAssignment(UUID assignmentId, UUID managerId) {
+    public void rejectAssignment(UUID assignmentId) {
         ProjectAssignment assignment = getAssignmentOrThrow(assignmentId);
 
-        validateManagerAccess(assignment, managerId);
         validatePendingStatus(assignment);
 
         assignment.setStatus(AssignmentStatus.REJECTED);
@@ -128,14 +134,6 @@ public class ProjectAssignmentService {
         }
     }
 
-    private void validateManagerAccess(ProjectAssignment assignment, UUID managerId) {
-        User employee = assignment.getUser();
-
-        if (employee.getSupervisor() == null || !employee.getSupervisor().getId().equals(managerId)) {
-            throw new ApplicationException(ApiErrorCode.ACCESS_DENIED, "You are not the linear manager of this user");
-        }
-    }
-
     private void validateAssignmentDates(LocalDate startDate, LocalDate endDate, Project project) {
         if (startDate.isAfter(endDate)) {
             throw new ApplicationException(
@@ -152,10 +150,5 @@ public class ProjectAssignmentService {
         }
     }
 
-    public List<AssignmentResponse> getPendingAssignmentsForManager(UUID supervisorId) {
-        return assignmentRepository.findAllByUserSupervisorIdAndStatus(supervisorId, AssignmentStatus.PENDING)
-                .stream()
-                .map(AssignmentResponse::from)
-                .toList();
-    }
+
 }

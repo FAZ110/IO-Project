@@ -20,12 +20,11 @@ import java.util.UUID;
 public class ProjectRiskService {
 
     private final RiskRepository riskRepository;
-    private final ProjectRepository projectRepository;
+    private final ProjectService projectService;
 
     @Transactional
     public RiskResponse createProjectRisk(RiskCommand command, UUID projectId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find provided project - " + projectId));
+        Project project = projectService.getProjectEntityOrThrow(projectId);
 
         ProjectRisk risk = buildRisk(command);
         risk.setProject(project);
@@ -35,6 +34,8 @@ public class ProjectRiskService {
     }
 
     public List<RiskResponse> getProjectRisks(UUID projectId) {
+        projectService.checkProjectExistsOrThrow(projectId);
+
         return riskRepository.findAllByProjectId(projectId)
                 .stream()
                 .map(RiskResponse::from)

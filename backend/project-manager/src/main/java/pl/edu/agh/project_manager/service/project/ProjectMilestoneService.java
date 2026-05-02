@@ -23,6 +23,7 @@ public class ProjectMilestoneService {
     private final ProjectRepository projectRepository;
     private final ProjectMilestoneRepository milestoneRepository;
 
+    @Transactional(readOnly = true)
     public List<MilestoneResponse> getProjectMilestones(UUID projectId) {
         if (!projectRepository.existsById(projectId)) {
             throw new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find project: " + projectId);

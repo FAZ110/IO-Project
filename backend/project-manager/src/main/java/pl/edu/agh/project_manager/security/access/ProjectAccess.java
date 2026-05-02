@@ -1,14 +1,15 @@
-package pl.edu.agh.project_manager.security;
+package pl.edu.agh.project_manager.security.access;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.edu.agh.project_manager.repository.project.ProjectRepository;
+import pl.edu.agh.project_manager.security.UserPrincipal;
 
 import java.util.UUID;
 
-@Component("projectSecurity")
+@Component("projectAccess")
 @RequiredArgsConstructor
-public class ProjectSecurity {
+public class ProjectAccess {
 
     private final ProjectRepository projectRepository;
 

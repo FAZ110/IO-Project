@@ -22,7 +22,7 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     @Query("SELECT p FROM Project p JOIN FETCH p.projectManager WHERE p.id = :id")
     Optional<Project> findByIdWithManager(@Param("id") UUID id);
 
-    @EntityGraph(attributePaths = {"sponsors", "committees", "members", "members.user", "members.user.qualifications"})
+    @EntityGraph(attributePaths = {"sponsors", "committees", "members", "members.user"})
     @Query("SELECT p FROM Project p WHERE p.id = :id")
     Optional<Project> findByIdWithAllMembers(@Param("id") UUID id);
 

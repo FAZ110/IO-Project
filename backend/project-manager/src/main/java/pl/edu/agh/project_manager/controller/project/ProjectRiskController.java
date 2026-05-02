@@ -20,7 +20,7 @@ public class ProjectRiskController {
     private final ProjectRiskService riskService;
 
     @PostMapping
-    @PreAuthorize("@projectSecurity.isProjectManagerForProject(#projectId, authentication.principal)")
+    @PreAuthorize("@projectAccess.isProjectManagerForProject(#projectId, authentication.principal)")
     public ResponseEntity<RiskResponse> createProjectRisk(
             @PathVariable UUID projectId,
             @Valid @RequestBody RiskRequest riskRequest
@@ -33,7 +33,7 @@ public class ProjectRiskController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectSecurity.canAccessProject(#projectId, authentication.principal)")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectAccess.canAccessProject(#projectId, authentication.principal)")
     public ResponseEntity<List<RiskResponse>> getRisks(
             @PathVariable UUID projectId
     ) {
@@ -42,7 +42,7 @@ public class ProjectRiskController {
     }
 
     @PatchMapping("/{riskId}")
-    @PreAuthorize("@projectSecurity.isProjectManagerForProject(#projectId, authentication.principal)")
+    @PreAuthorize("@projectAccess.isProjectManagerForProject(#projectId, authentication.principal)")
     public ResponseEntity<RiskResponse> updateProjectRisk(
             @PathVariable UUID projectId,
             @PathVariable UUID riskId,
@@ -58,7 +58,7 @@ public class ProjectRiskController {
     }
 
     @DeleteMapping("/{riskId}")
-    @PreAuthorize("@projectSecurity.isProjectManagerForProject(#projectId, authentication.principal)")
+    @PreAuthorize("@projectAccess.isProjectManagerForProject(#projectId, authentication.principal)")
     public ResponseEntity<Void> deleteProjectRisk(
             @PathVariable UUID riskId,
             @PathVariable UUID projectId

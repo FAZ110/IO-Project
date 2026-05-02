@@ -47,8 +47,8 @@ public class ProjectAssignment {
     private LocalDate endDate;
 
     @Column(name = "utilization_percentage", nullable = false)
-    @Min(value = 0, message = "Utylizacja nie może być mniejsza niż 0%")
-    @Max(value = 100, message = "Utylizacja nie może być większa niż 100%")
+    @Min(value = 0)
+    @Max(value = 100)
     private Integer utilizationPercentage;
 
     @Enumerated(EnumType.STRING)

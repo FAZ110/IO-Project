@@ -41,10 +41,10 @@ export const ENDPOINTS = {
         DETAIL: (groupId: string) => `/groups/${groupId}`,
         CREATE: '/groups',
     },
-    EMPLOYEE: {
-        ASSIGNMENTS: '/inbox/employee/assignments/pending',
-        ASSIGNMENT_DETAIL: (id: string) => `/inbox/assignments/${id}/details`,
-        ACCEPT_ASSIGNMENT: (id: string) => `/inbox/assignments/${id}/accept`,
-        REJECT_ASSIGNMENT: (id: string) => `/inbox/assignments/${id}/accept`
+    APPROVALS: {
+        ASSIGNMENTS: '/approvals/assignments/pending',
+        ASSIGNMENT_DETAIL: (id: string) => `/approvals/assignments/${id}/details`,
+        ACCEPT_ASSIGNMENT: (id: string) => `/approvals/assignments/${id}/accept`,
+        REJECT_ASSIGNMENT: (id: string) => `/approvals/assignments/${id}/reject`
     }
 } as const;

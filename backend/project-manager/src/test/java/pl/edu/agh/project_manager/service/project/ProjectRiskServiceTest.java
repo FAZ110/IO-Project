@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
 import pl.edu.agh.project_manager.domain.entity.project.Project;
 import pl.edu.agh.project_manager.domain.entity.project.ProjectRisk;
-import pl.edu.agh.project_manager.repository.project.ProjectRepository;
 import pl.edu.agh.project_manager.repository.project.RiskRepository;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
 
@@ -26,8 +25,9 @@ public class ProjectRiskServiceTest {
 
     @Mock
     private RiskRepository riskRepository;
+
     @Mock
-    private ProjectRepository projectRepository;
+    private ProjectService projectService;
 
     @InjectMocks
     private ProjectRiskService riskService;
@@ -91,7 +91,7 @@ public class ProjectRiskServiceTest {
                 .project(project)
                 .build();
 
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectService.getProjectEntityOrThrow(projectId)).thenReturn(project);
         when(riskRepository.save(any(ProjectRisk.class))).thenReturn(savedRisk);
 
         // When

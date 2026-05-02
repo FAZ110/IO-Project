@@ -132,23 +132,13 @@ public class ProjectService {
     }
 
     private void addSponsorsToProject(Project project, List<UUID> sponsors) {
-        long uniqueSponsorsCount = sponsors.stream().distinct().count();
         List<User> sponsorUsers = userService.getUsersByIdsOrThrow(sponsors, "Cannot find one or more provided sponsors");
-
-        if (sponsorUsers.size() != uniqueSponsorsCount) {
-            throw new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find one or more provided sponsors");
-        }
 
         sponsorUsers.forEach(project::addSponsor);
     }
 
     private void addCommitteesToProject(Project project, List<UUID> committee) {
-        long uniqueCommitteeCount = committee.stream().distinct().count();
         List<User> committeeUsers = userService.getUsersByIdsOrThrow(committee, "Cannot find one or more provided committee members");
-
-        if (committee.size() != uniqueCommitteeCount) {
-            throw new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find one or more provided committee members");
-        }
 
         committeeUsers.forEach(project::addCommittee);
     }

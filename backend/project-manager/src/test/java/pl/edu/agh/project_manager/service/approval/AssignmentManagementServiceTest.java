@@ -1,4 +1,4 @@
-package pl.edu.agh.project_manager.service.inbox;
+package pl.edu.agh.project_manager.service.approval;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

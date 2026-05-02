@@ -22,7 +22,7 @@ public class ProjectMilestoneController {
     private final ProjectMilestoneService milestoneService;
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectSecurity.canAccessProject(#projectId, authentication.principal)")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectAccess.canAccessProject(#projectId, authentication.principal)")
     public ResponseEntity<List<MilestoneResponse>> getMilestones(
             @PathVariable UUID projectId
     ) {
@@ -31,7 +31,7 @@ public class ProjectMilestoneController {
     }
 
     @PostMapping
-    @PreAuthorize("@projectSecurity.isProjectManagerForProject(#projectId, authentication.principal)")
+    @PreAuthorize("@projectAccess.isProjectManagerForProject(#projectId, authentication.principal)")
     public ResponseEntity<MilestoneResponse> createMilestone(
             @PathVariable UUID projectId,
             @Valid @RequestBody MilestoneRequest request
@@ -41,7 +41,7 @@ public class ProjectMilestoneController {
     }
 
     @PatchMapping("/{milestoneId}")
-    @PreAuthorize("@projectSecurity.isProjectManagerForProject(#projectId, authentication.principal)")
+    @PreAuthorize("@projectAccess.isProjectManagerForProject(#projectId, authentication.principal)")
     public ResponseEntity<MilestoneResponse> updateMilestone(
             @PathVariable UUID projectId,
             @PathVariable UUID milestoneId,
@@ -52,7 +52,7 @@ public class ProjectMilestoneController {
     }
 
     @DeleteMapping("/{milestoneId}")
-    @PreAuthorize("@projectSecurity.isProjectManagerForProject(#projectId, authentication.principal)")
+    @PreAuthorize("@projectAccess.isProjectManagerForProject(#projectId, authentication.principal)")
     public ResponseEntity<Void> deleteMilestone(
             @PathVariable UUID projectId,
             @PathVariable UUID milestoneId

@@ -21,7 +21,7 @@ public class ProjectAssignmentController {
     private final ProjectAssignmentService assignmentService;
 
     @PostMapping
-    @PreAuthorize("@projectSecurity.isProjectManagerForProject(#projectId, authentication.principal)")
+    @PreAuthorize("@projectAccess.isProjectManagerForProject(#projectId, authentication.principal)")
     public ResponseEntity<AssignmentResponse> createAssignment(
             @PathVariable UUID projectId,
             @Valid @RequestBody AssignmentCreateRequest request
@@ -31,7 +31,7 @@ public class ProjectAssignmentController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectSecurity.canAccessProject(#projectId, authentication.principal)")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectAccess.canAccessProject(#projectId, authentication.principal)")
     public ResponseEntity<List<AssignmentResponse>> getAssignments(
             @PathVariable UUID projectId
     ) {
@@ -40,7 +40,7 @@ public class ProjectAssignmentController {
     }
 
     @DeleteMapping("/{assignmentId}")
-    @PreAuthorize("@projectSecurity.isProjectManagerForProject(#projectId, authentication.principal)")
+    @PreAuthorize("@projectAccess.isProjectManagerForProject(#projectId, authentication.principal)")
     public ResponseEntity<Void> deleteAssignment(
             @PathVariable UUID projectId,
             @PathVariable UUID assignmentId
