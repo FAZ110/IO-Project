@@ -1,0 +1,90 @@
+package pl.edu.agh.project_manager.service.projectgroup;
+
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+import pl.edu.agh.project_manager.controller.dto.project_group.AllGroupsResponse;
+import pl.edu.agh.project_manager.controller.dto.project_group.GroupOwnerResponse;
+import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupDetailsResponse;
+import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupResponse;
+import pl.edu.agh.project_manager.domain.entity.projectgroup.ProjectGroup;
+import pl.edu.agh.project_manager.domain.entity.user.User;
+import pl.edu.agh.project_manager.domain.enums.GroupType;
+import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
+import pl.edu.agh.project_manager.domain.exception.ApplicationException;
+import pl.edu.agh.project_manager.repository.projectgroup.ProjectGroupRepository;
+import pl.edu.agh.project_manager.repository.user.UserRepository;
+import pl.edu.agh.project_manager.service.command.project.ProjectGroupCreationCommand;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@AllArgsConstructor
+public class ProjectGroupsService {
+
+    private final ProjectGroupRepository projectGroupRepository;
+    private final UserRepository userRepository;
+
+    public AllGroupsResponse getAllGroups() {
+        return new AllGroupsResponse(getWalletGroups(), getProgramGroups());
+    }
+
+    public List<SingleGroupResponse> getWalletGroups() {
+        return getGroupsByType(GroupType.WALLET);
+    }
+
+    public List<SingleGroupResponse> getProgramGroups() {
+        return getGroupsByType(GroupType.PROGRAM);
+    }
+
+    public SingleGroupDetailsResponse getGroupById(UUID id) {
+        ProjectGroup projectGroup = projectGroupRepository.findById(id)
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_GROUP_NOT_FOUND, "Cannot find project group with id: " + id));
+
+        GroupOwnerResponse ownerResponse = new GroupOwnerResponse(
+                projectGroup.getOwner().getName(),
+                projectGroup.getOwner().getSurname(),
+                projectGroup.getOwner().getEmail()
+        );
+
+        return new SingleGroupDetailsResponse(
+                projectGroup.getId(),
+                projectGroup.getName(),
+                projectGroup.getDescription(),
+                ownerResponse,
+                projectGroup.getGroupType()
+        );
+    }
+
+    public UUID createGroup(ProjectGroupCreationCommand command) {
+        User owner = userRepository.findById(command.ownerId())
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find user with id: " + command.ownerId()));
+
+        ProjectGroup projectGroup = buildProjectGroups(command, owner);
+
+        ProjectGroup savedGroup = projectGroupRepository.save(projectGroup);
+
+        return savedGroup.getId();
+    }
+
+    private List<SingleGroupResponse> getGroupsByType(GroupType groupType) {
+        return projectGroupRepository.getSingleGroupByGroupType(groupType)
+                .stream()
+                .map(group -> new SingleGroupResponse(group.getId(), group.getName()))
+                .toList();
+    }
+
+    private ProjectGroup buildProjectGroups(ProjectGroupCreationCommand command, User owner) {
+        return ProjectGroup.builder()
+                .name(command.name())
+                .description(command.description())
+                .groupType(command.groupType())
+                .owner(owner)
+                .build();
+    }
+
+    public ProjectGroup getProjectGroupOrThrow(UUID groupId) {
+        return projectGroupRepository.findById(groupId)
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_GROUP_NOT_FOUND, "Cannot find group: " + groupId));
+    }
+}

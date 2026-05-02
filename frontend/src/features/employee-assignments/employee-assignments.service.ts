@@ -5,20 +5,20 @@ import type { EmployeeAssignment, EmployeeAssignmentDetails } from "./employee-a
 
 export const employeeAssignmentsService = {
     getEmployeeAssignments: async () => {
-        const response = await api.get<EmployeeAssignment[]>(ENDPOINTS.EMPLOYEE.ASSIGNMENTS);
+        const response = await api.get<EmployeeAssignment[]>(ENDPOINTS.APPROVALS.ASSIGNMENTS);
         return response.data;
     },
 
     getEmployeeAssignmentDetails: async (id: string) => {
-        const response = await api.get<EmployeeAssignmentDetails>(ENDPOINTS.EMPLOYEE.ASSIGNMENT_DETAIL(id));
+        const response = await api.get<EmployeeAssignmentDetails>(ENDPOINTS.APPROVALS.ASSIGNMENT_DETAIL(id));
         return response.data;
     },
 
     acceptEmployeeAssignment: async (id: string) => {
-        await api.post(ENDPOINTS.EMPLOYEE.ACCEPT_ASSIGNMENT(id));
+        await api.post(ENDPOINTS.APPROVALS.ACCEPT_ASSIGNMENT(id));
     },
 
     rejectEmployeeAssignment: async (id: string) => {
-        await api.post(ENDPOINTS.EMPLOYEE.REJECT_ASSIGNMENT(id));
+        await api.post(ENDPOINTS.APPROVALS.REJECT_ASSIGNMENT(id));
     }
 }

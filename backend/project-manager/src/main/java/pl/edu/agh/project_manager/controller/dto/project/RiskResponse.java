@@ -1,6 +1,6 @@
 package pl.edu.agh.project_manager.controller.dto.project;
 
-import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
+import pl.edu.agh.project_manager.domain.entity.project.ProjectRisk;
 
 import java.util.UUID;
 

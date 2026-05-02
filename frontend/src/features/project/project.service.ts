@@ -42,6 +42,6 @@ export const projectService = {
     },
 
     createEmployeeAssignment: async (data: EmployeeAssignmentRequest): Promise<void> => {
-        await api.post<void>(ENDPOINTS.EMPLOYEE.ASSIGNMENTS, data);
+        await api.post<void>(ENDPOINTS.APPROVALS.ASSIGNMENTS, data);
     }
 };

@@ -13,78 +13,63 @@ import { CreateProjectFormSchema } from "../project.schema.ts";
 import { getNextDateFromToday } from "../project.utils.ts";
 
 export const CreateProjectForm = () => {
-    const methods = useForm<ProjectCreationRequest>({
-        resolver: zodResolver(CreateProjectFormSchema),
-        mode: "all",
-        defaultValues: {
-            title: "",
-            description: "",
-            projectGroupId: null,
-            sponsors: [],
-            committee: [],
-            milestones: [
-                {
-                    name: "Start",
-                    date: getNextDateFromToday(0),
-                },
-                {
-                    name: "End",
-                    date: getNextDateFromToday(30),
-                }
-            ],
-            roles: [],
-            risks: [],
-        },
+  const methods = useForm<ProjectCreationRequest>({
+    resolver: zodResolver(CreateProjectFormSchema),
+    mode: "all",
+    defaultValues: {
+      title: "",
+      description: "",
+      startDate: getNextDateFromToday(0),
+      endDate: getNextDateFromToday(30),
+      projectGroupId: null,
+      sponsors: [],
+      committee: [],
+      milestones: [],
+      risks: [],
+      roles: [],
+    },
+  });
+
+  const { data: groups = [] } = useProjectGroups();
+
+  const [sponsorsQuery, setSponsorsQuery] = useState("");
+  const [sponsorsQueryValue] = useDebounce(sponsorsQuery, 300);
+
+  const [committeeQuery, setCommitteeQuery] = useState("");
+  const [committeeQueryValue] = useDebounce(committeeQuery, 300);
+
+  const { data: foundSponsors = [] } = useSearchUsers(sponsorsQueryValue);
+  const { data: foundCommittee = [] } = useSearchUsers(committeeQueryValue);
+
+  const mutation = useCreateProject();
+  const navigate = useNavigate();
+
+  const onSubmit = methods.handleSubmit((data) => {
+    const payload = {
+      ...data,
+    };
+
+    mutation.mutate(payload, {
+      onSuccess: (newProjectId) => {
+        methods.reset();
+        navigate(PATHS.PROJECT(newProjectId));
+      },
     });
+  });
 
-    const { data: groups = [] } = useProjectGroups();
-
-    const [sponsorsQuery, setSponsorsQuery] = useState("");
-    const [sponsorsQueryValue] = useDebounce(sponsorsQuery, 300);
-
-    const [committeeQuery, setCommitteeQuery] = useState("");
-    const [committeeQueryValue] = useDebounce(committeeQuery, 300);
-
-    const { data: foundSponsors = [] } = useSearchUsers(sponsorsQueryValue);
-    const { data: foundCommittee = [] } = useSearchUsers(committeeQueryValue);
-
-    const mutation = useCreateProject();
-    const navigate = useNavigate();
-
-    const onSubmit = methods.handleSubmit((data) => {
-        const segmentsCount = Math.max(1, (data.milestones?.length || 2) - 1);
-
-        const mappedRoles = (data.roles || []).map(r => ({
-            name: r.name,
-            utilizationPercentages: Array(segmentsCount).fill(100)
-        }));
-
-        const payload = {
-            ...data,
-            roles: mappedRoles
-        };
-
-        mutation.mutate(payload, {
-            onSuccess: (newProjectId) => {
-                methods.reset();
-                navigate(PATHS.PROJECT(newProjectId));
-            },
-        });
-    });
-
-    return (
-        <FormProvider {...methods}>
-            <CreateProjectView
-                onSubmitProject={onSubmit}
-                isPending={mutation.isPending}
-                groups={groups}
-                foundSponsors={foundSponsors}
-                foundCommittee={foundCommittee}
-                onSponsorSearch={setSponsorsQuery}
-                onCommitteeSearch={setCommitteeQuery}
-            />
-        </FormProvider>
-    );
+  return (
+    <FormProvider {...methods}>
+      <CreateProjectView
+        onSubmitProject={onSubmit}
+        isPending={mutation.isPending}
+        groups={groups}
+        foundSponsors={foundSponsors}
+        foundCommittee={foundCommittee}
+        onSponsorSearch={setSponsorsQuery}
+        onCommitteeSearch={setCommitteeQuery}
+      />
+    </FormProvider>
+  );
 };
 
 export default CreateProjectForm;

@@ -3,17 +3,22 @@ package pl.edu.agh.project_manager.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import pl.edu.agh.project_manager.domain.entity.Qualification;
-import pl.edu.agh.project_manager.domain.entity.Skill;
-import pl.edu.agh.project_manager.domain.entity.User;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import pl.edu.agh.project_manager.domain.entity.user.Qualification;
+import pl.edu.agh.project_manager.domain.entity.user.Skill;
+import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.enums.QualificationStatus;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
+import pl.edu.agh.project_manager.repository.user.QualificationRepository;
+import pl.edu.agh.project_manager.repository.user.SkillRepository;
+import pl.edu.agh.project_manager.repository.user.UserRepository;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
 class QualificationRepositoryTest {
 
@@ -52,7 +57,7 @@ class QualificationRepositoryTest {
         user.addQualification(q1);
         qualificationRepository.save(q1);
 
-        List<Qualification> result = qualificationRepository.findAllByUserId(user.getId());
+        List<Qualification> result = qualificationRepository.findAllByUser_Id(user.getId());
 
         assertEquals(1, result.size());
         assertEquals(user.getId(), result.get(0).getUser().getId());

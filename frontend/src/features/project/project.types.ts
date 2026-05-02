@@ -4,11 +4,13 @@ export interface ProjectCreationRequest {
     title: string;
     description: string;
     projectGroupId?: string | null;
+    startDate: string;
+    endDate: string;
     sponsors: string[];
     committee: string[];
     milestones: Milestone[];
-    roles: ProjectRole[];
-    risks?: Risk[];
+    risks: Risk[];
+    roles: ProjectRole[]; // TODO: do usuniecia
 }
 
 export interface ProjectMembersResponse {
@@ -38,11 +40,13 @@ export interface ProjectResponse {
     description: string;
     isActive: boolean;
     startDate: string;
+    endDate: string;
 }
 
 export interface Milestone {
     date: string;
     name: string;
+    description?: string;
 }
 
 export interface ProjectDetailsResponse {
@@ -50,6 +54,7 @@ export interface ProjectDetailsResponse {
     title: string;
     description: string;
     startDate: string;
+    endDate: string;
     isActive: boolean;
     manager: UserResponse;
 }

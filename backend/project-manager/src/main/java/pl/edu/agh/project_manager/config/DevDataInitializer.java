@@ -7,11 +7,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import pl.edu.agh.project_manager.domain.entity.User;
+import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
-import pl.edu.agh.project_manager.repository.UserRepository;
-
+import pl.edu.agh.project_manager.repository.user.UserRepository;
 
 @Configuration
 @Profile("dev")
@@ -52,7 +51,7 @@ public class DevDataInitializer implements CommandLineRunner {
         );
 
         // LINEAR MANAGER
-        createUserIfNotExists(
+        User linearManager = createUserIfNotExists(
                 "linear@dev.com",
                 defaultPassword,
                 "Piotr",
@@ -75,14 +74,19 @@ public class DevDataInitializer implements CommandLineRunner {
                 defaultPassword,
                 "Maciej",
                 "Pracownik",
-                UserRole.COMMON
+                UserRole.COMMON,
+                linearManager
         );
 
         log.info("DEV users initialization completed.");
     }
 
-    private void createUserIfNotExists(String email, String encodedPassword, String name, String surname, UserRole role) {
-        if (!userRepository.existsByEmail(email)) {
+    private User createUserIfNotExists(String email, String encodedPassword, String name, String surname, UserRole role) {
+        return createUserIfNotExists(email, encodedPassword, name, surname, role, null);
+    }
+
+    private User createUserIfNotExists(String email, String encodedPassword, String name, String surname, UserRole role, User supervisor) {
+        return userRepository.findByEmail(email).orElseGet(() -> {
             User user = User.builder()
                     .email(email)
                     .password(encodedPassword)
@@ -90,10 +94,12 @@ public class DevDataInitializer implements CommandLineRunner {
                     .surname(surname)
                     .userRole(role)
                     .userStatus(UserStatus.ACTIVE)
+                    .supervisor(supervisor)
                     .build();
 
-            userRepository.save(user);
+            User savedUser = userRepository.save(user);
             log.info("Created user: {} with role: {}", email, role);
-        }
+            return savedUser;
+        });
     }
 }
