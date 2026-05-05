@@ -15,7 +15,6 @@ import { DashboardPage } from "@/pages/DashboardPage";
 import { AuthenticatedRoute } from '@/routes/AuthenticatedRoute';
 import { AuthorizedRoute } from '@/routes/AuthorizedRoute';
 import { EmployeeAssignmentsPage } from '@/pages/EmployeeAssignmentsPage';
-import { RequestsPage } from '@/pages/RequestsPage';
 import { CreateProjectGroupPage } from '@/pages/CreateProjectGroupPage';
 
 export const AppRoutes = () => {

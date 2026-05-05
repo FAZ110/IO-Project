@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.project_manager.controller.dto.project.*;
+import pl.edu.agh.project_manager.domain.enums.GroupType;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.project.ProjectService;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
@@ -58,6 +59,17 @@ public class ProjectController {
     ) {
         ProjectMembersResponse project = projectService.getProjectMembers(projectId);
         return ResponseEntity.ok(project);
+    }
+
+    @PreAuthorize("hasAnyRole('PROJECT_MANAGER', 'AUTHORITY')")
+    @GetMapping("/search")
+    public ResponseEntity<List<ProjectResponse>> searchProjects(
+            @RequestParam("query") String query,
+            @RequestParam(value = "groupId", required = false) UUID groupId,
+            @RequestParam(value = "groupIdIsNull", required = false) Boolean groupIdIsNull // make sure that group wasn't provided intentionally
+    ) {
+        List<ProjectResponse> projects = projectService.searchProjects(query, groupId, groupIdIsNull);
+        return ResponseEntity.ok(projects);
     }
 }
 

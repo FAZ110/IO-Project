@@ -1,7 +1,9 @@
 package pl.edu.agh.project_manager.service.project;
 
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import pl.edu.agh.project_manager.controller.dto.project.ProjectMembersResponse;
 import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
@@ -10,6 +12,7 @@ import pl.edu.agh.project_manager.domain.entity.project.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.projectgroup.ProjectGroup;
 import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.entity.project.ProjectMilestone;
+import pl.edu.agh.project_manager.domain.enums.GroupType;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.project.ProjectRepository;
@@ -18,6 +21,7 @@ import pl.edu.agh.project_manager.service.command.project.MilestoneCommand;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
@@ -154,4 +158,32 @@ public class ProjectService {
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find project: " + projectId));
     }
 
+    @Transactional
+    public List<ProjectResponse> searchProjects(String query, UUID groupId, Boolean groupIdIsNull) {
+        String searchPattern = (query != null && !query.isBlank())
+                ? "%" + query.toLowerCase() + "%"
+                : null;
+
+        Specification<Project> spec = ((root, query1, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (searchPattern != null) {
+                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), searchPattern));
+            }
+
+            if (groupId != null) {
+                predicates.add(criteriaBuilder.equal(root.get("projectGroup").get("id"), groupId));
+            } else if (Boolean.TRUE.equals(groupIdIsNull)) {
+                predicates.add(criteriaBuilder.isNull(root.get("projectGroup")));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        });
+
+        List<Project> project = projectRepository.findAll(spec);
+
+        return project.stream()
+                .map(ProjectResponse::from)
+                .toList();
+    }
 }
