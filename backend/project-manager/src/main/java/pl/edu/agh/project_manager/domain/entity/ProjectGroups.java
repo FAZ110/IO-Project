@@ -38,4 +38,9 @@ public class ProjectGroups {
     @OneToMany(mappedBy = "projectGroup")
     @Builder.Default
     private List<Project> projects = new ArrayList<>();
+
+    public void addProject(Project project) {
+        this.projects.add(project);
+        project.setProjectGroup(this);
+    }
 }

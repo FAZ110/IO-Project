@@ -27,5 +27,13 @@ export const useCreateProject = () => {
   });
 };
 
+export const useSearchProjects = (query: string) => {
+  return useQuery({
+    queryKey: PROJECT_KEYS.search(query),
+    queryFn: () => projectService.searchProjects(query),
+    enabled: query.length >= 2
+  });
+};
+
 
 

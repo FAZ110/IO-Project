@@ -39,5 +39,11 @@ export const NAV_ITEMS: NavItem[] = [
     icon: ShieldAlert,
     roles: [UserRole.ADMINISTRATOR],
     isCritical: true,
+  },
+  {
+    label: "Nowy portfel/program",
+    path: PATHS.CREATE_PROJECT_GROUP,
+    icon: FolderPlus,
+    roles: [UserRole.PROJECT_MANAGER]
   }
 ];

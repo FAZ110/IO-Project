@@ -93,6 +93,14 @@ public class ProjectManagement {
         List<ProjectResponse> projects = projectService.getAllProjects(userPrincipal);
         return ResponseEntity.ok(projects);
     }
+
+    @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('PROJECT_MANAGER', 'AUTHORITY')")
+    public ResponseEntity<List<ProjectResponse>> searchProject(
+            @RequestParam("search") String query
+    ) {
+        return ResponseEntity.ok(projectService.searchProjects(query));
+    }
 }
 
 

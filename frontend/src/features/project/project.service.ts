@@ -21,5 +21,14 @@ export const projectService = {
   getRisks: async (projectId: string): Promise<RiskResponse[]> => {
     const response = await api.get<RiskResponse[]>(ENDPOINTS.PROJECT.RISK.LIST(projectId));
     return response.data;
+  },
+
+  searchProjects: async (searchTerm: string): Promise<ProjectDetailsResponse[]> => {
+    const response = await api.get<ProjectDetailsResponse[]>(ENDPOINTS.PROJECT.SEARCH_PROJECTS, {
+      params: {
+        search: searchTerm
+      }
+    });
+    return response.data;
   }
 };

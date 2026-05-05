@@ -26,6 +26,7 @@ export const ENDPOINTS = {
           RISK: {
             LIST: (projectId: string) => `/projects/${projectId}/risk`
           },
+          SEARCH_PROJECTS: '/projects/search'
   },
   PROJECT_GROUP: {
     LIST_ALL: '/groups',

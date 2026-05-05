@@ -261,4 +261,13 @@ public class ProjectService {
 
         committeeUsers.forEach(project::addCommittee);
     }
+
+    @Transactional
+    public List<ProjectResponse> searchProjects(String query) {
+        List<Project> project = projectRepository.findByTitleContainingIgnoreCaseAndProjectGroupIsNull(query);
+
+        return project.stream()
+                .map(ProjectResponse::from)
+                .toList();
+    }
 }

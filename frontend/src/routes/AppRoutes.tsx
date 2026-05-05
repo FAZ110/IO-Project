@@ -15,6 +15,7 @@ import { DashboardPage } from "@/pages/DashboardPage";
 import { AuthenticatedRoute } from '@/routes/AuthenticatedRoute';
 import { AuthorizedRoute } from '@/routes/AuthorizedRoute';
 import { RequestsPage } from '@/pages/RequestsPage';
+import { CreateProjectGroupPage } from '@/pages/CreateProjectGroupPage';
 
 export const AppRoutes = () => {
   return (
@@ -30,10 +31,6 @@ export const AppRoutes = () => {
         <Route element={<MainLayout/>}>
           <Route path={PATHS.ROOT} element={<DashboardPage />} />
           <Route path={PATHS.PROFILE} element={<ProfilePage />} />
-
-          <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER]} />}>
-            <Route path={PATHS.CREATE_PROJECT} element={<CreateProjectPage/>} />
-          </Route>
           <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
 
           {/* LINEAR MANAGER ROUTES */}
@@ -45,6 +42,7 @@ export const AppRoutes = () => {
           <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER]} />}>
               <Route path={PATHS.CREATE_PROJECT} element={<CreateProjectPage />} />
               <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
+              <Route path={PATHS.CREATE_PROJECT_GROUP} element={<CreateProjectGroupPage />} />
           </Route>
 
           {/* ADMIN ROUTES */}

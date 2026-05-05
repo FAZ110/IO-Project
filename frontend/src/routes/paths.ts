@@ -17,5 +17,6 @@ export const PATHS = {
   ADMIN_USERS: '/admin/users',
   ADMIN_USER_DETAILS: (userId: string) => `/admin/users/${userId}`,
   CREATE_PROJECT: `/create-project`,
+  CREATE_PROJECT_GROUP: `/create-project-group`,
   PROJECT: (id: string) => `project/${id}`
 } as const;
