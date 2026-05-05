@@ -10,9 +10,9 @@ public record ProjectCreationCommand(
         String title,
         String description,
         LocalDate startDate,
+        LocalDate endDate,
         UUID projectGroupId,
         List<RiskCommand> risks,
-        List<RoleCommand> roles,
         List<MilestoneCommand> milestones,
         List<UUID> sponsors,
         List<UUID> committee

@@ -20,6 +20,13 @@ export interface SimpleUserResponse {
   surname: string
 }
 
+export interface BasicUserResponse {
+  id: string,
+  email: string,
+  name: string,
+  surname: string
+}
+
 export interface InviteUserRequest {
   email: string;
   role: AdminAssignableRole;
