@@ -1,7 +1,9 @@
 package pl.edu.agh.project_manager.service;
 
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
 import pl.edu.agh.project_manager.domain.entity.*;
@@ -263,8 +265,29 @@ public class ProjectService {
     }
 
     @Transactional
-    public List<ProjectResponse> searchProjects(String query) {
-        List<Project> project = projectRepository.findByTitleContainingIgnoreCaseAndProjectGroupIsNull(query);
+    public List<ProjectResponse> searchProjects(String query, UUID groupId, Boolean groupIdIsNull) {
+        String searchPattern = (query != null && !query.isBlank())
+                ? "%" + query.toLowerCase() + "%"
+                : null;
+
+        Specification<Project> spec = (root, q, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (searchPattern != null) {
+                predicates.add(cb.like(cb.lower(root.get("title")), searchPattern));
+            }
+
+            if (groupId != null) {
+                predicates.add(cb.equal(root.get("projectGroup").get("id"), groupId));
+            } else if (Boolean.TRUE.equals(groupIdIsNull)) {
+                predicates.add(cb.isNull(root.get("projectGroup")));
+
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        List<Project> project = projectRepository.findAll(spec);
 
         return project.stream()
                 .map(ProjectResponse::from)

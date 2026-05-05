@@ -6,8 +6,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
+import org.springframework.data.jpa.domain.Specification;
+import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
 import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
 import pl.edu.agh.project_manager.domain.entity.Project;
+import pl.edu.agh.project_manager.domain.entity.ProjectGroups;
 import pl.edu.agh.project_manager.domain.entity.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.User;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
@@ -32,6 +38,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@DataJpaTest
 @ExtendWith(MockitoExtension.class)
 class ProjectServiceTest {
 
@@ -46,6 +53,9 @@ class ProjectServiceTest {
 
     @InjectMocks
     private ProjectService projectService;
+
+    @Autowired
+    private TestEntityManager entityManager;
 
 
     @Test

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.parameters.P;
 import pl.edu.agh.project_manager.controller.dto.project_group.AllGroupsResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupDetailsResponse;
 import pl.edu.agh.project_manager.domain.entity.ProjectGroups;
@@ -14,9 +15,11 @@ import pl.edu.agh.project_manager.domain.enums.GroupType;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.ProjectGroupsRepository;
+import pl.edu.agh.project_manager.repository.ProjectRepository;
 import pl.edu.agh.project_manager.repository.UserRepository;
 import pl.edu.agh.project_manager.service.command.project.ProjectGroupCreationCommand;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,6 +37,9 @@ class ProjectGroupsServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ProjectRepository projectRepository;
 
     @InjectMocks
     private ProjectGroupsService projectGroupsService;
@@ -119,13 +125,14 @@ class ProjectGroupsServiceTest {
         // Given
         UUID userId = UUID.randomUUID();
         ProjectGroupCreationCommand command = new ProjectGroupCreationCommand(
-                "New Program", "Desc", GroupType.PROGRAM, userId
+                "New Program", "Desc", GroupType.PROGRAM, new ArrayList<>(), userId
         );
         User owner = User.builder().id(userId).build();
         ProjectGroups savedGroup = ProjectGroups.builder().id(UUID.randomUUID()).build();
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(owner));
         when(projectGroupsRepository.save(any(ProjectGroups.class))).thenReturn(savedGroup);
+        when(projectRepository.findAllById(new ArrayList<>())).thenReturn(new ArrayList<>());
 
         // When
         UUID resultId = projectGroupsService.createGroup(command);
@@ -141,7 +148,7 @@ class ProjectGroupsServiceTest {
         // Given
         UUID userId = UUID.randomUUID();
         ProjectGroupCreationCommand command = new ProjectGroupCreationCommand(
-                "New Program", "Desc", GroupType.PROGRAM, userId
+                "New Program", "Desc", GroupType.PROGRAM, new ArrayList<>(), userId
         );
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());

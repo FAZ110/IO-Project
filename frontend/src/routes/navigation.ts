@@ -44,6 +44,6 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Nowy portfel/program",
     path: PATHS.CREATE_PROJECT_GROUP,
     icon: FolderPlus,
-    roles: [UserRole.PROJECT_MANAGER]
+    roles: [UserRole.PROJECT_MANAGER, UserRole.AUTHORITY]
   }
 ];

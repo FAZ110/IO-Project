@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PATHS } from "@/routes/paths.ts";
 import { CreateProjectGroupFormSchema } from "../project_group.schema.ts";
-import { useSearchProjects } from "@/features/project/project.hooks.ts";
+import { useSearchProjectsWithinGroup } from "@/features/project/project.hooks.ts";
 import { useCreateProjectGroup } from "../project_group.hooks.ts";
 import { CreateProjectGroupFormView } from "./CreateProjectGroupForm.view.tsx";
 
@@ -25,7 +25,7 @@ export const CreateProjectGroupForm = () => {
     const [projectQuery, setProjectQuery] = useState("");
     const [projectQueryValue] = useDebounce(projectQuery, 300);
 
-    const { data: foundProjects = [] } = useSearchProjects(projectQueryValue);
+    const { data: foundProjects = [] } = useSearchProjectsWithinGroup(projectQueryValue);
 
     const mutation = useCreateProjectGroup();
     const navigate = useNavigate();

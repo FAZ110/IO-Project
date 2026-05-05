@@ -27,10 +27,10 @@ export const useCreateProject = () => {
   });
 };
 
-export const useSearchProjects = (query: string) => {
+export const useSearchProjectsWithinGroup = (query: string) => {
   return useQuery({
     queryKey: PROJECT_KEYS.search(query),
-    queryFn: () => projectService.searchProjects(query),
+    queryFn: () => projectService.searchProjectsWithinGroup(query),
     enabled: query.length >= 2
   });
 };

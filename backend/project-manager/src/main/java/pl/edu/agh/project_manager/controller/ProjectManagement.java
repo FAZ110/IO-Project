@@ -11,6 +11,7 @@ import pl.edu.agh.project_manager.controller.dto.project.ProjectCreationRequest;
 import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
 import pl.edu.agh.project_manager.controller.dto.project.RiskRequest;
 import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
+import pl.edu.agh.project_manager.domain.enums.GroupType;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.ProjectService;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
@@ -97,9 +98,11 @@ public class ProjectManagement {
     @GetMapping("/search")
     @PreAuthorize("hasAnyRole('PROJECT_MANAGER', 'AUTHORITY')")
     public ResponseEntity<List<ProjectResponse>> searchProject(
-            @RequestParam("search") String query
+            @RequestParam(value = "search", required = false) String query,
+            @RequestParam(value = "groupId", required = false) UUID groupId,
+            @RequestParam("groupIdIsNull") Boolean groupIdIsNull
     ) {
-        return ResponseEntity.ok(projectService.searchProjects(query));
+        return ResponseEntity.ok(projectService.searchProjects(query, groupId, groupIdIsNull));
     }
 }
 
