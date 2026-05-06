@@ -9,7 +9,6 @@ import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
-import pl.edu.agh.project_manager.infrastructure.email.ConsoleEmailSender;
 import pl.edu.agh.project_manager.service.command.invitation.AdminInviteUserCommand;
 import pl.edu.agh.project_manager.repository.user.ActivationTokenRepository;
 import pl.edu.agh.project_manager.repository.user.UserRepository;
