@@ -2,6 +2,7 @@ package pl.edu.agh.project_manager.domain.entity.user;
 
 import jakarta.persistence.*;
 import lombok.*;
+import pl.edu.agh.project_manager.domain.entity.notification.Notification;
 import pl.edu.agh.project_manager.domain.entity.project.Project;
 import pl.edu.agh.project_manager.domain.entity.projectgroup.ProjectGroup;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
@@ -66,6 +67,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Qualification> qualifications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Notification> notifications = new ArrayList<>();
 
     public void addQualification(Qualification qualification) {
         qualifications.add(qualification);
