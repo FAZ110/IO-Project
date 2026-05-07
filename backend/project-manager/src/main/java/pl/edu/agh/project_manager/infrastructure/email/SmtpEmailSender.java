@@ -15,8 +15,8 @@ public class SmtpEmailSender implements EmailSender {
 
      private final JavaMailSender mailSender;
 
-     // To na pewno do zmiany i dodania w pliku konfiguracyjnym
-     private static final String URL = "http://localhost:5173/";
+     @Value("${application.app.frontend.url}")
+     private String URL;
 
      @Value("${application.from.email}")
      private String fromEmail;
