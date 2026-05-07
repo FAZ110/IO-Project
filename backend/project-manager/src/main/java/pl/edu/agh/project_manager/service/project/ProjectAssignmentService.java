@@ -1,6 +1,7 @@
 package pl.edu.agh.project_manager.service.project;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.project_manager.controller.dto.project.AssignmentResponse;
@@ -8,6 +9,9 @@ import pl.edu.agh.project_manager.domain.entity.project.Project;
 import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.entity.project.ProjectAssignment;
 import pl.edu.agh.project_manager.domain.enums.AssignmentStatus;
+import pl.edu.agh.project_manager.domain.event.AssignmentAcceptedEvent;
+import pl.edu.agh.project_manager.domain.event.AssignmentRejectedEvent;
+import pl.edu.agh.project_manager.domain.event.AssignmentRequestedEvent;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.project.ProjectAssignmentRepository;
@@ -25,6 +29,7 @@ public class ProjectAssignmentService {
     private final ProjectService projectService;
     private final UserService userService;
     private final ProjectAssignmentRepository assignmentRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public AssignmentResponse createAssignment(UUID projectId, AssignmentCommand command) {
@@ -44,6 +49,14 @@ public class ProjectAssignmentService {
                 .build();
 
         ProjectAssignment savedAssignment = assignmentRepository.save(assignment);
+
+        if (user.getSupervisor() != null) {
+            eventPublisher.publishEvent(new AssignmentRequestedEvent(
+                    savedAssignment.getId(),
+                    user.getSupervisor(),
+                    "Kierownik projektu " + project.getTitle() + " prosi o alokację pracownika " + user.getName() + " " + user.getSurname()
+            ));
+        }
 
         return AssignmentResponse.from(savedAssignment);
     }
@@ -108,6 +121,12 @@ public class ProjectAssignmentService {
         if (!isAlreadyMember) {
             project.addMember(user);
         }
+
+        eventPublisher.publishEvent(new AssignmentAcceptedEvent(
+                assignment.getId(),
+                project.getProjectManager(),
+                "Zaakceptowano przypisanie pracownika " + user.getName() + " do projektu " + project.getTitle()
+        ));
     }
 
     @Transactional
@@ -117,6 +136,12 @@ public class ProjectAssignmentService {
         validatePendingStatus(assignment);
 
         assignment.setStatus(AssignmentStatus.REJECTED);
+
+        eventPublisher.publishEvent(new AssignmentRejectedEvent(
+                assignment.getId(),
+                assignment.getProject().getProjectManager(),
+                "Odrzucono przypisanie pracownika " + assignment.getUser().getName() + " do projektu " + assignment.getProject().getTitle()
+        ));
     }
 
     public ProjectAssignment getAssignmentOrThrow(UUID assignmentId) {

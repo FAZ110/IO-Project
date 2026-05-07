@@ -1,6 +1,7 @@
 package pl.edu.agh.project_manager.service.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +11,7 @@ import pl.edu.agh.project_manager.domain.entity.user.Qualification;
 import pl.edu.agh.project_manager.domain.entity.user.Skill;
 import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.enums.QualificationStatus;
+import pl.edu.agh.project_manager.domain.event.QualificationRequestedEvent;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.user.QualificationRepository;
@@ -26,6 +28,7 @@ public class QualificationService {
     private final QualificationRepository qualificationRepository;
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public List<QualificationResponse> addQualificationsToUser(UUID userId, List<String> skillNames, List<UUID> skillIds) {
@@ -67,7 +70,18 @@ public class QualificationService {
                 .status(QualificationStatus.WAITING)
                 .build();
         user.addQualification(qualification);
-        return qualificationRepository.save(qualification);
+        Qualification saved =  qualificationRepository.save(qualification);
+
+        // FIXME: na ten moment przy jednym zgłoszeniu 5 skilli przychodziłoby 5 powiadomień, raczej tak nie chcemy, ale na razie nie wiem jak będzie wyglądało to na froncie, więc zostawiam zakomentowane
+//        if (user.getSupervisor() != null) {
+//            eventPublisher.publishEvent(new QualificationRequestedEvent(
+//                    saved.getId(),
+//                    user.getSupervisor(),
+//                    user.getFullName() + " zgłasza umiejętność: " + skill.getName()
+//            ));
+//        }
+
+        return saved;
     }
 
     public List<SkillSuggestion> searchSkills(String query) {

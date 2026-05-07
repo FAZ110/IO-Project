@@ -76,4 +76,8 @@ public class User {
         qualifications.add(qualification);
         qualification.setUser(this);
     }
+
+    public String getFullName() {
+        return String.format("%s %s", this.name, this.surname);
+    }
 }
