@@ -1,16 +1,17 @@
 package pl.edu.agh.project_manager.service.notification;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
+import pl.edu.agh.project_manager.controller.dto.notification.NotificationResponse;
 import pl.edu.agh.project_manager.domain.entity.notification.Notification;
 import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.enums.NotificationType;
-import pl.edu.agh.project_manager.domain.event.AssignmentAcceptedEvent;
-import pl.edu.agh.project_manager.domain.event.AssignmentRequestedEvent;
-import pl.edu.agh.project_manager.domain.event.QualificationRequestedEvent;
+import pl.edu.agh.project_manager.domain.event.*;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.notification.NotificationRepository;
@@ -32,14 +33,38 @@ public class NotificationService {
 
     @TransactionalEventListener
     @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void onAssignmentAccepted(AssignmentAcceptedEvent event) {
+        create(event.recipient(), NotificationType.ASSIGNMENT_ACCEPTED, event.message(), event.assignmentId());
+    }
+
+    @TransactionalEventListener
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void onAssignmentRejected(AssignmentRejectedEvent event) {
+        create(event.recipient(), NotificationType.ASSIGNMENT_REJECTED, event.message(), event.assignmentId());
+    }
+
+    @TransactionalEventListener
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void onQualificationRequested(QualificationRequestedEvent event) {
         create(event.recipient(), NotificationType.QUALIFICATION_REQUESTED, event.message(), event.qualificationId());
     }
 
     @TransactionalEventListener
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void onAssignmentAccepted(AssignmentAcceptedEvent event) {
-        create(event.recipient(), NotificationType.ASSIGNMENT_ACCEPTED, event.message(), event.assignmentId());
+    public void onQualificationAccepted(QualificationAcceptedEvent event) {
+        create(event.recipient(), NotificationType.QUALIFICATION_ACCEPTED, event.message(), event.qualificationId());
+    }
+
+    @TransactionalEventListener
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void onQualificationRejected(QualificationRejectedEvent event) {
+        create(event.recipient(), NotificationType.QUALIFICATION_REJECTED, event.message(), event.qualificationId());
+    }
+
+    @TransactionalEventListener
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void onSystemNewEmployee(SystemNewEmployeeEvent event) {
+        create(event.recipient(), NotificationType.SYSTEM_NEW_EMPLOYEE, event.message(), event.employeeId());
     }
 
     private void create(User recipient, NotificationType type, String message, UUID referenceId) {
@@ -53,13 +78,13 @@ public class NotificationService {
     }
 
     @Transactional(readOnly = true)
-    public List<Notification> getAllForUser(UUID userId) {
-        return notificationRepository.findAllByRecipientIdOrderByCreatedAtDesc(userId);
-    }
+    public List<NotificationResponse> getNotificationsForUser(UUID userId, int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
 
-    @Transactional(readOnly = true)
-    public List<Notification> getFirst50ForUser(UUID userId) {
-        return notificationRepository.findTop50ByRecipientIdOrderByCreatedAtDesc(userId);
+        return notificationRepository.findAllByRecipientIdOrderByCreatedAtDesc(userId, pageable)
+                .stream()
+                .map(NotificationResponse::from)
+                .toList();
     }
 
     @Transactional

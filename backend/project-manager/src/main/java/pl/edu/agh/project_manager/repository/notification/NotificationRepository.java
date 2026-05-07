@@ -1,5 +1,6 @@
 package pl.edu.agh.project_manager.repository.notification;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,9 +12,9 @@ import java.util.UUID;
 
 public interface NotificationRepository extends JpaRepository<Notification, UUID> {
 
-    List<Notification> findAllByRecipientIdOrderByCreatedAtDesc(UUID recipientId);
+    boolean existsByIdAndRecipientId(UUID notificationId, UUID recipientId);
 
-    List<Notification> findTop50ByRecipientIdOrderByCreatedAtDesc(UUID recipientId);
+    List<Notification> findAllByRecipientIdOrderByCreatedAtDesc(UUID recipientId, Pageable pageable);
 
     @Modifying
     @Query("UPDATE Notification n SET n.isRead = true WHERE n.recipient.id = :userId AND n.isRead = false")
