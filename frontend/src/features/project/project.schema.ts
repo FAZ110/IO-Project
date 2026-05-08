@@ -15,11 +15,6 @@ export const CreateProjectFormSchema = z.object({
     description: z.string().optional()
   })),
 
-  roles: z.array(z.object({
-    name: z.string().min(1),
-    utilizationPercentages: z.array(z.number())
-  })),
-
   risks: z.array(z.object({
     name: z.string().min(1),
     description: z.string().min(1),

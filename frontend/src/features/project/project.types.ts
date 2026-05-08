@@ -10,7 +10,6 @@ export interface ProjectCreationRequest {
     committee: string[];
     milestones: Milestone[];
     risks: Risk[];
-    roles: ProjectRole[]; // TODO: do usuniecia
 }
 
 export interface ProjectMembersResponse {
@@ -41,6 +40,7 @@ export interface ProjectResponse {
     isActive: boolean;
     startDate: string;
     endDate: string;
+    manager: UserResponse;
 }
 
 export interface Milestone {

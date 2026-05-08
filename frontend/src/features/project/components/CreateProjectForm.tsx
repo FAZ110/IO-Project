@@ -1,6 +1,6 @@
 import { useForm, FormProvider } from "react-hook-form";
 import { CreateProjectView } from "./CreateProjectForm.view.tsx";
-import type { ProjectCreationRequest } from "../project.types.ts";
+import type { CreateProjectFormData } from "../project.schema.ts";
 import { useCreateProject } from "../project.hooks.ts";
 import { useProjectGroups } from "@/features/project_group/project_group.hooks.ts";
 import { useState } from "react";
@@ -13,7 +13,7 @@ import { CreateProjectFormSchema } from "../project.schema.ts";
 import { getNextDateFromToday } from "../project.utils.ts";
 
 export const CreateProjectForm = () => {
-  const methods = useForm<ProjectCreationRequest>({
+  const methods = useForm<CreateProjectFormData>({
     resolver: zodResolver(CreateProjectFormSchema),
     mode: "all",
     defaultValues: {
@@ -26,7 +26,6 @@ export const CreateProjectForm = () => {
       committee: [],
       milestones: [],
       risks: [],
-      roles: [],
     },
   });
 

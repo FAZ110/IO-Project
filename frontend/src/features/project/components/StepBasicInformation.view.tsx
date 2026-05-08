@@ -1,6 +1,6 @@
 import { Controller, useFormContext } from "react-hook-form";
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
-import type { ProjectCreationRequest } from "../project.types";
+import type { CreateProjectFormData } from "../project.schema";
 import { ChevronDownIcon, CheckIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -13,8 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface StepBasicInformationViewProps {
-    register: UseFormRegister<ProjectCreationRequest>;
-    errors: FieldErrors<ProjectCreationRequest>;
+    register: UseFormRegister<CreateProjectFormData>;
+    errors: FieldErrors<CreateProjectFormData>;
     groups: { id: string; name: string }[];
 }
 
@@ -23,7 +23,7 @@ export const StepBasicInformation = ({
     errors, 
     groups 
 }: StepBasicInformationViewProps) => {
-    const { control, setValue } = useFormContext<ProjectCreationRequest>();
+    const { control, setValue } = useFormContext<CreateProjectFormData>();
 
     return (
         <div className="space-y-4">

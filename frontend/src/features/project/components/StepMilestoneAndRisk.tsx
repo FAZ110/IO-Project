@@ -5,20 +5,20 @@ import {
   type UseFieldArrayRemove,
   type UseFormRegister,
 } from "react-hook-form";
-import type { ProjectCreationRequest } from "../project.types";
+import type { CreateProjectFormData } from "../project.schema";
 import { getNextDateFromToday } from "../project.utils.ts";
 
 interface StepMilestonesAndRisksProps {
-  register: UseFormRegister<ProjectCreationRequest>;
-  errors: FieldErrors<ProjectCreationRequest>;
-  milestones: ProjectCreationRequest["milestones"];
+  register: UseFormRegister<CreateProjectFormData>;
+  errors: FieldErrors<CreateProjectFormData>;
+  milestones: CreateProjectFormData["milestones"];
 
-  milestonesFields: FieldArrayWithId<ProjectCreationRequest, "milestones", "id">[];
-  appendMilestone: UseFieldArrayAppend<ProjectCreationRequest, "milestones">;
+  milestonesFields: FieldArrayWithId<CreateProjectFormData, "milestones", "id">[];
+  appendMilestone: UseFieldArrayAppend<CreateProjectFormData, "milestones">;
   removeMilestone: UseFieldArrayRemove;
 
-  riskFields: FieldArrayWithId<ProjectCreationRequest, "risks", "id">[];
-  appendRisk: UseFieldArrayAppend<ProjectCreationRequest, "risks">;
+  riskFields: FieldArrayWithId<CreateProjectFormData, "risks", "id">[];
+  appendRisk: UseFieldArrayAppend<CreateProjectFormData, "risks">;
   removeRisk: UseFieldArrayRemove;
 }
 

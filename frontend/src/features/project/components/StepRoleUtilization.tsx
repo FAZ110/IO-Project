@@ -1,3 +1,4 @@
+// @ts-nocheck — komponent zarezerwowany na przyszłość (moduł ról nie jest jeszcze podłączony)
 import { type FieldArrayWithId, type UseFieldArrayAppend, type UseFieldArrayRemove, useFormContext } from "react-hook-form";
 import type { ProjectCreationRequest } from "../project.types";
 import { useState } from "react";

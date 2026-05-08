@@ -1,5 +1,5 @@
 import { useFieldArray, useFormContext } from "react-hook-form";
-import type { ProjectCreationRequest } from "../project.types.ts";
+import type { CreateProjectFormData } from "../project.schema.ts";
 import { useState, useCallback } from "react";
 import type { SimpleUserResponse } from "@/features/user-management";
 import { UserAutocomplete } from "./UserAutocomplete.tsx";
@@ -29,7 +29,7 @@ export const CreateProjectView = ({ onSubmitProject, isPending, groups, foundSpo
     setValue,
     getValues,
     trigger,
-  } = useFormContext<ProjectCreationRequest>();
+  } = useFormContext<CreateProjectFormData>();
 
   const milestones = watch("milestones");
   const {
@@ -49,15 +49,6 @@ export const CreateProjectView = ({ onSubmitProject, isPending, groups, foundSpo
     name: "milestones",
   });
 
-
-  // const {
-  //   fields: roleFields,
-  //   append: appendRole,
-  //   remove: removeRole,
-  // } = useFieldArray({
-  //   control,
-  //   name: "roles",
-  // });
 
   const [usersById, setUsersById] = useState<Record<string, SimpleUserResponse>>({});
 
