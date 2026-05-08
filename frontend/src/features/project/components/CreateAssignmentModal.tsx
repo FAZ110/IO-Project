@@ -87,7 +87,7 @@ export const CreateAssignmentModal = ({ project }: CreateAssignmentModalProps) =
           <Button variant="outline">Stwórz wniosek</Button>
         </DialogTrigger>
 
-        <DialogContent className="sm:max-w-[520px]" data-project-id={project.id}>
+        <DialogContent className="sm:max-w-[640px]" data-project-id={project.id}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <DialogHeader>
               <DialogTitle>Stwórz wniosek</DialogTitle>

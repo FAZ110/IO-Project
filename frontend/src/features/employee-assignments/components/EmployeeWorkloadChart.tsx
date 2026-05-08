@@ -1,6 +1,6 @@
 "use client"
 
-import { AreaChart, CartesianGrid, XAxis, YAxis, Area, ReferenceLine, Tooltip } from "recharts"
+import { AreaChart, CartesianGrid, XAxis, YAxis, Area, ReferenceLine, Tooltip, Legend } from "recharts"
 import {
   type ChartConfig,
   ChartContainer,
@@ -35,26 +35,54 @@ export const EmployeeWorkloadChart = ({ currentWorkload, requestedWorkload, star
 
   return (
     <div className="w-full min-w-0">
-      <ChartContainer config={chartConfig} className="h-[200px] w-full">
+      <ChartContainer config={chartConfig} className="h-[300px] w-full">
         <AreaChart data={chartData} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
           <defs>
             <pattern
               id="hatch"
               patternUnits="userSpaceOnUse"
-              width="7"
-              height="7"
+              width="6"
+              height="6"
               patternTransform="rotate(45)"
             >
               <line
                 x1="0"
                 y1="0"
                 x2="0"
-                y2="7"
+                y2="6"
                 stroke="var(--color-requested)"
                 strokeWidth="4"
               />
             </pattern>
           </defs>
+
+          <Legend
+            verticalAlign="top"
+            align="right"
+            content={(props) => {
+              const { payload } = props;
+
+              return (
+                <ul className="flex justify-end gap-4 text-xs font-medium text-muted-foreground uppercase mb-4">
+                  {payload?.map((entry, index) => (
+                    <li key={`item-${index}`} className="flex items-center gap-2">
+                      {/* Nasza customowa ikonka */}
+                      <svg width="14" height="14">
+                        <rect
+                          width="14"
+                          height="14"
+                          rx={2}
+                          fill={entry.value === "requested" ? "url(#hatch)" : entry.color}
+                          stroke={entry.color}
+                        />
+                      </svg>
+                      <span>{entry.value === "current" ? "Obecne" : "Wnioskowane"}</span>
+                    </li>
+                  ))}
+                </ul>
+              );
+            }}
+          />
 
           <CartesianGrid vertical={false} strokeDasharray="3 3" />
           <XAxis
