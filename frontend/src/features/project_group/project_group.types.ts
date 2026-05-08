@@ -2,7 +2,6 @@ export const PROJECT_GROUP_TYPE_VALUES = ["WALLET", "PROGRAM"] as const;
 
 export type ProjectGroupType = (typeof PROJECT_GROUP_TYPE_VALUES)[number];
 
-// Map ProjectGroupType to polish labels
 export const PROJECT_GROUP_TYPE_LABELS: Record<ProjectGroupType, string> = {
     WALLET: "Portfel",
     PROGRAM: "Program",

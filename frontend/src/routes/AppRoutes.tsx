@@ -43,13 +43,16 @@ export const AppRoutes = () => {
           <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER]} />}>
               <Route path={PATHS.CREATE_PROJECT} element={<CreateProjectPage />} />
               <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
-              <Route path={PATHS.CREATE_PROJECT_GROUP} element={<CreateProjectGroupPage />} />
           </Route>
 
           {/* ADMIN ROUTES */}
           <Route element={<AuthorizedRoute allowedRoles={[UserRole.ADMINISTRATOR]} />}>
             <Route path={PATHS.ADMIN_USERS} element={<AdminUsersPage />} />
             <Route path={PATHS.ADMIN_USER_DETAILS(`:${ROUTE_PARAMS.USER_ID}`)} element={<AdminUserDetailsPage />} />
+          </Route>
+
+          <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER, UserRole.AUTHORITY]} />}>
+            <Route path={PATHS.CREATE_PROJECT_GROUP} element={<CreateProjectGroupPage />} />
           </Route>
         </Route>
       </Route>

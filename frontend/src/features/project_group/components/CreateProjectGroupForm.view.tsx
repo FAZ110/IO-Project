@@ -1,12 +1,12 @@
 import type { ProjectDetailsResponse } from "@/features/project/project.types.ts";
-import type { ProjectGroupCreationRequest } from "../project_group.types.ts";
 import { PROJECT_GROUP_TYPE_LABELS, PROJECT_GROUP_TYPE_VALUES } from "../project_group.types.ts";
 import type { SubmitHandler, UseFormReturn } from "react-hook-form";
 import { useState } from "react";
+import type { CreateProjectGroupFormData } from "../project_group.schema.ts";
 
 interface CreateProjectGroupFormProps {
-  methods: UseFormReturn<ProjectGroupCreationRequest>;
-  onSubmit: SubmitHandler<ProjectGroupCreationRequest>;
+  methods: UseFormReturn<CreateProjectGroupFormData>;
+  onSubmit: SubmitHandler<CreateProjectGroupFormData>;
   foundProjects: ProjectDetailsResponse[];
   onSearchProjects: (query: string) => void;
 }

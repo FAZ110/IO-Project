@@ -49,7 +49,7 @@ export const projectService = {
     const response = await api.get<ProjectDetailsResponse[]>(ENDPOINTS.PROJECT.SEARCH_PROJECTS, {
       params: {
         query: searchTerm,
-        groupIdIsNull: true
+        unassignedOnly: true
       }
     });
     return response.data;

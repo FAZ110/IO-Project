@@ -1,4 +1,5 @@
 import { useForm} from "react-hook-form";
+import type { CreateProjectGroupFormData } from "../project_group.schema.ts";
 import type { ProjectGroupCreationRequest } from "../project_group.types.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDebounce } from "use-debounce";
@@ -12,7 +13,7 @@ import { CreateProjectGroupFormView } from "./CreateProjectGroupForm.view.tsx";
 
 
 export const CreateProjectGroupForm = () => {
-    const methods = useForm<ProjectGroupCreationRequest>({
+    const methods = useForm<CreateProjectGroupFormData>({
       resolver: zodResolver(CreateProjectGroupFormSchema),
       defaultValues: {
           name: "",
@@ -30,8 +31,15 @@ export const CreateProjectGroupForm = () => {
     const mutation = useCreateProjectGroup();
     const navigate = useNavigate();
 
-    const onSubmit = (data: ProjectGroupCreationRequest) => {
-        mutation.mutate(data, {
+    const onSubmit = (data: CreateProjectGroupFormData) => {
+        const payload: ProjectGroupCreationRequest = {
+            name: data.name,
+            description: data.description,
+            groupType: data.groupType,
+            projectIds: data.projectIds,
+        };
+
+        mutation.mutate(payload, {
             onSuccess: () => {
                 methods.reset();
                 navigate(PATHS.ROOT);

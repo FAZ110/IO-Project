@@ -1,5 +1,6 @@
 package pl.edu.agh.project_manager.service.project;
 
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
+import pl.edu.agh.project_manager.service.command.project.SearchProjectCommand;
 import pl.edu.agh.project_manager.service.projectgroup.ProjectGroupsService;
 import pl.edu.agh.project_manager.service.user.UserService;
 
@@ -159,9 +161,9 @@ public class ProjectService {
     }
 
     @Transactional
-    public List<ProjectResponse> searchProjects(String query, UUID groupId, Boolean groupIdIsNull) {
-        String searchPattern = (query != null && !query.isBlank())
-                ? "%" + query.toLowerCase() + "%"
+    public List<ProjectResponse> searchProjects(SearchProjectCommand command) {
+        String searchPattern = (command.query() != null && !command.query().isBlank())
+                ? "%" + command.query().toLowerCase() + "%"
                 : null;
 
         Specification<Project> spec = ((root, query1, criteriaBuilder) -> {
@@ -171,9 +173,19 @@ public class ProjectService {
                 predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), searchPattern));
             }
 
-            if (groupId != null) {
-                predicates.add(criteriaBuilder.equal(root.get("projectGroup").get("id"), groupId));
-            } else if (Boolean.TRUE.equals(groupIdIsNull)) {
+            switch (command.userRole()) {
+                case PROJECT_MANAGER -> predicates.add(criteriaBuilder.equal(root.get("projectManager").get("id"), command.userId()));
+                case LINEAR_MANAGER, COMMON -> {
+                    Join<Project, User> membersJoin = root.join("members");
+                    predicates.add(criteriaBuilder.equal(membersJoin.get("id"), command.userId()));
+                    query1.distinct(true);
+                }
+                case ADMINISTRATOR, AUTHORITY -> {}
+            }
+
+            if (command.groupId() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("projectGroup").get("id"), command.groupId()));
+            } else if (Boolean.TRUE.equals(command.unassignedOnly())) {
                 predicates.add(criteriaBuilder.isNull(root.get("projectGroup")));
             }
 

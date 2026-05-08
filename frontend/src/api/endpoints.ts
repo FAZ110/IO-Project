@@ -33,7 +33,7 @@ export const ENDPOINTS = {
             STATUS_LIST: (projectId: string) => `/projects/${projectId}/roles/status`,
             ALLOCATE: (roleId: string) => `/roles/${roleId}/allocation-requests`
         },
-        SEARCH_PROJECTS: '/projects/search'
+        SEARCH_PROJECTS: '/projects'
     },
     PROJECT_GROUP: {
         LIST_ALL: '/groups',
