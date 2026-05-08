@@ -15,11 +15,6 @@ export const CreateProjectFormSchema = z.object({
     description: z.string().optional()
   })),
 
-  roles: z.array(z.object({
-    name: z.string().min(1),
-    utilizationPercentages: z.array(z.number())
-  })),
-
   risks: z.array(z.object({
     name: z.string().min(1),
     description: z.string().min(1),
@@ -28,3 +23,18 @@ export const CreateProjectFormSchema = z.object({
 });
 
 export type CreateProjectFormData = z.infer<typeof CreateProjectFormSchema>;
+
+export const CreateAssignmentSchema = z.object({
+  projectId: z.string(),
+  userId: z.string().min(1, "Musisz wybrać pracownika"),
+  roleName: z.string().min(2, "Nazwa roli jest za krótka"),
+  utilizationPercentage: z.number().min(1).max(100),
+  startDate: z.date({ error: "Data rozpoczęcia jest wymagana" }),
+  endDate: z.date({ error: "Data zakończenia jest wymagana" }),
+}).refine((data) => data.endDate > data.startDate, {
+  message: "Data zakończenia musi być po dacie rozpoczęcia",
+  path: ["endDate"],
+});
+
+export type CreateAssignmentFormData = z.infer<typeof CreateAssignmentSchema>;
+

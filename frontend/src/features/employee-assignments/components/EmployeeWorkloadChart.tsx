@@ -1,6 +1,6 @@
 "use client"
 
-import { AreaChart, CartesianGrid, XAxis, YAxis, Area, ReferenceLine } from "recharts"
+import { AreaChart, CartesianGrid, XAxis, YAxis, Area, ReferenceLine, Tooltip } from "recharts"
 import {
   type ChartConfig,
   ChartContainer,
@@ -11,6 +11,8 @@ import { prepareStackedData } from "../employee-assignments.utils"
 interface WorkloadChartProps {
   currentWorkload: ChartInterval[]
   requestedWorkload: ChartInterval[]
+  startDate?: Date
+  endDate?: Date
 }
 
 const chartConfig = {
@@ -24,8 +26,12 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export const EmployeeWorkloadChart = ({ currentWorkload, requestedWorkload }: WorkloadChartProps) => {
+export const EmployeeWorkloadChart = ({ currentWorkload, requestedWorkload, startDate, endDate }: WorkloadChartProps) => {
   const chartData = prepareStackedData(currentWorkload, requestedWorkload);
+  const dates = chartData.map(d => d.date);
+
+  const minDate = startDate ? startDate.getTime() : Math.min(...dates);
+  const maxDate = endDate ? endDate.getTime() : Math.max(...dates);
 
   return (
     <div className="w-full min-w-0">
@@ -53,6 +59,9 @@ export const EmployeeWorkloadChart = ({ currentWorkload, requestedWorkload }: Wo
           <CartesianGrid vertical={false} strokeDasharray="3 3" />
           <XAxis
             dataKey="date"
+            type="number"
+            scale="time"
+            domain={[startDate?.getTime() ?? minDate, endDate?.getTime() ?? maxDate]}
             tickLine={false}
             axisLine={false}
             tickMargin={10}
@@ -65,7 +74,7 @@ export const EmployeeWorkloadChart = ({ currentWorkload, requestedWorkload }: Wo
             axisLine={false}
             unit="%"
             domain={[0, 120]}
-            ticks={[0, 25, 50, 75, 100]}
+            ticks={[0, 50, 100]}
           />
 
           <ReferenceLine
@@ -92,6 +101,7 @@ export const EmployeeWorkloadChart = ({ currentWorkload, requestedWorkload }: Wo
             dot={false}
             activeDot={false}
             connectNulls
+            isAnimationActive={false}
           />
 
           <Area
@@ -106,6 +116,7 @@ export const EmployeeWorkloadChart = ({ currentWorkload, requestedWorkload }: Wo
             dot={false}
             activeDot={false}
             connectNulls
+            isAnimationActive={false}
           />
         </AreaChart>
       </ChartContainer>

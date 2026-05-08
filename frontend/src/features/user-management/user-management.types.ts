@@ -1,4 +1,5 @@
 import type { UserRole } from '@/features/auth/auth.types';
+import type { ChartInterval } from '@/features/employee-assignments/employee-assignments.types';
 
 export type UserStatus = 'PENDING' | 'ACTIVE' | 'EXPIRED';
 
@@ -36,4 +37,8 @@ export interface UserListParams {
   userRole?: UserRole;
   status?: UserStatus;
   search?: string;
+}
+
+export interface UserWorkloadResponse {
+  workload: ChartInterval[];
 }

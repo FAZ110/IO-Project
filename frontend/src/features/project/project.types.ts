@@ -10,7 +10,6 @@ export interface ProjectCreationRequest {
     committee: string[];
     milestones: Milestone[];
     risks: Risk[];
-    roles: ProjectRole[]; // TODO: do usuniecia
 }
 
 export interface ProjectMembersResponse {
@@ -59,28 +58,11 @@ export interface ProjectDetailsResponse {
     manager: UserResponse;
 }
 
-export interface ProjectRole {
-    name: string;
-    utilizationPercentages: number[];
-}
-
-export const ProjectRoleStatus = {
-    OPEN: 'OPEN',
-    PENDING: 'PENDING',
-    FILLED: 'FILLED'
-} as const;
-
-export type ProjectRoleStatus = typeof ProjectRoleStatus[keyof typeof ProjectRoleStatus];
-
-export interface ProjectRoleStatusResponse {
-    id: string;
-    roleName: string;
-    status: ProjectRoleStatus;
-    utilizationPercentages: number[];
-}
-
-export interface EmployeeAssignmentRequest {
-    userId: string;
+export interface CreateEmployeeAssignmentRequest {
     projectId: string;
-    roleId: string;
+    userId: string;
+    startDate: string;
+    endDate: string;
+    utilizationPercentage: number;
+    roleName: string;
 }

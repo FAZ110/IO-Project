@@ -1,7 +1,7 @@
 import api from '@/api/client';
 import { ENDPOINTS } from '@/api/endpoints';
 import type { PagedResponse, PaginationParams } from '@/api/api.types';
-import type {InviteUserRequest, SimpleUserResponse, UserListParams, UserResponse} from './user-management.types';
+import type {InviteUserRequest, SimpleUserResponse, UserListParams, UserResponse, UserWorkloadResponse} from './user-management.types';
 
 export const userManagementService = {
   getUsers: async (params: PaginationParams & UserListParams = {}): Promise<PagedResponse<UserResponse>> => {
@@ -27,6 +27,11 @@ export const userManagementService = {
         search: searchTerm
       }
     });
+    return res.data;
+  },
+
+  getUserWorkload: async (userId?: string): Promise<UserWorkloadResponse> => {
+    const res = await api.get<UserWorkloadResponse>(ENDPOINTS.USERS.WORKLOAD(userId));
     return res.data;
   }
 };
