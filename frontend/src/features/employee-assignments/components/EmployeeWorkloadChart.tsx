@@ -35,8 +35,8 @@ export const EmployeeWorkloadChart = ({ currentWorkload, requestedWorkload, star
 
   return (
     <div className="w-full min-w-0">
-      <ChartContainer config={chartConfig} className="h-[300px] w-full">
-        <AreaChart data={chartData} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
+      <ChartContainer config={chartConfig} className="h-[250px] w-full">
+        <AreaChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
           <defs>
             <pattern
               id="hatch"
@@ -66,7 +66,6 @@ export const EmployeeWorkloadChart = ({ currentWorkload, requestedWorkload, star
                 <ul className="flex justify-end gap-4 text-xs font-medium text-muted-foreground uppercase mb-4">
                   {payload?.map((entry, index) => (
                     <li key={`item-${index}`} className="flex items-center gap-2">
-                      {/* Nasza customowa ikonka */}
                       <svg width="14" height="14">
                         <rect
                           width="14"
@@ -128,7 +127,7 @@ export const EmployeeWorkloadChart = ({ currentWorkload, requestedWorkload, star
             strokeWidth={2}
             dot={false}
             activeDot={false}
-            connectNulls
+            connectNulls={false}
             isAnimationActive={false}
           />
 
@@ -143,7 +142,7 @@ export const EmployeeWorkloadChart = ({ currentWorkload, requestedWorkload, star
             strokeDasharray="8 6"
             dot={false}
             activeDot={false}
-            connectNulls
+            connectNulls={false}
             isAnimationActive={false}
           />
         </AreaChart>

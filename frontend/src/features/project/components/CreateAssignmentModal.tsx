@@ -87,7 +87,7 @@ export const CreateAssignmentModal = ({ project }: CreateAssignmentModalProps) =
           <Button variant="outline">Stwórz wniosek</Button>
         </DialogTrigger>
 
-        <DialogContent className="sm:max-w-[640px]" data-project-id={project.id}>
+        <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto" data-project-id={project.id}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <DialogHeader>
               <DialogTitle>Stwórz wniosek</DialogTitle>
@@ -110,26 +110,25 @@ export const CreateAssignmentModal = ({ project }: CreateAssignmentModalProps) =
                         <Command
                           shouldFilter={false}
                           className={cn(
-                            "border shadow-md rounded-lg overflow-hidden", // dodałem zaokrąglenie i cień
+                            "border shadow-md rounded-lg overflow-hidden",
                             fieldState.error && "border-destructive ring-1 ring-destructive"
                           )}
                         >
                           <CommandInput
                             placeholder="Szukaj pracownika..."
                             onValueChange={setUserQuery}
-                            className="h-12" // Większa wysokość inputa
+                            className="h-12"
                           />
-                          <CommandList className="max-h-[300px] min-h-[200px]"> {/* Wymuszenie minimalnej wysokości listy */}
+                          <CommandList className="max-h-[300px] min-h-[200px]">
                             <CommandEmpty>Nie znaleziono pracowników.</CommandEmpty>
                             <CommandGroup>
                               {users?.map((user) => (
                                 <CommandItem
                                   key={user.id}
                                   onSelect={() => handleSelectUser(user)}
-                                  className="flex items-center gap-3 px-4 py-3 cursor-pointer" // Większy padding i odstęp
+                                  className="flex items-center gap-3 px-4 py-3 cursor-pointer"
                                 >
                                   <Avatar className="h-9 w-9 border">
-                                    {/* Opcjonalnie: <AvatarImage src={user.avatarUrl} /> */}
                                     <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
                                       {getInitials(user.name, user.surname)}
                                     </AvatarFallback>

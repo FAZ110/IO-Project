@@ -43,7 +43,7 @@ export const EmployeeAssignmentsPage = () => {
         )}
 
         <Dialog open={isModalOpen} onOpenChange={(open) => !open && handleCloseModal()}>
-          <DialogContent className="w-[calc(100vw-2rem)] max-w-2xl overflow-x-hidden">
+          <DialogContent className="w-[calc(100vw-2rem)] max-w-xl overflow-x-hidden">
             <DialogHeader>
               <DialogTitle>Szczegóły weryfikacji</DialogTitle>
             </DialogHeader>

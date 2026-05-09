@@ -7,6 +7,7 @@ import { useUserWorkload } from "@/features/user-management/user-management.hook
 import { Slider } from "@/components/ui/slider"
 import type { CreateAssignmentFormData } from "../project.schema";
 import { DatePicker } from "@/components/ui/date-picker";
+import { useMemo } from "react";
 
 interface CreateAssignmentDetailsProps {
   project: ProjectResponse
@@ -26,17 +27,23 @@ export const CreateAssignmentDetails = ({ project }: CreateAssignmentDetailsProp
 
   const utilizationPercentage = watch("utilizationPercentage");
 
+  const requestedWorkload = useMemo(() => {
+    if (!startDate || !endDate) return [];
+
+    return [{
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      percentage: utilizationPercentage || 0,
+    }];
+  }, [startDate, endDate, utilizationPercentage]);
+
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {userWorkload && (
         <div className="rounded-lg border bg-muted/20 p-4">
           <EmployeeWorkloadChart
             currentWorkload={userWorkload}
-            requestedWorkload={(startDate && endDate) ? [{
-              startDate: startDate.toISOString(),
-              endDate: endDate.toISOString(),
-              percentage: utilizationPercentage || 0,
-            }] : []}
+            requestedWorkload={requestedWorkload}
             startDate={projectStart}
             endDate={projectEnd}
           />
@@ -120,85 +127,3 @@ export const CreateAssignmentDetails = ({ project }: CreateAssignmentDetailsProp
     </div>
   );
 };
-
-
-
-//       {/* <CreateAssignmentDetails project={project} /> */}
-
-//       {/* <div className="grid gap-3">
-//           <div className="mt-3">
-//             {userWorkload && <EmployeeWorkloadChart currentWorkload={userWorkload} requestedWorkload={requestedWorkload} />}
-//           </div>
-
-
-//             <div className="space-y-2">
-//               <div className="flex items-center justify-between gap-3">
-//                 <label className="block text-sm font-medium">Percentage</label>
-//                 <span className="text-sm text-muted-foreground">{utilizationPercentage}%</span>
-//               </div>
-//               <Controller
-//                 name="utilizationPercentage"
-//                 control={control}
-//                 render={({ field }) => (
-//                   <Slider
-//                     value={[field.value]}
-//                     min={0}
-//                     max={100}
-//                     step={1}
-//                     onValueChange={([value]) => field.onChange(value)}
-//                     className="w-full py-2"
-//                   />
-//                 )}
-//               />
-//             </div>
-//           </div>
-//           {errors.startDate && (
-//             <div className="pt-2 text-sm text-destructive">{errors.startDate.message}</div>
-//           )}
-//           {errors.endDate && (
-//             <div className="pt-2 text-sm text-destructive">{errors.endDate.message}</div>
-//           )}
-//         </div> */}
-
-
-//   )
-// }
-// const formatDate = (date: Date) => date.toISOString().slice(0, 10);
-
-// const getDefaultDates = (projectStart?: string, projectEnd?: string) => {
-//   const now = new Date();
-//   const projStart = projectStart ? new Date(projectStart) : null;
-//   const projEnd = projectEnd ? new Date(projectEnd) : null;
-
-//   const startDate = projStart && projStart > now ? projStart : now;
-//   const endDate = new Date(startDate);
-//   endDate.setMonth(endDate.getMonth() + 1);
-
-//   if (projEnd && endDate > projEnd) endDate.setTime(projEnd.getTime());
-//   if (projEnd && startDate > projEnd) startDate.setTime(projEnd.getTime());
-
-//   return {
-//     startDate: formatDate(startDate),
-//     endDate: formatDate(endDate),
-//   };
-// };
-
-
-
-// const requestedWorkload = useMemo(() => [{
-//   startDate,
-//   endDate,
-//   percentage: utilizationPercentage,
-// }], [endDate, utilizationPercentage, startDate]);
-
-// const visibleUsers = useMemo(() => {
-//   const list = users ?? [];
-//   if (!selectedUser) return list;
-
-//   const next = list.filter((user) => user.id !== selectedUser.id);
-//   return [selectedUser, ...next];
-// }, [users, selectedUser]);
-
-// const defaultDates = getDefaultDates(project.startDate, project.endDate);
-// reset(defaultDates);
-// const defaultDates = getDefaultDates(project.startDate, project.endDate);
