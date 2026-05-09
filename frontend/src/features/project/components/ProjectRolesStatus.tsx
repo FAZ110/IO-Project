@@ -17,6 +17,9 @@ export const ProjectRolesStatus = ({ projectId }: { projectId: string }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedUserId, setSelectedUserId] = useState('');
     const [justification, setJustification] = useState('');
+    const [assignmentStartDate, setAssignmentStartDate] = useState('');
+    const [assignmentEndDate, setAssignmentEndDate] = useState('');
+    const [utilizationPercentage, setUtilizationPercentage] = useState(100);
 
     const { data: usersData, isLoading: isUsersLoading } = useUsersQuery(0, 100, { search: searchQuery });
 
@@ -32,16 +35,21 @@ export const ProjectRolesStatus = ({ projectId }: { projectId: string }) => {
     };
 
     const submitEmployeeAssignment = () => {
-        if (!selectedRole || !selectedUserId || !justification) return;
+        if (!selectedRole || !selectedUserId || !assignmentStartDate || !assignmentEndDate) return;
 
         createEmployeeAssignment.mutate({
             userId: selectedUserId,
-            projectId: projectId,
-            roleId: selectedRole.id,
+            roleName: selectedRole.roleName,
+            startDate: assignmentStartDate,
+            endDate: assignmentEndDate,
+            utilizationPercentage,
         }, {
             onSuccess: () => {
                 setIsAllocationDialogOpen(false);
                 setSelectedUserId('');
+                setAssignmentStartDate('');
+                setAssignmentEndDate('');
+                setUtilizationPercentage(100);
             }
         });
     };
@@ -150,6 +158,40 @@ export const ProjectRolesStatus = ({ projectId }: { projectId: string }) => {
                             )}
                         </div>
 
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="flex flex-col gap-1">
+                                <label className="text-sm font-medium">Data od</label>
+                                <input
+                                    type="date"
+                                    value={assignmentStartDate}
+                                    onChange={(e) => setAssignmentStartDate(e.target.value)}
+                                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <label className="text-sm font-medium">Data do</label>
+                                <input
+                                    type="date"
+                                    value={assignmentEndDate}
+                                    onChange={(e) => setAssignmentEndDate(e.target.value)}
+                                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                            <label className="text-sm font-medium">Alokacja: {utilizationPercentage}%</label>
+                            <input
+                                type="range"
+                                min={0}
+                                max={100}
+                                step={5}
+                                value={utilizationPercentage}
+                                onChange={(e) => setUtilizationPercentage(Number(e.target.value))}
+                                className="w-full accent-blue-600"
+                            />
+                        </div>
+
                         <div className="flex flex-col gap-2 mt-2">
                             <label className="text-sm font-medium">Uzasadnienie wniosku</label>
                             <textarea
@@ -163,7 +205,7 @@ export const ProjectRolesStatus = ({ projectId }: { projectId: string }) => {
                         <Button variant="outline" onClick={() => setIsAllocationDialogOpen(false)}>Anuluj</Button>
                         <Button
                             onClick={submitEmployeeAssignment}
-                            disabled={createEmployeeAssignment.isPending || !selectedUserId}
+                            disabled={createEmployeeAssignment.isPending || !selectedUserId || !assignmentStartDate || !assignmentEndDate}
                         >
                             {createEmployeeAssignment.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                             Złóż wniosek

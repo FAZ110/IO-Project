@@ -9,6 +9,15 @@ export const CreateProjectFormSchema = z.object({
   sponsors: z.array(z.string()).min(1, "Wymagany min. 1 sponsor"),
   committee: z.array(z.string()).min(1, "Wymagany min. 1 członek komitetu"),
 
+  assignments: z.array(z.object({
+    userId: z.string().uuid("Wybierz użytkownika"),
+    userName: z.string(),
+    roleName: z.string().min(1, "Rola jest wymagana"),
+    startDate: z.string().min(1, "Data rozpoczęcia jest wymagana"),
+    endDate: z.string().min(1, "Data zakończenia jest wymagana"),
+    utilizationPercentage: z.number().min(0).max(100),
+  })),
+
   milestones: z.array(z.object({
     name: z.string().min(1),
     date: z.string().min(1),

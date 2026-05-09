@@ -29,6 +29,10 @@ export const ENDPOINTS = {
             LIST: (projectId: string) => `/projects/${projectId}/risks`
         },
         MEMBERS: (projectId: string) => `/projects/${projectId}/members`,
+        ASSIGNMENTS: {
+            CREATE: (projectId: string) => `/projects/${projectId}/assignments`,
+            LIST: (projectId: string) => `/projects/${projectId}/assignments`,
+        },
         ROLES: {
             STATUS_LIST: (projectId: string) => `/projects/${projectId}/roles/status`,
             ALLOCATE: (roleId: string) => `/roles/${roleId}/allocation-requests`

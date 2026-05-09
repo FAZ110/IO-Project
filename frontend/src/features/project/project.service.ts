@@ -5,7 +5,8 @@ import type {
     ProjectResponse,
     ProjectDetailsResponse,
     ProjectRoleStatusResponse,
-    EmployeeAssignmentRequest,
+    AssignmentCreateRequest,
+    AssignmentResponse,
     RiskResponse,
     ProjectMembersResponse
 } from './project.types';
@@ -41,7 +42,8 @@ export const projectService = {
         return response.data;
     },
 
-    createEmployeeAssignment: async (data: EmployeeAssignmentRequest): Promise<void> => {
-        await api.post<void>(ENDPOINTS.APPROVALS.ASSIGNMENTS, data);
+    createEmployeeAssignment: async (projectId: string, data: AssignmentCreateRequest): Promise<AssignmentResponse> => {
+        const response = await api.post<AssignmentResponse>(ENDPOINTS.PROJECT.ASSIGNMENTS.CREATE(projectId), data);
+        return response.data;
     }
 };

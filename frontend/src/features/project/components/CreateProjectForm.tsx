@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CreateProjectFormSchema } from "../project.schema.ts";
 import { getNextDateFromToday } from "../project.utils.ts";
+import { projectService } from "../project.service.ts";
 
 export const CreateProjectForm = () => {
   const methods = useForm<CreateProjectFormData>({
@@ -24,6 +25,7 @@ export const CreateProjectForm = () => {
       projectGroupId: null,
       sponsors: [],
       committee: [],
+      assignments: [],
       milestones: [],
       risks: [],
     },
@@ -43,13 +45,17 @@ export const CreateProjectForm = () => {
   const mutation = useCreateProject();
   const navigate = useNavigate();
 
-  const onSubmit = methods.handleSubmit((data) => {
-    const payload = {
-      ...data,
-    };
+  const onSubmit = methods.handleSubmit(async (data) => {
+    const { assignments, ...projectPayload } = data;
 
-    mutation.mutate(payload, {
-      onSuccess: (newProjectId) => {
+    mutation.mutate(projectPayload, {
+      onSuccess: async (newProjectId) => {
+        await Promise.all(
+          assignments.map(({ userName: _userName, ...assignment }) =>
+            projectService.createEmployeeAssignment(newProjectId, assignment)
+          )
+        );
+
         methods.reset();
         navigate(PATHS.PROJECT(newProjectId));
       },

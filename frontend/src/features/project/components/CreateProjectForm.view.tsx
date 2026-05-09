@@ -1,11 +1,11 @@
-import { useFieldArray, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import type { CreateProjectFormData } from "../project.schema.ts";
 import { useState, useCallback } from "react";
 import type { SimpleUserResponse } from "@/features/user-management";
 import { UserAutocomplete } from "./UserAutocomplete.tsx";
 import { StepProgressTracker } from "./StepProgressTracker.tsx";
 import { StepBasicInformation } from "./StepBasicInformation.view.tsx";
-import { StepMilestonesAndRisks } from "./StepMilestoneAndRisk.tsx";
+import { StepAssignmentsRisksAndMilestones } from "./StepAssignmentsRisksAndMilestones.tsx";
 import { StepNavigation } from "./StepNavigation.tsx";
 
 interface CreateProjectViewProps {
@@ -19,42 +19,61 @@ interface CreateProjectViewProps {
   message?: string;
 }
 
-export const CreateProjectView = ({ onSubmitProject, isPending, groups, foundSponsors, foundCommittee, onSponsorSearch, onCommitteeSearch, message }: CreateProjectViewProps) => {
+export const CreateProjectView = ({
+  onSubmitProject,
+  isPending,
+  groups,
+  foundSponsors,
+  foundCommittee,
+  onSponsorSearch,
+  onCommitteeSearch,
+  message,
+}: CreateProjectViewProps) => {
   const {
     register,
-    control,
     formState: { errors },
     clearErrors,
-    watch,
     setValue,
     getValues,
+    watch,
     trigger,
   } = useFormContext<CreateProjectFormData>();
 
-  const milestones = watch("milestones");
-  const {
-    fields: riskFields,
-    append: appendRisk,
-    remove: removeRisk,
-  } = useFieldArray({
-    control,
-    name: "risks",
-  });
-  const {
-    fields: milestonesFields,
-    append: appendMilestone,
-    remove: removeMilestone,
-  } = useFieldArray({
-    control,
-    name: "milestones",
-  });
-
+  const sponsorIds = watch("sponsors");
+  const committeeIds = watch("committee");
 
   const [usersById, setUsersById] = useState<Record<string, SimpleUserResponse>>({});
-
   const rememberUser = useCallback((user: SimpleUserResponse) => {
     setUsersById((prev) => ({ ...prev, [user.id]: user }));
   }, []);
+
+  const handleAddSponsor = (user: SimpleUserResponse) => {
+    const current = getValues("sponsors");
+    if (!current.includes(user.id)) {
+      setValue("sponsors", [...current, user.id], { shouldValidate: true, shouldDirty: true });
+      clearErrors("sponsors");
+    }
+    rememberUser(user);
+  };
+
+  const handleRemoveSponsor = (userId: string) => {
+    const next = getValues("sponsors").filter((id) => id !== userId);
+    setValue("sponsors", next, { shouldValidate: true, shouldDirty: true });
+  };
+
+  const handleAddCommittee = (user: SimpleUserResponse) => {
+    const current = getValues("committee");
+    if (!current.includes(user.id)) {
+      setValue("committee", [...current, user.id], { shouldValidate: true, shouldDirty: true });
+      clearErrors("committee");
+    }
+    rememberUser(user);
+  };
+
+  const handleRemoveCommittee = (userId: string) => {
+    const next = getValues("committee").filter((id) => id !== userId);
+    setValue("committee", next, { shouldValidate: true, shouldDirty: true });
+  };
 
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 2;
@@ -62,7 +81,14 @@ export const CreateProjectView = ({ onSubmitProject, isPending, groups, foundSpo
   const handleNextStep = async () => {
     if (currentStep !== 1) return;
 
-    const isValid = await trigger(["title", "description", "startDate", "endDate", "sponsors", "committee", "milestones"]);
+    const isValid = await trigger([
+      "title",
+      "description",
+      "startDate",
+      "endDate",
+      "sponsors",
+      "committee",
+    ]);
 
     if (isValid) {
       setCurrentStep((prev) => prev + 1);
@@ -83,7 +109,7 @@ export const CreateProjectView = ({ onSubmitProject, isPending, groups, foundSpo
         </div>
       )}
 
-      <StepProgressTracker currentStep={currentStep} steps={["Podstawowe informacje", "Role i alokacja czasu"]} />
+      <StepProgressTracker currentStep={currentStep} steps={["Podstawowe informacje", "Zasoby i ryzyka"]} />
 
       <form className="space-y-6 text-left">
         {currentStep === 1 && (
@@ -115,54 +141,28 @@ export const CreateProjectView = ({ onSubmitProject, isPending, groups, foundSpo
               label="Sponsorzy"
               foundUsers={foundSponsors}
               onSearch={onSponsorSearch}
-              setValue={setValue}
-              getValues={getValues}
-              roles="sponsors"
-              clearErrors={clearErrors}
+              selectedUserIds={sponsorIds}
               usersById={usersById}
-              onRememberUser={rememberUser}
+              onAdd={handleAddSponsor}
+              onRemove={handleRemoveSponsor}
             />
-
             {errors.sponsors?.message && <p className="text-red-500 text-sm mt-2">{errors.sponsors.message}</p>}
 
             <UserAutocomplete
               label="Komitet Sterujący"
               foundUsers={foundCommittee}
               onSearch={onCommitteeSearch}
-              setValue={setValue}
-              getValues={getValues}
-              roles="committee"
-              clearErrors={clearErrors}
+              selectedUserIds={committeeIds}
               usersById={usersById}
-              onRememberUser={rememberUser}
+              onAdd={handleAddCommittee}
+              onRemove={handleRemoveCommittee}
             />
-
             {errors.committee?.message && <p className="text-red-500 text-sm mt-2">{errors.committee.message}</p>}
-
-            <StepMilestonesAndRisks
-              register={register}
-              errors={errors}
-              riskFields={riskFields}
-              appendRisk={appendRisk}
-              removeRisk={removeRisk}
-              milestones={milestones}
-              milestonesFields={milestonesFields}
-              appendMilestone={appendMilestone}
-              removeMilestone={removeMilestone}
-            />
           </>
         )}
 
         {currentStep === 2 && (
-          <div className="py-12 text-center bg-gray-50 rounded-lg border border-gray-200 border-dashed">
-            <h3 className="text-lg font-medium text-gray-700">Role i alokacja czasu (Wkrótce)</h3>
-            <p className="text-gray-500 mt-2">
-              Moduł składania wniosków i doboru ról zostanie uruchomiony w późniejszym etapie.
-              Możesz zapisać projekt bez przypisywania zasobów.
-            </p>
-            {/* Wyciszony komponent - zakomentowany na wszelki wypadek */}
-            {/* <StepRoleUtilization roleFields={roleFields} appendRole={appendRole} removeRole={removeRole} /> */}
-          </div>
+          <StepAssignmentsRisksAndMilestones />
         )}
 
         <StepNavigation

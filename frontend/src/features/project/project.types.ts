@@ -79,8 +79,21 @@ export interface ProjectRoleStatusResponse {
     utilizationPercentages: number[];
 }
 
-export interface EmployeeAssignmentRequest {
+export interface AssignmentCreateRequest {
     userId: string;
+    roleName: string;
+    startDate: string;
+    endDate: string;
+    utilizationPercentage: number;
+}
+
+export interface AssignmentFormEntry extends AssignmentCreateRequest {
+    userName: string;
+}
+
+export interface AssignmentResponse extends AssignmentCreateRequest {
+    id: string;
     projectId: string;
-    roleId: string;
+    status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+    createdAt: string;
 }
