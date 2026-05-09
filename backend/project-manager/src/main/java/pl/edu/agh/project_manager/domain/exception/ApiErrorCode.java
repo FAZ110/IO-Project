@@ -31,6 +31,7 @@ public enum ApiErrorCode {
     USER_NOT_PENDING("USR_002", HttpStatus.BAD_REQUEST, "Cannot resend invitation — user is not in PENDING status"),
 
     QUALIFICATION_NOT_FOUND("QUAL_001", HttpStatus.NOT_FOUND, "Qualification not found"),
+    INVALID_QUALIFICATION_STATE("QUAL_002", HttpStatus.BAD_REQUEST, "Qualification is not in WAITING state"),
 
     ROLE_NOT_IN_PROJECT("REQ_001", HttpStatus.BAD_REQUEST, "Role must exist within the provided project"),
     USER_ALREADY_IN_PROJECT("REQ_002", HttpStatus.CONFLICT, "User is already a member of this project"),

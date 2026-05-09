@@ -45,6 +45,9 @@ export const ENDPOINTS = {
         ASSIGNMENTS: '/approvals/assignments/pending',
         ASSIGNMENT_DETAIL: (id: string) => `/approvals/assignments/${id}/details`,
         ACCEPT_ASSIGNMENT: (id: string) => `/approvals/assignments/${id}/accept`,
-        REJECT_ASSIGNMENT: (id: string) => `/approvals/assignments/${id}/reject`
+        REJECT_ASSIGNMENT: (id: string) => `/approvals/assignments/${id}/reject`,
+        QUALIFICATIONS: '/approvals/qualifications',
+        QUALIFICATION_DETAILS: '/approvals/qualifications/details',
+        QUALIFICATIONS_BULK_UPDATE: '/approvals/qualifications/bulk-update'
     }
 } as const;

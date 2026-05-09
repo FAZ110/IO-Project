@@ -15,6 +15,7 @@ import { DashboardPage } from "@/pages/DashboardPage";
 import { AuthenticatedRoute } from '@/routes/AuthenticatedRoute';
 import { AuthorizedRoute } from '@/routes/AuthorizedRoute';
 import { EmployeeAssignmentsPage } from '@/pages/EmployeeAssignmentsPage';
+import { QualificationRequestsPage } from '@/pages/QualificationRequestsPage';
 
 export const AppRoutes = () => {
   return (
@@ -35,7 +36,8 @@ export const AppRoutes = () => {
 
           {/* LINEAR MANAGER ROUTES */}
           <Route element={<AuthorizedRoute allowedRoles={[UserRole.LINEAR_MANAGER]} />}>
-            <Route path={PATHS.REQUESTS} element={<EmployeeAssignmentsPage />} />
+            <Route path={PATHS.PROJECT_REQUESTS} element={<EmployeeAssignmentsPage />} />
+            <Route path={PATHS.QUALIFICATION_REQUESTS} element={<QualificationRequestsPage />} />
           </Route>
 
           {/* PROJECT MANAGER ROUTES */}

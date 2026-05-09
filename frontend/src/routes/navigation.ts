@@ -2,7 +2,8 @@ import {
   LayoutDashboard,
   ClipboardList,
   FolderPlus,
-  ShieldAlert
+  ShieldAlert,
+  GraduationCap
 } from 'lucide-react';
 import { UserRole } from '@/features/auth/auth.types';
 import { PATHS } from '@/routes/paths';
@@ -22,9 +23,15 @@ export const NAV_ITEMS: NavItem[] = [
     icon: LayoutDashboard,
   },
   {
-    label: 'Wnioski',
-    path: PATHS.REQUESTS,
+    label: 'Wnioski projektowe',
+    path: PATHS.PROJECT_REQUESTS,
     icon: ClipboardList,
+    roles: [UserRole.LINEAR_MANAGER],
+  },
+    {
+    label: 'Wnioski kwalifikacyjne',
+    path: PATHS.QUALIFICATION_REQUESTS,
+    icon: GraduationCap,
     roles: [UserRole.LINEAR_MANAGER],
   },
   {
