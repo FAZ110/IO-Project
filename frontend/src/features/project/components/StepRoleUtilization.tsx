@@ -1,21 +1,20 @@
-// @ts-nocheck — komponent zarezerwowany na przyszłość (moduł ról nie jest jeszcze podłączony)
 import { type FieldArrayWithId, type UseFieldArrayAppend, type UseFieldArrayRemove, useFormContext } from "react-hook-form";
-import type { ProjectCreationRequest } from "../project.types";
+import type { CreateProjectFormData } from "../project.schema";
 import { useState } from "react";
 import { generatePhasesFromMilestones } from "../project.utils";
 
 interface StepRoleUtilizationProps {
-    roleFields: FieldArrayWithId<ProjectCreationRequest, "roles", "id">[];
-    appendRole: UseFieldArrayAppend<ProjectCreationRequest, "roles">;
+    roleFields: FieldArrayWithId<CreateProjectFormData, "roles", "id">[];
+    appendRole: UseFieldArrayAppend<CreateProjectFormData, "roles">;
     removeRole: UseFieldArrayRemove;
 }
 
-export const StepRoleUtilization = ({ 
-    roleFields, 
-    appendRole, 
+export const StepRoleUtilization = ({
+    roleFields,
+    appendRole,
     removeRole
 }: StepRoleUtilizationProps) => {
-    const { register, getValues, clearErrors, formState: { errors } } = useFormContext<ProjectCreationRequest>();
+    const { register, getValues, clearErrors, formState: { errors } } = useFormContext<CreateProjectFormData>();
 
     const [roleInput, setRoleInput] = useState("");
 

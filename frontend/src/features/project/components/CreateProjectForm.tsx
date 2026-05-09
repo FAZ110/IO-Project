@@ -28,6 +28,7 @@ export const CreateProjectForm = () => {
       assignments: [],
       milestones: [],
       risks: [],
+      roles: [],
     },
   });
 
@@ -46,7 +47,7 @@ export const CreateProjectForm = () => {
   const navigate = useNavigate();
 
   const onSubmit = methods.handleSubmit(async (data) => {
-    const { assignments, ...projectPayload } = data;
+    const { assignments, roles: _roles, ...projectPayload } = data;
 
     mutation.mutate(projectPayload, {
       onSuccess: async (newProjectId) => {

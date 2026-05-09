@@ -29,6 +29,11 @@ export const CreateProjectFormSchema = z.object({
     description: z.string().min(1),
     probability: z.number()
   })),
+
+  roles: z.array(z.object({
+    name: z.string().min(1),
+    utilizationPercentages: z.array(z.number().min(0).max(100)),
+  })),
 });
 
 export type CreateProjectFormData = z.infer<typeof CreateProjectFormSchema>;
