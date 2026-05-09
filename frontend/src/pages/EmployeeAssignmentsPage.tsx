@@ -12,7 +12,6 @@ export const EmployeeAssignmentsPage = () => {
   const { rejectRequest } = useEmployeeAssignmentsActions();
 
   const [selectedAssignment, setSelectedAssignment] = useState<EmployeeAssignment | null>(null);
-  const isModalOpen = !!selectedAssignment;
 
   const handleReject = useCallback((assignment: EmployeeAssignment) => {
     rejectRequest(assignment.id);
