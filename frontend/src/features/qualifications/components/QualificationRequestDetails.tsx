@@ -17,21 +17,25 @@ export const QualificationRequestDetails = ({ userId, onClose }: QualificationRe
 
   const [decisions, setDecisions] = useState<Record<string, QualificationUpdateAction>>({});
 
-  // Obliczamy payload na bieżąco, aby wiedzieć, czy faktycznie mamy coś do zapisania
-  const pendingPayload: QualificationUpdateRequest[] = Object.entries(decisions)
-    .filter(([_, action]) => action !== QualificationUpdateAction.EMPTY)
-    .map(([qualificationId, action]) => ({
+  const pendingPayload: QualificationUpdateRequest[] = Object.entries(decisions).map(
+    ([qualificationId, action]) => ({
       qualificationId,
       action,
-    }));
+    })
+  );
 
   const hasChanges = pendingPayload.length > 0;
 
   const handleActionChange = (qualificationId: string, action: QualificationUpdateAction) => {
-    setDecisions((prev) => ({
-      ...prev,
-      [qualificationId]: prev[qualificationId] === action ? QualificationUpdateAction.EMPTY : action,
-    }));
+    setDecisions((prev) => {
+      const newState = { ...prev };
+      if (prev[qualificationId] === action) {
+        delete newState[qualificationId];
+      } else {
+        newState[qualificationId] = action;
+      }
+      return newState;
+    });
   };
 
   const handleSave = () => {
@@ -54,7 +58,6 @@ export const QualificationRequestDetails = ({ userId, onClose }: QualificationRe
     );
   }
 
-  // Obsługa przypadku, gdy nie ma żadnych wniosków do wyświetlenia
   if (!rowDetails || rowDetails.length === 0) {
     return (
       <div className="py-10 text-center">
@@ -76,22 +79,22 @@ export const QualificationRequestDetails = ({ userId, onClose }: QualificationRe
           </TableHeader>
           <TableBody>
             {rowDetails.map((req) => {
-              const currentAction = decisions[req.qualificationId] || QualificationUpdateAction.EMPTY;
+              const currentAction = decisions[req.qualificationId];
 
               return (
                 <TableRow key={req.qualificationId}>
-                  <TableCell className="font-medium">{req.qualificationName}</TableCell>
+                  <TableCell className="font-medium text-sm">
+                    {req.qualificationName}
+                  </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button
                         size="sm"
                         variant="outline"
-                        title="Akceptuj"
                         className={cn(
-                          "h-8 w-8 p-0 border-green-200 transition-all",
-                          currentAction === QualificationUpdateAction.ACCEPT
-                            ? "bg-green-600 text-white border-transparent hover:bg-green-700"
-                            : "text-green-600 hover:bg-green-50"
+                          "h-8 w-8 p-0 border-green-200 transition-all hover:bg-green-50 hover:text-green-600",
+                          currentAction === QualificationUpdateAction.ACCEPT &&
+                          "bg-green-600 text-white border-transparent hover:bg-green-700 hover:text-white"
                         )}
                         onClick={() => handleActionChange(req.qualificationId, QualificationUpdateAction.ACCEPT)}
                       >
@@ -100,12 +103,10 @@ export const QualificationRequestDetails = ({ userId, onClose }: QualificationRe
                       <Button
                         size="sm"
                         variant="outline"
-                        title="Odrzuć"
                         className={cn(
-                          "h-8 w-8 p-0 border-red-200 transition-all",
-                          currentAction === QualificationUpdateAction.REJECT
-                            ? "bg-red-600 text-white border-transparent hover:bg-red-700"
-                            : "text-red-600 hover:bg-red-50"
+                          "h-8 w-8 p-0 border-red-200 transition-all hover:bg-red-50 hover:text-red-600",
+                          currentAction === QualificationUpdateAction.REJECT &&
+                          "bg-red-600 text-white border-transparent hover:bg-red-700 hover:text-white"
                         )}
                         onClick={() => handleActionChange(req.qualificationId, QualificationUpdateAction.REJECT)}
                       >
@@ -126,7 +127,6 @@ export const QualificationRequestDetails = ({ userId, onClose }: QualificationRe
         </Button>
         <Button
           onClick={handleSave}
-          // Teraz przycisk wyłączy się poprawnie, jeśli odznaczysz wszystkie opcje
           disabled={isUpdating || !hasChanges}
           className="min-w-[120px]"
         >
