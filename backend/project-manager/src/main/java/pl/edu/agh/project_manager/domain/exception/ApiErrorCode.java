@@ -32,6 +32,8 @@ public enum ApiErrorCode {
 
     QUALIFICATION_NOT_FOUND("QUAL_001", HttpStatus.NOT_FOUND, "Qualification not found"),
 
+    NOTIFICATION_NOT_FOUND("NOTIF_001", HttpStatus.NOT_FOUND, "Notification not found"),
+
     ROLE_NOT_IN_PROJECT("REQ_001", HttpStatus.BAD_REQUEST, "Role must exist within the provided project"),
     USER_ALREADY_IN_PROJECT("REQ_002", HttpStatus.CONFLICT, "User is already a member of this project"),
     USER_HAS_ONGOING_REQUEST("REQ_003", HttpStatus.CONFLICT, "User already has a pending request for this project"),
