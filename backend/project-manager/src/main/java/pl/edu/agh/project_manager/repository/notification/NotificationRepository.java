@@ -20,11 +20,11 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
 
     Page<Notification> findAllByRecipientIdAndIsReadFalseOrderByCreatedAtDesc(UUID recipientId, Pageable pageable);
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE Notification n SET n.isRead = true WHERE n.recipient.id = :userId AND n.isRead = false")
     void markAllAsReadByUserId(@Param("userId") UUID userId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM Notification n WHERE n.isRead = true AND n.createdAt < :thresholdDate")
     int deleteReadAndOlderThan(@Param("thresholdDate") LocalDateTime thresholdDate);
 }
