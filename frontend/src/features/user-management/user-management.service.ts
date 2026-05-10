@@ -21,11 +21,9 @@ export const userManagementService = {
     await api.post(ENDPOINTS.USERS.RESEND_INVITATION, { userId });
   },
 
-  searchUsers: async (searchTerm: string): Promise<SimpleUserResponse[]> => {
+  searchUsers: async (searchTerm: string, userRole?: string): Promise<SimpleUserResponse[]> => {
     const res = await api.get<SimpleUserResponse[]>(ENDPOINTS.USERS.SEARCH_USERS, {
-      params: {
-        search: searchTerm
-      }
+      params: { search: searchTerm, ...(userRole ? { userRole } : {}) }
     });
     return res.data;
   }

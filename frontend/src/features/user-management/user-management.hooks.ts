@@ -39,3 +39,11 @@ export const useSearchUsers = (searchTerm: string) => {
         enabled: searchTerm.length >= 2
     });
 }
+
+export const useSearchLinearManagers = (searchTerm: string) => {
+    return useQuery({
+        queryKey: usersKeys.search(`LINEAR_MANAGER:${searchTerm}`).queryKey,
+        queryFn: () => userManagementService.searchUsers(searchTerm, 'LINEAR_MANAGER'),
+        enabled: searchTerm.length >= 2
+    });
+}

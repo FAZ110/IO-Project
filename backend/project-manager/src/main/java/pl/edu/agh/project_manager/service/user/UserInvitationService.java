@@ -9,11 +9,9 @@ import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
-import pl.edu.agh.project_manager.infrastructure.email.ConsoleEmailSender;
 import pl.edu.agh.project_manager.service.command.invitation.AdminInviteUserCommand;
 import pl.edu.agh.project_manager.repository.user.ActivationTokenRepository;
 import pl.edu.agh.project_manager.repository.user.UserRepository;
-import pl.edu.agh.project_manager.service.command.invitation.ManagerInviteUserCommand;
 import pl.edu.agh.project_manager.service.command.invitation.SendInvitationCommand;
 import pl.edu.agh.project_manager.service.common.EmailSender;
 
@@ -32,17 +30,12 @@ public class UserInvitationService {
         processInvitation(command.email(), command.role(), command.supervisorId());
     }
 
-    @Transactional
-    public void inviteUser(ManagerInviteUserCommand command) {
-        processInvitation(command.email(), UserRole.COMMON, command.supervisorId());
-    }
-
     private void processInvitation(String email, UserRole role, UUID supervisorId) {
         if (userRepository.existsByEmail(email)) {
             throw new ApplicationException(ApiErrorCode.INVITATION_USER_ALREADY_EXISTS);
         }
 
-        var supervisor = fetchUser(supervisorId);
+        var supervisor = fetchSupervisor(supervisorId);
 
         var newUser = createInvitedUser(email, role, supervisor);
         userRepository.save(newUser);
@@ -64,8 +57,9 @@ public class UserInvitationService {
         emailSender.sendInvitation(sendInvitationCommand);
     }
 
-    private User fetchUser(UUID id) {
-        return userRepository.findById(id)
+    private User fetchSupervisor(UUID supervisorId) {
+        if (supervisorId == null) return null;
+        return userRepository.findById(supervisorId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.INVITATION_SUPERVISOR_NOT_FOUND));
     }
 

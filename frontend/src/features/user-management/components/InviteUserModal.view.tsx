@@ -1,5 +1,5 @@
 import type { FieldErrors, UseFormRegister } from 'react-hook-form';
-import type { InviteUserRequest } from '../user-management.types';
+import type { AdminAssignableRole, InviteUserRequest } from '../user-management.types';
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,11 +8,12 @@ import {
   DialogTitle,
   DialogDescription
 } from "@/components/ui/dialog";
+import { ManagerSelector } from './ManagerSelector';
 
 const ROLE_OPTIONS = [
   { value: 'COMMON',          label: 'Employee' },
   { value: 'AUTHORITY',       label: 'Authority' },
-  { value: 'LINEAR_MANAGER',  label: 'Line Manager' },
+  { value: 'LINEAR_MANAGER',  label: 'Linear Manager' },
   { value: 'PROJECT_MANAGER', label: 'Project Manager' },
 ] as const;
 
@@ -22,9 +23,21 @@ interface InviteUserModalViewProps {
   onClose: () => void;
   isPending: boolean;
   errors: FieldErrors<InviteUserRequest>;
+  watchedRole: AdminAssignableRole | undefined;
+  onManagerSelect: (id: string) => void;
+  managerError?: string;
 }
 
-export const InviteUserModalView = ({ register, onSubmit, onClose, isPending, errors }: InviteUserModalViewProps) => (
+export const InviteUserModalView = ({
+  register,
+  onSubmit,
+  onClose,
+  isPending,
+  errors,
+  watchedRole,
+  onManagerSelect,
+  managerError,
+}: InviteUserModalViewProps) => (
   <Dialog open={true} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
     <DialogContent>
       <DialogHeader>
@@ -66,10 +79,14 @@ export const InviteUserModalView = ({ register, onSubmit, onClose, isPending, er
           {errors.role && <span className="text-red-500 text-xs">{errors.role.message}</span>}
         </div>
 
+        {watchedRole === 'COMMON' && (
+          <ManagerSelector onSelect={onManagerSelect} error={managerError} />
+        )}
+
         <div className="flex gap-3 pt-2">
-            <Button type="submit" disabled={isPending} className="w-full py-6 cursor-pointer">
-              {isPending ? 'Wysyłanie...' : 'Zatwierdź'}
-            </Button>
+          <Button type="submit" disabled={isPending} className="w-full py-6 cursor-pointer">
+            {isPending ? 'Wysyłanie...' : 'Zatwierdź'}
+          </Button>
         </div>
       </form>
     </DialogContent>

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useInviteUserMutation } from '../user-management.hooks';
 import type { InviteUserRequest } from '../user-management.types';
@@ -8,10 +9,23 @@ interface InviteUserModalProps {
 }
 
 export const InviteUserModal = ({ onClose }: InviteUserModalProps) => {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<InviteUserRequest>();
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<InviteUserRequest>();
   const inviteMutation = useInviteUserMutation();
+  const [managerError, setManagerError] = useState<string | undefined>();
+
+  const watchedRole = watch('role');
+
+  const onManagerSelect = (id: string) => {
+    setValue('supervisorId', id || undefined);
+    if (id) setManagerError(undefined);
+  };
 
   const onSubmit = handleSubmit((data) => {
+    if (data.role === 'COMMON' && !data.supervisorId) {
+      setManagerError('Menedżer liniowy jest wymagany dla roli Employee');
+      return;
+    }
+    setManagerError(undefined);
     inviteMutation.mutate(data, {
       onSuccess: () => {
         reset();
@@ -27,6 +41,9 @@ export const InviteUserModal = ({ onClose }: InviteUserModalProps) => {
       onClose={onClose}
       isPending={inviteMutation.isPending}
       errors={errors}
+      watchedRole={watchedRole}
+      onManagerSelect={onManagerSelect}
+      managerError={managerError}
     />
   );
 };

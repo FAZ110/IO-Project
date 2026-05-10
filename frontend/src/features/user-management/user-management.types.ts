@@ -30,6 +30,7 @@ export interface BasicUserResponse {
 export interface InviteUserRequest {
   email: string;
   role: AdminAssignableRole;
+  supervisorId?: string;
 }
 
 export interface UserListParams {
