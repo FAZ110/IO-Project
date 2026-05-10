@@ -1,6 +1,7 @@
 package pl.edu.agh.project_manager.service.notification;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,10 +19,12 @@ import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.notification.NotificationRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class NotificationService {
 
@@ -77,5 +80,16 @@ public class NotificationService {
     @Transactional
     public void markAllAsRead(UUID userId) {
         notificationRepository.markAllAsReadByUserId(userId);
+    }
+
+    @Transactional
+    public void cleanupOldReadNotifications() {
+        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
+
+        int deletedCount = notificationRepository.deleteReadAndOlderThan(thirtyDaysAgo);
+
+        if (deletedCount > 0) {
+            log.info("Zakończono czyszczenie powiadomień. Usunięto {} starych, przeczytanych rekordów.", deletedCount);
+        }
     }
 }
