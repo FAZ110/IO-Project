@@ -1,17 +1,17 @@
-package pl.edu.agh.project_manager.controller;
+package pl.edu.agh.project_manager.controller.notification;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import pl.edu.agh.project_manager.controller.dto.PagedResponse;
 import pl.edu.agh.project_manager.controller.dto.notification.NotificationResponse;
-import pl.edu.agh.project_manager.domain.entity.notification.Notification;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.notification.NotificationService;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,11 +22,19 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping
-    public ResponseEntity<List<NotificationResponse>> getUserNotifications(
-            @RequestParam(defaultValue = "50") int limit,
+    public ResponseEntity<PagedResponse<NotificationResponse>> getUserNotifications(
+            @RequestParam(defaultValue = "true") boolean unreadOnly,
+            @PageableDefault(size = 20) Pageable pageable,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        return ResponseEntity.ok(notificationService.getNotificationsForUser(userPrincipal.userId(), limit));
+        return ResponseEntity.ok(
+                notificationService.getNotificationsForUser(
+                        userPrincipal.userId(),
+                        pageable.getPageNumber(),
+                        pageable.getPageSize(),
+                        unreadOnly
+                )
+        );
     }
 
     @PatchMapping("/{notificationId}/mark-as-read")

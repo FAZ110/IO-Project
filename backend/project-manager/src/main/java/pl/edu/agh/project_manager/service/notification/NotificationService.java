@@ -1,12 +1,14 @@
 package pl.edu.agh.project_manager.service.notification;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
+import pl.edu.agh.project_manager.controller.dto.PagedResponse;
 import pl.edu.agh.project_manager.controller.dto.notification.NotificationResponse;
 import pl.edu.agh.project_manager.domain.entity.notification.Notification;
 import pl.edu.agh.project_manager.domain.entity.user.User;
@@ -27,44 +29,8 @@ public class NotificationService {
 
     @TransactionalEventListener
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void onAssignmentRequested(AssignmentRequestedEvent event) {
-        create(event.recipient(), NotificationType.ASSIGNMENT_REQUESTED, event.message(), event.assignmentId());
-    }
-
-    @TransactionalEventListener
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void onAssignmentAccepted(AssignmentAcceptedEvent event) {
-        create(event.recipient(), NotificationType.ASSIGNMENT_ACCEPTED, event.message(), event.assignmentId());
-    }
-
-    @TransactionalEventListener
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void onAssignmentRejected(AssignmentRejectedEvent event) {
-        create(event.recipient(), NotificationType.ASSIGNMENT_REJECTED, event.message(), event.assignmentId());
-    }
-
-    @TransactionalEventListener
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void onQualificationRequested(QualificationRequestedEvent event) {
-        create(event.recipient(), NotificationType.QUALIFICATION_REQUESTED, event.message(), event.qualificationId());
-    }
-
-    @TransactionalEventListener
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void onQualificationAccepted(QualificationAcceptedEvent event) {
-        create(event.recipient(), NotificationType.QUALIFICATION_ACCEPTED, event.message(), event.qualificationId());
-    }
-
-    @TransactionalEventListener
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void onQualificationRejected(QualificationRejectedEvent event) {
-        create(event.recipient(), NotificationType.QUALIFICATION_REJECTED, event.message(), event.qualificationId());
-    }
-
-    @TransactionalEventListener
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void onSystemNewEmployee(SystemNewEmployeeEvent event) {
-        create(event.recipient(), NotificationType.SYSTEM_NEW_EMPLOYEE, event.message(), event.employeeId());
+    public void onNotificationEvent(NotificationEvent event) {
+        create(event.recipient(), event.type(), event.message(), event.referenceId());
     }
 
     private void create(User recipient, NotificationType type, String message, UUID referenceId) {
@@ -78,13 +44,18 @@ public class NotificationService {
     }
 
     @Transactional(readOnly = true)
-    public List<NotificationResponse> getNotificationsForUser(UUID userId, int limit) {
-        Pageable pageable = PageRequest.of(0, limit);
+    public PagedResponse<NotificationResponse> getNotificationsForUser(UUID userId, int page, int size, boolean unreadOnly) {
+        Pageable pageable = PageRequest.of(page, size);
 
-        return notificationRepository.findAllByRecipientIdOrderByCreatedAtDesc(userId, pageable)
-                .stream()
-                .map(NotificationResponse::from)
-                .toList();
+        Page<Notification> notificationPage;
+
+        if (unreadOnly) {
+            notificationPage = notificationRepository.findAllByRecipientIdAndIsReadFalseOrderByCreatedAtDesc(userId, pageable);
+        } else {
+            notificationPage = notificationRepository.findAllByRecipientIdOrderByCreatedAtDesc(userId, pageable);
+        }
+
+        return PagedResponse.from(notificationPage, NotificationResponse::from);
     }
 
     @Transactional

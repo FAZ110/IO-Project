@@ -6,8 +6,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import pl.edu.agh.project_manager.controller.dto.PagedResponse;
 import pl.edu.agh.project_manager.controller.dto.notification.NotificationResponse;
 import pl.edu.agh.project_manager.domain.entity.notification.Notification;
 import pl.edu.agh.project_manager.domain.entity.user.User;
@@ -35,7 +38,7 @@ class NotificationServiceTest {
     private NotificationService notificationService;
 
     @Test
-    void shouldCreateAndSaveNotificationOnAssignmentRequestedEvent() {
+    void shouldCreateAndSaveNotificationWhenNotificationEventIsPublished() {
         // Given
         User recipient = new User();
         recipient.setId(UUID.randomUUID());
@@ -47,7 +50,7 @@ class NotificationServiceTest {
         ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 
         // When
-        notificationService.onAssignmentRequested(event);
+        notificationService.onNotificationEvent(event);
 
         // Then
         verify(notificationRepository).save(notificationCaptor.capture());
@@ -61,30 +64,67 @@ class NotificationServiceTest {
     }
 
     @Test
-    void shouldReturnMappedNotificationsForUser() {
+    void shouldReturnPagedNotificationsForUserWhenUnreadOnlyIsFalse() {
         // Given
         UUID userId = UUID.randomUUID();
-        int limit = 10;
-        Pageable expectedPageable = PageRequest.of(0, limit);
+        int page = 0;
+        int size = 10;
+        Pageable expectedPageable = PageRequest.of(page, size);
 
         Notification notification = Notification.builder()
                 .id(UUID.randomUUID())
                 .type(NotificationType.SYSTEM_NEW_EMPLOYEE)
-                .message("Test")
+                .message("Test All")
+                .isRead(true)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        Page<Notification> notificationPage = new PageImpl<>(List.of(notification), expectedPageable, 1);
+
+        when(notificationRepository.findAllByRecipientIdOrderByCreatedAtDesc(userId, expectedPageable))
+                .thenReturn(notificationPage);
+
+        // When
+        PagedResponse<NotificationResponse> result = notificationService.getNotificationsForUser(userId, page, size, false);
+
+        // Then
+        assertEquals(1, result.items().size());
+        assertEquals(notification.getId(), result.items().get(0).id());
+        assertEquals("Test All", result.items().get(0).message());
+        assertEquals(1, result.totalCount());
+        assertEquals(0, result.pageNumber());
+    }
+
+    @Test
+    void shouldReturnPagedNotificationsForUserWhenUnreadOnlyIsTrue() {
+        // Given
+        UUID userId = UUID.randomUUID();
+        int page = 0;
+        int size = 10;
+        Pageable expectedPageable = PageRequest.of(page, size);
+
+        Notification notification = Notification.builder()
+                .id(UUID.randomUUID())
+                .type(NotificationType.ASSIGNMENT_REQUESTED)
+                .message("Test Unread")
                 .isRead(false)
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        when(notificationRepository.findAllByRecipientIdOrderByCreatedAtDesc(userId, expectedPageable))
-                .thenReturn(List.of(notification));
+        Page<Notification> notificationPage = new PageImpl<>(List.of(notification), expectedPageable, 1);
+
+        when(notificationRepository.findAllByRecipientIdAndIsReadFalseOrderByCreatedAtDesc(userId, expectedPageable))
+                .thenReturn(notificationPage);
 
         // When
-        List<NotificationResponse> result = notificationService.getNotificationsForUser(userId, limit);
+        PagedResponse<NotificationResponse> result = notificationService.getNotificationsForUser(userId, page, size, true);
 
         // Then
-        assertEquals(1, result.size());
-        assertEquals(notification.getId(), result.get(0).id());
-        assertEquals(notification.getMessage(), result.get(0).message());
+        assertEquals(1, result.items().size());
+        assertEquals(notification.getId(), result.items().get(0).id());
+        assertEquals("Test Unread", result.items().get(0).message());
+        assertFalse(result.items().get(0).isRead());
+        assertEquals(1, result.totalPages());
     }
 
     @Test
