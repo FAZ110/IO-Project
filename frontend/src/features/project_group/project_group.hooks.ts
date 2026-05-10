@@ -12,7 +12,7 @@ export const useProjectGroups = () => {
 
 export const useCreateProjectGroup = () => {
   return useMutation({
-    mutationFn: projectGroupService.create,
+    mutationFn: projectGroupService.createGroup,
     onSuccess: () => {
       toast.success('Dodano grupę projektową.');
     },

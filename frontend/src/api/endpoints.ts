@@ -22,8 +22,6 @@ export const ENDPOINTS = {
     },
     PROJECT: {
         BASE: '/projects',
-        LIST: '/projects',
-        CREATE: '/projects',
         DETAIL: (id: string) => `/projects/${id}`,
         RISK: {
             LIST: (projectId: string) => `/projects/${projectId}/risks`
@@ -32,8 +30,7 @@ export const ENDPOINTS = {
         ROLES: {
             STATUS_LIST: (projectId: string) => `/projects/${projectId}/roles/status`,
             ALLOCATE: (roleId: string) => `/roles/${roleId}/allocation-requests`
-        },
-        SEARCH_PROJECTS: '/projects'
+        }
     },
     PROJECT_GROUP: {
         LIST_ALL: '/groups',

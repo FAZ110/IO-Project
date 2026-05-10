@@ -18,7 +18,7 @@ public record ProjectGroupCreationRequest(
         @NotNull(message = "Typ grupy nie może być pusty")
         GroupType groupType,
 
-        List<UUID> projectIds
+        List<@NotNull UUID> projectIds
 ) {
 
     public ProjectGroupCreationCommand toCommand(UUID ownerId) {

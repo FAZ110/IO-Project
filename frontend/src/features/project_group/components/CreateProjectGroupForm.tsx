@@ -1,6 +1,6 @@
-import { useForm} from "react-hook-form";
+import { FormProvider, useForm} from "react-hook-form";
 import type { CreateProjectGroupFormData } from "../project_group.schema.ts";
-import type { ProjectGroupCreationRequest } from "../project_group.types.ts";
+import { PROJECT_GROUP_TYPE_VALUES, type ProjectGroupCreationRequest } from "../project_group.types.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDebounce } from "use-debounce";
 import { useState } from "react";
@@ -18,7 +18,7 @@ export const CreateProjectGroupForm = () => {
       defaultValues: {
           name: "",
           description: "",
-          groupType: "WALLET",
+          groupType: PROJECT_GROUP_TYPE_VALUES[0],
           projectIds: [],
       }
     });
@@ -49,14 +49,14 @@ export const CreateProjectGroupForm = () => {
     };
 
     return (
-        <CreateProjectGroupFormView 
-            methods={methods}
-            onSubmit={onSubmit} 
-            foundProjects={foundProjects}
-            onSearchProjects={setProjectQuery}
-        />
+        <FormProvider {...methods}>
+            <CreateProjectGroupFormView
+                onSubmit={onSubmit} 
+                foundProjects={foundProjects}
+                onSearchProjects={setProjectQuery}
+            />
+        </FormProvider>
     )
-
 }
 
 export default CreateProjectGroupForm;

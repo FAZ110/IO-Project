@@ -7,12 +7,6 @@ export const PROJECT_GROUP_TYPE_LABELS: Record<ProjectGroupType, string> = {
     PROGRAM: "Program",
 };
 
-export const ProjectGroupType = {
-    Wallet: 'WALLET',
-    Program: 'PROGRAM'
-} as const;
-
-
 export interface SingleGroupResponse {
     id: string,
     name: string
@@ -28,4 +22,8 @@ export interface ProjectGroupCreationRequest {
     description: string
     groupType: ProjectGroupType,
     projectIds: string[]
+}
+
+export interface ProjectGroupCreatedResponse {
+    id: string
 }

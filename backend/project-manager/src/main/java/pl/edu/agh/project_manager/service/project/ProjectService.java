@@ -62,23 +62,6 @@ public class ProjectService {
         return savedProject.getId();
     }
 
-    @Transactional
-    public List<ProjectResponse> getAccessibleProjects(UserPrincipal userPrincipal) {
-
-        UserRole role = userPrincipal.userRole();
-
-        List<Project> projects = switch (role) {
-            case ADMINISTRATOR, AUTHORITY -> projectRepository.findAll();
-            case PROJECT_MANAGER          -> projectRepository.findAllByProjectManagerId(userPrincipal.userId());
-            case LINEAR_MANAGER, COMMON   -> projectRepository.findAllByMemberId(userPrincipal.userId());
-            default                       -> List.of();
-        };
-
-        return projects.stream()
-                .map(ProjectResponse::from)
-                .toList();
-    }
-
     public ProjectResponse getProject(UUID projectId) {
         Project project = projectRepository.findByIdWithManager(projectId)
                 .orElseThrow(() -> new ApplicationException(
@@ -162,40 +145,28 @@ public class ProjectService {
 
     @Transactional
     public List<ProjectResponse> searchProjects(SearchProjectCommand command) {
-        String searchPattern = (command.query() != null && !command.query().isBlank())
-                ? "%" + command.query().toLowerCase() + "%"
-                : null;
+        Specification<Project> spec = Specification
+                .where(ProjectSpecification.accessibleByUser(command.user()))
+                .and(buildSearchFilter(command));
 
-        Specification<Project> spec = ((root, query1, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-
-            if (searchPattern != null) {
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), searchPattern));
-            }
-
-            switch (command.userRole()) {
-                case PROJECT_MANAGER -> predicates.add(criteriaBuilder.equal(root.get("projectManager").get("id"), command.userId()));
-                case LINEAR_MANAGER, COMMON -> {
-                    Join<Project, User> membersJoin = root.join("members");
-                    predicates.add(criteriaBuilder.equal(membersJoin.get("id"), command.userId()));
-                    query1.distinct(true);
-                }
-                case ADMINISTRATOR, AUTHORITY -> {}
-            }
-
-            if (command.groupId() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("projectGroup").get("id"), command.groupId()));
-            } else if (Boolean.TRUE.equals(command.unassignedOnly())) {
-                predicates.add(criteriaBuilder.isNull(root.get("projectGroup")));
-            }
-
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        });
-
-        List<Project> project = projectRepository.findAll(spec);
-
-        return project.stream()
+        return projectRepository.findAll(spec).stream()
                 .map(ProjectResponse::from)
                 .toList();
+    }
+
+    private Specification<Project> buildSearchFilter(SearchProjectCommand command) {
+        Specification<Project> spec = (root, query, cb) -> cb.conjunction();
+
+        if (command.query() != null && !command.query().isBlank()) {
+            spec = spec.and(ProjectSpecification.withSearchPattern(command.query()));
+        }
+
+        if (command.groupId() != null) {
+            spec = spec.and(ProjectSpecification.inGroup(command.groupId()));
+        } else if (Boolean.TRUE.equals(command.unassignedOnly())) {
+            spec = spec.and(ProjectSpecification.unassigned());
+        }
+
+        return spec;
     }
 }

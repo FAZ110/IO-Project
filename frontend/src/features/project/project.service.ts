@@ -46,7 +46,7 @@ export const projectService = {
     },
 
   searchProjectsWithinGroup: async (searchTerm: string): Promise<ProjectDetailsResponse[]> => {
-    const response = await api.get<ProjectDetailsResponse[]>(ENDPOINTS.PROJECT.SEARCH_PROJECTS, {
+    const response = await api.get<ProjectDetailsResponse[]>(ENDPOINTS.PROJECT.BASE, {
       params: {
         query: searchTerm,
         unassignedOnly: true

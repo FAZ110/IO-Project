@@ -43,20 +43,13 @@ public class ProjectController {
             @RequestParam(value = "groupId", required = false) UUID groupId,
             @RequestParam(value = "unassignedOnly", required = false, defaultValue = "false") Boolean unassignedOnly
     ) {
-        if (query == null && groupId == null) {
-            List<ProjectResponse> projects = projectService.getAccessibleProjects(userPrincipal);
-            return ResponseEntity.ok(projects);
-        }
-
         SearchProjectCommand command = new SearchProjectCommand(
-                userPrincipal.userId(),
-                userPrincipal.userRole(),
+                userPrincipal,
                 query,
                 groupId,
                 unassignedOnly
         );
-        List<ProjectResponse> projects = projectService.searchProjects(command);
-        return ResponseEntity.ok(projects);
+        return ResponseEntity.ok(projectService.searchProjects(command));
     }
 
     @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectAccess.canAccessProject(#projectId, authentication.principal)")

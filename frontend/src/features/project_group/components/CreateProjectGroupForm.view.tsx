@@ -1,24 +1,24 @@
 import type { ProjectDetailsResponse } from "@/features/project/project.types.ts";
 import { PROJECT_GROUP_TYPE_LABELS, PROJECT_GROUP_TYPE_VALUES } from "../project_group.types.ts";
-import type { SubmitHandler, UseFormReturn } from "react-hook-form";
+import { useFormContext, type SubmitHandler } from "react-hook-form";
 import { useState } from "react";
 import type { CreateProjectGroupFormData } from "../project_group.schema.ts";
 
 interface CreateProjectGroupFormProps {
-  methods: UseFormReturn<CreateProjectGroupFormData>;
   onSubmit: SubmitHandler<CreateProjectGroupFormData>;
   foundProjects: ProjectDetailsResponse[];
   onSearchProjects: (query: string) => void;
 }
 
-export const CreateProjectGroupFormView = ({ methods, onSubmit, foundProjects, onSearchProjects }: CreateProjectGroupFormProps) => {
+export const CreateProjectGroupFormView = ({ onSubmit, foundProjects, onSearchProjects }: CreateProjectGroupFormProps) => {
   const {
     register,
+    handleSubmit,
     formState: { errors },
     watch,
     getValues,
     setValue,
-  } = methods;
+  } = useFormContext<CreateProjectGroupFormData>();
 
   const [searchInput, setSearchInput] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -62,7 +62,7 @@ export const CreateProjectGroupFormView = ({ methods, onSubmit, foundProjects, o
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Tworzenie portfela/programu</h2>
-      <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-700">
             Nazwa *

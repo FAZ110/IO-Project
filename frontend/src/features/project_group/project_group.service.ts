@@ -1,6 +1,6 @@
 import apiClient from '../../api/client';
 import { ENDPOINTS } from '../../api/endpoints';
-import type {AllGroupsResponse, SingleGroupResponse, ProjectGroupCreationRequest} from "@/features/project_group/project_group.types.ts";
+import type {AllGroupsResponse, SingleGroupResponse, ProjectGroupCreationRequest, ProjectGroupCreatedResponse} from "@/features/project_group/project_group.types.ts";
 
 export const projectGroupService = {
     getAll: async (): Promise<SingleGroupResponse[]> => {
@@ -8,8 +8,8 @@ export const projectGroupService = {
         return [ ...data.wallets, ...data.programs];
     },
 
-    create: async (projectGroupData: ProjectGroupCreationRequest): Promise<string> => {
-        const response = await apiClient.post<{ id: string }>(ENDPOINTS.PROJECT_GROUP.CREATE, projectGroupData);
+    createGroup: async (projectGroupData: ProjectGroupCreationRequest): Promise<string> => {
+        const response = await apiClient.post<ProjectGroupCreatedResponse>(ENDPOINTS.PROJECT_GROUP.CREATE, projectGroupData);
         return response.data.id;
     }
 };

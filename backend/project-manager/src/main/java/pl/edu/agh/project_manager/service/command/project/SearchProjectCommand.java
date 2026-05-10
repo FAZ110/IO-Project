@@ -1,17 +1,17 @@
 package pl.edu.agh.project_manager.service.command.project;
 
 import pl.edu.agh.project_manager.domain.enums.UserRole;
+import pl.edu.agh.project_manager.security.UserPrincipal;
 
 import java.util.UUID;
 
 public record SearchProjectCommand(
-        UUID userId,
-        UserRole userRole,
+        UserPrincipal user,
         String query,
         UUID groupId,
         Boolean unassignedOnly
 ) {
-    public SearchProjectCommand toCommand(UUID userId, UserRole userRole, String query, UUID groupId, Boolean unassignedOnly) {
-        return new SearchProjectCommand(userId, userRole, query, groupId, unassignedOnly);
+    public SearchProjectCommand toCommand(UserPrincipal user, String query, UUID groupId, Boolean unassignedOnly) {
+        return new SearchProjectCommand(user, query, groupId, unassignedOnly);
     }
 }
