@@ -50,7 +50,6 @@ public class QualificationManagementService {
     @Transactional
     public void updateRequests(UUID managerId, List<QualificationUpdateRequest> requests) {
         var activeRequestsMap = requests.stream()
-                .filter(r -> r.action() != QualificationUpdateAction.EMPTY)
                 .collect(Collectors.toMap(
                         QualificationUpdateRequest::qualificationId,
                         r -> r,
@@ -78,7 +77,7 @@ public class QualificationManagementService {
                 if (!skill.isValid()) {
                     skill.setValid(true);
                 }
-            } else {
+            } else if (action == QualificationUpdateAction.REJECT) {
                 qualification.setStatus(QualificationStatus.REJECTED);
             }
         }
