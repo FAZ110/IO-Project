@@ -26,6 +26,7 @@ import java.util.UUID;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final NotificationSender notificationSender;
 
     @TransactionalEventListener
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -40,7 +41,11 @@ public class NotificationService {
                 .message(message)
                 .referenceId(referenceId)
                 .build();
-        notificationRepository.save(notification);
+
+        Notification savedNotification = notificationRepository.save(notification);
+
+        NotificationResponse response = NotificationResponse.from(savedNotification);
+        notificationSender.send(response, recipient.getId());
     }
 
     @Transactional(readOnly = true)
