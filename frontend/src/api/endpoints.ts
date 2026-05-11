@@ -46,5 +46,11 @@ export const ENDPOINTS = {
         ASSIGNMENT_DETAIL: (id: string) => `/approvals/assignments/${id}/details`,
         ACCEPT_ASSIGNMENT: (id: string) => `/approvals/assignments/${id}/accept`,
         REJECT_ASSIGNMENT: (id: string) => `/approvals/assignments/${id}/reject`
+    },
+    NOTIFICATIONS: {
+      BASE: '/notifications',
+      STREAM: '/notifications/stream',
+      MARK_READ: (id: string) => `/notifications/${id}/mark-as-read`,
+      MARK_ALL_READ: '/notifications/mark-all-as-read',
     }
 } as const;

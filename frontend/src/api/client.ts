@@ -4,11 +4,15 @@ import {ENDPOINTS} from "./endpoints.ts";
 let currentAccessToken: string | null = null;
 
 export const setAccessToken = (token: string | null) => {
-    currentAccessToken = token;
+  currentAccessToken = token;
 }
 
+export const getAccessToken = () => currentAccessToken;
+
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },

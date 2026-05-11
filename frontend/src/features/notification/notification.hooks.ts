@@ -1,32 +1,105 @@
-import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import {useQuery, useMutation, useQueryClient, useInfiniteQuery} from '@tanstack/react-query';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
+import { notificationService } from './notification.service';
+import { queryKeys } from '@/api';
+import { ENDPOINTS } from '@/api/endpoints';
 import type { NotificationResponse } from './notification.types';
-import {NOTIFICATION_KEYS} from "@/features/notification/notification.keys.ts";
+import type { PagedResponse } from '@/api/api.types';
+import {API_BASE_URL, getAccessToken} from "@/api/client.ts";
 
-const MOCK_NOTIFICATIONS: NotificationResponse[] = [
-  {
-    id: '1',
-    type: 'ASSIGNMENT_REQUESTED',
-    message: 'Jan Kowalski prosi o przypisanie do projektu "Apollo".',
-    isRead: false,
-    referenceId: 'proj-123',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    type: 'QUALIFICATION_ACCEPTED',
-    message: 'Twoja kwalifikacja "React" została zaakceptowana.',
-    isRead: true,
-    referenceId: 'qual-456',
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-  }
-];
-
-export const useNotifications = () => {
+export const useNotifications = (unreadOnly: boolean = true) => {
   return useQuery({
-    queryKey: NOTIFICATION_KEYS.feed(),
-    queryFn: async () => {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return MOCK_NOTIFICATIONS;
+    queryKey: queryKeys.notifications.feed(unreadOnly, 0).queryKey,
+    queryFn: () => notificationService.getNotifications(unreadOnly, 0, 10),
+  });
+};
+
+export const useInfiniteNotifications = (unreadOnly: boolean = true) => {
+  return useInfiniteQuery({
+    queryKey: queryKeys.notifications.infinite(unreadOnly).queryKey,
+    queryFn: ({ pageParam = 0 }) => notificationService.getNotifications(unreadOnly, pageParam, 20),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.pageNumber < lastPage.totalPages - 1) {
+        return lastPage.pageNumber + 1;
+      }
+      return undefined;
     },
   });
+};
+
+export const useMarkNotificationAsRead = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: notificationService.markAsRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications._def });
+    },
+  });
+};
+
+export const useMarkAllNotificationsAsRead = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: notificationService.markAllAsRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications._def });
+    },
+  });
+};
+
+export const useNotificationStream = () => {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const token = getAccessToken();
+
+    if (!token) return;
+
+    const controller = new AbortController();
+
+    const connectStream = async () => {
+      const url = `${API_BASE_URL}${ENDPOINTS.NOTIFICATIONS.STREAM}`;
+
+      await fetchEventSource(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'text/event-stream, application/json',
+        },
+        signal: controller.signal,
+        onmessage(ev) {
+          if (ev.event === 'NOTIFICATION') {
+            const newNotification: NotificationResponse = JSON.parse(ev.data);
+
+            const mainFeedKey = queryKeys.notifications.feed(true, 0).queryKey;
+
+            queryClient.setQueryData<PagedResponse<NotificationResponse>>(
+              mainFeedKey,
+              (oldData) => {
+                if (!oldData) return oldData;
+                return {
+                  ...oldData,
+                  items: [newNotification, ...oldData.items],
+                  totalCount: oldData.totalCount + 1,
+                };
+              }
+            );
+          }
+        },
+        onerror(err) {
+          console.error('Błąd połączenia SSE:', err);
+        }
+      });
+    };
+
+    connectStream();
+
+    return () => {
+      controller.abort();
+    };
+  }, [queryClient, getAccessToken()]);
 };

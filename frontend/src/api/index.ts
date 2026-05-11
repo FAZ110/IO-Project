@@ -5,4 +5,10 @@ export const employeeAssignmentsKeys = createQueryKeys('employee-assignments', {
   list: null
 })
 
-export const queryKeys = mergeQueryKeys(employeeAssignmentsKeys)
+export const notificationsKeys = createQueryKeys('notifications', {
+  feed: (unreadOnly: boolean, page: number) => [{ unreadOnly, page }],
+
+  infinite: (unreadOnly: boolean) => [{ unreadOnly, type: 'infinite' }],
+});
+
+export const queryKeys = mergeQueryKeys(employeeAssignmentsKeys, notificationsKeys)
