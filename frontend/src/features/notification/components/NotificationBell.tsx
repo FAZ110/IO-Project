@@ -16,7 +16,7 @@ import {
   useMarkNotificationAsRead,
   useMarkAllNotificationsAsRead
 } from '../notification.hooks';
-import { getNotificationUrl } from '../notification.types';
+import { getNotificationUrl } from '../notification.utils';
 import type { NotificationType } from '../notification.types';
 import { cn } from '@/lib/utils';
 

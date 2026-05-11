@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {useQuery, useMutation, useQueryClient, useInfiniteQuery} from '@tanstack/react-query';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { notificationService } from './notification.service';
 import { queryKeys } from '@/api';
@@ -65,6 +65,20 @@ export const useMarkAllNotificationsAsRead = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.notifications._def });
     }
+  });
+};
+
+export const useInfiniteNotifications = (unreadOnly: boolean) => {
+  return useInfiniteQuery({
+    queryKey: queryKeys.notifications.infinite(unreadOnly).queryKey,
+    queryFn: ({ pageParam = 0 }) => notificationService.getNotifications(unreadOnly, pageParam, 20),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.pageNumber < lastPage.totalPages - 1) {
+        return lastPage.pageNumber + 1;
+      }
+      return undefined;
+    },
   });
 };
 

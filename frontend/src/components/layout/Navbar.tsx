@@ -3,7 +3,6 @@ import { useAuth } from '@/providers/AuthContext';
 import { useAuthActions } from '@/features/auth/auth.hooks';
 import { PATHS } from '@/routes/paths';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +16,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   LogOut,
   Briefcase,
-  Bell,
   UserCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
