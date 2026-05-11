@@ -1,6 +1,6 @@
 import { FormProvider, useForm} from "react-hook-form";
 import type { CreateProjectGroupFormData } from "../project_group.schema.ts";
-import { PROJECT_GROUP_TYPE_VALUES, type ProjectGroupCreationRequest } from "../project_group.types.ts";
+import { type ProjectGroupCreationRequest } from "../project_group.types.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDebounce } from "use-debounce";
 import { useState } from "react";
@@ -10,6 +10,7 @@ import { CreateProjectGroupFormSchema } from "../project_group.schema.ts";
 import { useSearchProjectsWithinGroup } from "@/features/project/project.hooks.ts";
 import { useCreateProjectGroup } from "../project_group.hooks.ts";
 import { CreateProjectGroupFormView } from "./CreateProjectGroupForm.view.tsx";
+import { ProjectGroupType } from "../project_group.types.ts";
 
 
 export const CreateProjectGroupForm = () => {
@@ -18,7 +19,7 @@ export const CreateProjectGroupForm = () => {
       defaultValues: {
           name: "",
           description: "",
-          groupType: PROJECT_GROUP_TYPE_VALUES[0],
+          groupType: ProjectGroupType.WALLET,
           projectIds: [],
       }
     });
