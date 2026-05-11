@@ -74,12 +74,9 @@ public class ApprovalsController {
     }
 
     @GetMapping("/qualifications/details")
-    @PreAuthorize("hasRole('LINEAR_MANAGER')")
-    public ResponseEntity<List<QualificationDetailsResponse>> getQualificationRequestDetails(
-            @AuthenticationPrincipal UserPrincipal principal,
-            @RequestParam UUID userId
-    ) {
-        return ResponseEntity.ok(qualificationService.getPendingForUser(principal.userId(), userId));
+    @PreAuthorize("hasRole('LINEAR_MANAGER') and @qualificationSecurity.isManagerForUser(principal.userId(), #userId)")
+    public ResponseEntity<List<QualificationDetailsResponse>> getQualificationRequestDetails(@RequestParam UUID userId) {
+        return ResponseEntity.ok(qualificationService.getPendingForUser(userId));
     }
 
     @PostMapping("/qualifications/bulk-update")

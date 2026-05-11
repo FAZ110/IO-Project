@@ -75,7 +75,7 @@ public class QualificationManagementService {
     }
 
     @Transactional(readOnly = true)
-    public List<QualificationDetailsResponse> getPendingForUser(UUID managerId, UUID userId) {
+    public List<QualificationDetailsResponse> getPendingForUser(UUID userId) {
         if (!userRepository.existsById(userId)) {
             throw new ApplicationException(ApiErrorCode.USER_NOT_FOUND);
         }
