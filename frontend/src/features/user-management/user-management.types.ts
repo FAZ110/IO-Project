@@ -2,7 +2,22 @@ import type { UserRole } from '@/features/auth/auth.types';
 
 export type UserStatus = 'PENDING' | 'ACTIVE' | 'EXPIRED';
 
-export type AdminAssignableRole = Exclude<UserRole, 'ADMINISTRATOR'>;
+export const AdminAssignableRole = {
+  COMMON: 'COMMON',
+  AUTHORITY: 'AUTHORITY',
+  LINEAR_MANAGER: 'LINEAR_MANAGER',
+  PROJECT_MANAGER: 'PROJECT_MANAGER',
+} as const;
+export type AdminAssignableRole = typeof AdminAssignableRole[keyof typeof AdminAssignableRole];
+
+export const UserSearchableRole = {
+  COMMON: 'COMMON',
+  AUTHORITY: 'AUTHORITY',
+  LINEAR_MANAGER: 'LINEAR_MANAGER',
+  PROJECT_MANAGER: 'PROJECT_MANAGER',
+  ADMINISTRATOR: 'ADMINISTRATOR',
+} as const;
+export type UserSearchableRole = typeof UserSearchableRole[keyof typeof UserSearchableRole];
 
 export interface UserResponse {
   id: string;

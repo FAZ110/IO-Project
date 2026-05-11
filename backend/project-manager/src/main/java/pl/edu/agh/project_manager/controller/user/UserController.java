@@ -73,10 +73,10 @@ class UserController {
     @GetMapping("/users/search")
     public ResponseEntity<List<SimpleUserResponse>> searchUsers(
             @RequestParam("search") String search,
-            @RequestParam(required = false) UserRole userRole
+            @RequestParam(required = false) UserSearchableRole userRole
     ) {
         if (userRole != null) {
-            return ResponseEntity.ok(userService.searchUsersByRole(search, userRole));
+            return ResponseEntity.ok(userService.searchUsersByRole(search, UserRole.valueOf(userRole.name())));
         }
         return ResponseEntity.ok(userService.searchUsers(search));
     }

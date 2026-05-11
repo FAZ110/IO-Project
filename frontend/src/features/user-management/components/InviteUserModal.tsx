@@ -1,7 +1,6 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { useInviteUserMutation } from '../user-management.hooks';
-import type { InviteUserRequest } from '../user-management.types';
+import { AdminAssignableRole, type InviteUserRequest } from '../user-management.types';
 import { InviteUserModalView } from './InviteUserModal.view';
 
 interface InviteUserModalProps {
@@ -9,23 +8,15 @@ interface InviteUserModalProps {
 }
 
 export const InviteUserModal = ({ onClose }: InviteUserModalProps) => {
-  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<InviteUserRequest>();
+  const methods = useForm<InviteUserRequest>();
+  const { handleSubmit, reset, setError } = methods;
   const inviteMutation = useInviteUserMutation();
-  const [managerError, setManagerError] = useState<string | undefined>();
-
-  const watchedRole = watch('role');
-
-  const onManagerSelect = (id: string) => {
-    setValue('supervisorId', id || undefined);
-    if (id) setManagerError(undefined);
-  };
 
   const onSubmit = handleSubmit((data) => {
-    if (data.role === 'COMMON' && !data.supervisorId) {
-      setManagerError('Menedżer liniowy jest wymagany dla roli Employee');
+    if (data.role === AdminAssignableRole.COMMON && !data.supervisorId) {
+      setError('supervisorId', { message: 'Menedżer liniowy jest wymagany dla roli Employee' });
       return;
     }
-    setManagerError(undefined);
     inviteMutation.mutate(data, {
       onSuccess: () => {
         reset();
@@ -35,15 +26,8 @@ export const InviteUserModal = ({ onClose }: InviteUserModalProps) => {
   });
 
   return (
-    <InviteUserModalView
-      register={register}
-      onSubmit={onSubmit}
-      onClose={onClose}
-      isPending={inviteMutation.isPending}
-      errors={errors}
-      watchedRole={watchedRole}
-      onManagerSelect={onManagerSelect}
-      managerError={managerError}
-    />
+    <FormProvider {...methods}>
+      <InviteUserModalView onSubmit={onSubmit} onClose={onClose} isPending={inviteMutation.isPending} />
+    </FormProvider>
   );
 };

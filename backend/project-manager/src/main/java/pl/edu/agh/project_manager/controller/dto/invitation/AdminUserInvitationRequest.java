@@ -1,5 +1,6 @@
 package pl.edu.agh.project_manager.controller.dto.invitation;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,4 +17,8 @@ public record AdminUserInvitationRequest(
 
         UUID supervisorId
 ) {
+    @AssertTrue(message = "Menedżer liniowy jest wymagany dla roli Employee")
+    boolean isSupervisorRequiredForRole() {
+        return role != AdminAssignableRole.COMMON || supervisorId != null;
+    }
 }
