@@ -76,7 +76,14 @@ class UserController {
             @RequestParam(required = false) UserSearchableRole userRole
     ) {
         if (userRole != null) {
-            return ResponseEntity.ok(userService.searchUsersByRole(search, UserRole.valueOf(userRole.name())));
+            UserRole mappedRole = switch (userRole) {
+                case COMMON -> UserRole.COMMON;
+                case AUTHORITY -> UserRole.AUTHORITY;
+                case LINEAR_MANAGER -> UserRole.LINEAR_MANAGER;
+                case PROJECT_MANAGER -> UserRole.PROJECT_MANAGER;
+                case ADMINISTRATOR -> UserRole.ADMINISTRATOR;
+            };
+            return ResponseEntity.ok(userService.searchUsersByRole(search, mappedRole));
         }
         return ResponseEntity.ok(userService.searchUsers(search));
     }
