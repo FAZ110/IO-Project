@@ -1,6 +1,6 @@
 import api from '@/api/client';
 import { ENDPOINTS } from '@/api/endpoints';
-import type { NotificationResponse } from './notification.types';
+import type {NotificationResponse, UnreadCountResponse} from './notification.types';
 import type { PagedResponse } from '@/api/api.types';
 
 export const notificationService = {
@@ -17,5 +17,10 @@ export const notificationService = {
 
   markAllAsRead: async (): Promise<void> => {
     await api.patch(ENDPOINTS.NOTIFICATIONS.MARK_ALL_READ);
-  }
+  },
+
+  getUnreadCount: async (): Promise<number> => {
+    const { data } = await api.get<UnreadCountResponse>(ENDPOINTS.NOTIFICATIONS.UNREAD_COUNT);
+    return data.count;
+  },
 };

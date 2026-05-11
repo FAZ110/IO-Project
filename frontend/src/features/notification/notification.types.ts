@@ -18,6 +18,10 @@ export interface NotificationResponse {
   createdAt: string;
 }
 
+export interface UnreadCountResponse {
+  count: number;
+}
+
 // TODO: Do zmiany gdy już beda znane
 export const getNotificationUrl = (type: NotificationType, referenceId: string): string => {
   switch (type) {

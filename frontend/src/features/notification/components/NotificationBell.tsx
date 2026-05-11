@@ -1,7 +1,6 @@
-// features/notification/components/NotificationBell.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Check, Loader2, Filter } from 'lucide-react';
+import { Bell, Check, CheckCircle2, Loader2, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
@@ -13,39 +12,41 @@ import {
 } from '@/components/ui/popover';
 import {
   useNotifications,
+  useUnreadCount,
   useMarkNotificationAsRead,
   useMarkAllNotificationsAsRead
 } from '../notification.hooks';
 import { getNotificationUrl } from '../notification.types';
 import type { NotificationType } from '../notification.types';
 import { cn } from '@/lib/utils';
-import { PATHS } from '@/routes/paths';
 
 export const NotificationBell = () => {
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
   const [unreadOnly, setUnreadOnly] = useState(true);
 
-  const { data, isLoading } = useNotifications(unreadOnly);
+  const { data: unreadCount = 0 } = useUnreadCount();
+
+  const { data, isLoading } = useNotifications(unreadOnly, isOpen);
 
   const { mutate: markAsRead } = useMarkNotificationAsRead();
   const { mutate: markAllAsRead, isPending: isMarkingAll } = useMarkAllNotificationsAsRead();
 
   const notifications = data?.items || [];
 
-  const unreadCount = unreadOnly
-    ? (data?.totalCount || 0)
-    : notifications.filter(n => !n.isRead).length;
-
   const handleNotificationClick = (type: NotificationType, referenceId: string, id: string, isRead: boolean) => {
-    if (!isRead) {
-      markAsRead(id);
-    }
-    const url = getNotificationUrl(type, referenceId);
-    navigate(url);
+    if (!isRead) markAsRead(id);
+    setIsOpen(false);
+    navigate(getNotificationUrl(type, referenceId));
+  };
+
+  const handleMarkAsReadOnly = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    markAsRead(id);
   };
 
   return (
-    <Popover>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon" className="relative text-slate-500 hover:text-slate-900 cursor-pointer">
           <Bell className="h-5 w-5" />
@@ -63,8 +64,7 @@ export const NotificationBell = () => {
             <span className="font-semibold text-slate-900">Powiadomienia</span>
             {unreadCount > 0 && (
               <Button
-                variant="ghost"
-                size="sm"
+                variant="ghost" size="sm"
                 onClick={() => markAllAsRead()}
                 disabled={isMarkingAll}
                 className="h-auto p-1 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50"
@@ -102,45 +102,54 @@ export const NotificationBell = () => {
             </div>
           ) : (
             notifications.map((notification) => (
-              <button
+              <div
                 key={notification.id}
-                onClick={() => handleNotificationClick(notification.type, notification.referenceId, notification.id, notification.isRead)}
                 className={cn(
-                  "w-full text-left flex flex-col items-start p-4 transition-colors border-b last:border-b-0",
-                  !notification.isRead
-                    ? "bg-blue-50/40 hover:bg-blue-50/80"
-                    : "bg-white hover:bg-slate-50 opacity-70"
+                  "relative flex group transition-colors border-b last:border-b-0",
+                  !notification.isRead ? "bg-blue-50/20 hover:bg-blue-50/60" : "bg-white hover:bg-slate-50 opacity-60 grayscale-[30%]"
                 )}
               >
-                <div className="flex justify-between w-full mb-1">
-                  <span className={cn(
-                    "text-xs font-semibold uppercase tracking-wider",
-                    !notification.isRead ? "text-blue-700" : "text-slate-500"
+                <button
+                  onClick={() => handleNotificationClick(notification.type, notification.referenceId, notification.id, notification.isRead)}
+                  className="w-full text-left flex flex-col items-start p-4 pr-10"
+                >
+                  <div className="flex justify-between w-full mb-1">
+                    <span className={cn(
+                      "text-xs font-semibold uppercase tracking-wider",
+                      !notification.isRead ? "text-blue-700" : "text-slate-500"
+                    )}>
+                      Aktywność
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium">
+                      {new Date(notification.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className={cn(
+                    "text-sm line-clamp-2 mt-1",
+                    !notification.isRead ? "text-slate-900 font-medium" : "text-slate-500"
                   )}>
-                    Aktywność
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-medium">
-                    {new Date(notification.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-                <p className={cn(
-                  "text-sm line-clamp-2 mt-1",
-                  !notification.isRead ? "text-slate-900 font-medium" : "text-slate-600"
-                )}>
-                  {notification.message}
-                </p>
-              </button>
+                    {notification.message}
+                  </p>
+                </button>
+
+                {!notification.isRead && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => handleMarkAsReadOnly(e, notification.id)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 text-slate-400 hover:text-blue-600 hover:bg-blue-100 opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Oznacz jako przeczytane"
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             ))
           )}
         </div>
 
         <div className="p-2 border-t text-center bg-slate-50 rounded-b-md">
-          <Button
-            variant="link"
-            size="sm"
-            onClick={() => navigate('/notifications')}
-            className="text-xs text-slate-500 hover:text-slate-900"
-          >
+          <Button variant="link" size="sm" onClick={() => { setIsOpen(false); navigate('/notifications'); }} className="text-xs text-slate-500 hover:text-slate-900">
             Zobacz wszystkie powiadomienia
           </Button>
         </div>

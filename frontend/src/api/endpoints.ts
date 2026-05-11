@@ -50,6 +50,7 @@ export const ENDPOINTS = {
     NOTIFICATIONS: {
       BASE: '/notifications',
       STREAM: '/notifications/stream',
+      UNREAD_COUNT: 'notifications/unread-count',
       MARK_READ: (id: string) => `/notifications/${id}/mark-as-read`,
       MARK_ALL_READ: '/notifications/mark-all-as-read',
     }

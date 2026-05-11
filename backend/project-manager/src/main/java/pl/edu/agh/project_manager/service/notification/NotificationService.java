@@ -52,6 +52,11 @@ public class NotificationService {
     }
 
     @Transactional(readOnly = true)
+    public Integer getUnreadCount(UUID userId) {
+        return notificationRepository.countAllByRecipientIdAndIsReadFalse(userId);
+    }
+
+    @Transactional(readOnly = true)
     public PagedResponse<NotificationResponse> getNotificationsForUser(UUID userId, int page, int size, boolean unreadOnly) {
         Pageable pageable = PageRequest.of(page, size);
 

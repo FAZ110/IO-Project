@@ -7,7 +7,7 @@ export const employeeAssignmentsKeys = createQueryKeys('employee-assignments', {
 
 export const notificationsKeys = createQueryKeys('notifications', {
   feed: (unreadOnly: boolean, page: number) => [{ unreadOnly, page }],
-
+  unreadCount: () => ['count'],
   infinite: (unreadOnly: boolean) => [{ unreadOnly, type: 'infinite' }],
 });
 
