@@ -5,4 +5,15 @@ export const employeeAssignmentsKeys = createQueryKeys('employee-assignments', {
   list: null
 })
 
-export const queryKeys = mergeQueryKeys(employeeAssignmentsKeys)
+export const qualificationsKeys = createQueryKeys('qualifications', {
+  mine: null, // me/qualifications
+  suggestions: (query: string) => [query],
+});
+
+export const approvalsKeys = createQueryKeys('approvals', {
+  waitingSummary: null,
+  details: (userId: string) => [userId],
+});
+
+
+export const queryKeys = mergeQueryKeys(employeeAssignmentsKeys, qualificationsKeys, approvalsKeys);

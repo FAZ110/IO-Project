@@ -26,3 +26,27 @@ export interface PendingSkill {
   name: string;
   id?: string;
 }
+
+export const QualificationUpdateAction = {
+  ACCEPT: 'ACCEPT',
+  REJECT: 'REJECT'
+} as const;
+
+export type QualificationUpdateAction = typeof QualificationUpdateAction[keyof typeof QualificationUpdateAction];
+
+export interface QualificationUpdateRequest {
+  qualificationId: string;
+  action: QualificationUpdateAction;
+}
+
+export interface QualificationRequestResponse {
+  userId: string;
+  employeeName: string;
+  employeeSurname: string;
+  qualificationsCount: number;
+}
+
+export interface QualificationDetailsResponse {
+  qualificationId: string;
+  qualificationName: string;
+}
