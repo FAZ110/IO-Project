@@ -29,8 +29,7 @@ export interface PendingSkill {
 
 export const QualificationUpdateAction = {
   ACCEPT: 'ACCEPT',
-  REJECT: 'REJECT',
-  EMPTY: 'EMPTY',
+  REJECT: 'REJECT'
 } as const;
 
 export type QualificationUpdateAction = typeof QualificationUpdateAction[keyof typeof QualificationUpdateAction];
