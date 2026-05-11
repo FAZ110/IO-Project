@@ -3,12 +3,15 @@ package pl.edu.agh.project_manager.controller.notification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import pl.edu.agh.project_manager.controller.dto.PagedResponse;
 import pl.edu.agh.project_manager.controller.dto.notification.NotificationResponse;
+import pl.edu.agh.project_manager.infrastructure.notification.SseSubscriber;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.notification.NotificationService;
 
@@ -20,6 +23,13 @@ import java.util.UUID;
 public class NotificationController {
 
     private final NotificationService notificationService;
+    private final SseSubscriber sseSubscriber;
+
+    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public ResponseEntity<SseEmitter> streamNotifications(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        SseEmitter emitter = sseSubscriber.subscribe(userPrincipal.userId());
+        return ResponseEntity.ok(emitter);
+    }
 
     @GetMapping
     public ResponseEntity<PagedResponse<NotificationResponse>> getUserNotifications(

@@ -34,11 +34,14 @@ class NotificationServiceTest {
     @Mock
     private NotificationRepository notificationRepository;
 
+    @Mock
+    private NotificationSender notificationSender;
+
     @InjectMocks
     private NotificationService notificationService;
 
     @Test
-    void shouldCreateAndSaveNotificationWhenNotificationEventIsPublished() {
+    void shouldCreateSaveAndSendNotificationWhenNotificationEventIsPublished() {
         // Given
         User recipient = new User();
         recipient.setId(UUID.randomUUID());
@@ -49,18 +52,26 @@ class NotificationServiceTest {
 
         ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 
+        Notification savedMock = Notification.builder()
+                .id(UUID.randomUUID())
+                .recipient(recipient)
+                .type(NotificationType.ASSIGNMENT_REQUESTED)
+                .message(message)
+                .referenceId(assignmentId)
+                .isRead(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+        when(notificationRepository.save(any(Notification.class))).thenReturn(savedMock);
+
         // When
         notificationService.onNotificationEvent(event);
 
         // Then
         verify(notificationRepository).save(notificationCaptor.capture());
-        Notification savedNotification = notificationCaptor.getValue();
+        Notification capturedNotification = notificationCaptor.getValue();
+        assertEquals(NotificationType.ASSIGNMENT_REQUESTED, capturedNotification.getType());
 
-        assertEquals(recipient, savedNotification.getRecipient());
-        assertEquals(NotificationType.ASSIGNMENT_REQUESTED, savedNotification.getType());
-        assertEquals(message, savedNotification.getMessage());
-        assertEquals(assignmentId, savedNotification.getReferenceId());
-        assertFalse(savedNotification.isRead());
+        verify(notificationSender).send(any(NotificationResponse.class), eq(recipient.getId()));
     }
 
     @Test
@@ -173,5 +184,24 @@ class NotificationServiceTest {
 
         // Then
         verify(notificationRepository).markAllAsReadByUserId(userId);
+    }
+
+    @Test
+    void shouldCleanupOldReadNotifications() {
+        // Given
+        ArgumentCaptor<LocalDateTime> dateCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
+
+        when(notificationRepository.deleteReadAndOlderThan(any(LocalDateTime.class))).thenReturn(5);
+
+        // When
+        notificationService.cleanupOldReadNotifications();
+
+        // Then
+        verify(notificationRepository).deleteReadAndOlderThan(dateCaptor.capture());
+        LocalDateTime capturedDate = dateCaptor.getValue();
+
+        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
+        assertTrue(capturedDate.isBefore(thirtyDaysAgo.plusMinutes(1)));
+        assertTrue(capturedDate.isAfter(thirtyDaysAgo.minusMinutes(1)));
     }
 }
