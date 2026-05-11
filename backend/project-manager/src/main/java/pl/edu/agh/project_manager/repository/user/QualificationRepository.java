@@ -4,10 +4,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import pl.edu.agh.project_manager.domain.entity.project.ProjectAssignment;
 import pl.edu.agh.project_manager.domain.entity.user.Qualification;
-import pl.edu.agh.project_manager.domain.entity.user.User;
-import pl.edu.agh.project_manager.domain.enums.AssignmentStatus;
 import pl.edu.agh.project_manager.domain.enums.QualificationStatus;
 
 import java.util.Collection;

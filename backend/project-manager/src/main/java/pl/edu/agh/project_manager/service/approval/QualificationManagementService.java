@@ -50,11 +50,7 @@ public class QualificationManagementService {
     @Transactional
     public void updateRequests(UUID managerId, List<QualificationUpdateRequest> requests) {
         var activeRequestsMap = requests.stream()
-                .collect(Collectors.toMap(
-                        QualificationUpdateRequest::qualificationId,
-                        r -> r,
-                        (existing, replacement) -> existing
-                ));
+                .collect(Collectors.toMap(QualificationUpdateRequest::qualificationId, r -> r));
 
         if (activeRequestsMap.isEmpty()) return;
 
@@ -63,22 +59,17 @@ public class QualificationManagementService {
         List<Qualification> allowedQualifications = qualificationRepository.findAllByIdInAndUserSupervisorId(ids, managerId);
 
         if (allowedQualifications.size() != ids.size()) {
-            throw new ApplicationException(ApiErrorCode.ACCESS_DENIED);
+            throw new ApplicationException(ApiErrorCode.QUALIFICATION_OWNER_NOT_SUBORDINATE);
         }
 
         for (Qualification qualification : allowedQualifications) {
-            var action = activeRequestsMap.get(qualification.getId()).action();
-
             validateWaitingStatus(qualification);
 
-            if (action == QualificationUpdateAction.ACCEPT) {
-                qualification.setStatus(QualificationStatus.ACCEPTED);
-                Skill skill = qualification.getSkill();
-                if (!skill.isValid()) {
-                    skill.setValid(true);
-                }
-            } else if (action == QualificationUpdateAction.REJECT) {
-                qualification.setStatus(QualificationStatus.REJECTED);
+            var action = activeRequestsMap.get(qualification.getId()).action();
+
+            switch (action) {
+                case QualificationUpdateAction.ACCEPT -> qualification.accept();
+                case QualificationUpdateAction.REJECT -> qualification.reject();
             }
         }
     }

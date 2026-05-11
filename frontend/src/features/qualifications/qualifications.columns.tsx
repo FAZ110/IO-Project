@@ -29,30 +29,35 @@ export const getColumns = ({ onVerify }: ColumnActions): ColumnDef<Qualification
           variant="outline"
           className="border-amber-500 text-amber-700 bg-amber-50 font-medium"
         >
-          {count} {count === 1 ? 'WNIOSEK' : 'WNIOSKI'} OCZEKUJĄCE
+          {count} {
+            count === 1 ? 'WNIOSEK' :
+              (count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20))
+                ? 'WNIOSKI'
+                : 'WNIOSKÓW'
+          }
         </Badge>
       );
     },
   },
   {
-  id: "actions",
-  header: () => <div className="text-right px-4">Akcje</div>,
-  cell: ({ row }) => {
-    const userSummary = row.original;
+    id: "actions",
+    header: () => <div className="text-right px-4">Akcje</div>,
+    cell: ({ row }) => {
+      const userSummary = row.original;
 
-    return (
-      <div className="flex justify-end px-4">
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-8 gap-2" // gap-2 przyda się, jeśli dodasz ikonkę
-          onClick={() => onVerify?.(userSummary)}
-        >
-          {/* Opcjonalnie: <Eye className="h-4 w-4" /> */}
-          Weryfikuj
-        </Button>
-      </div>
-    );
+      return (
+        <div className="flex justify-end px-4">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 gap-2"
+            onClick={() => onVerify?.(userSummary)}
+          >
+            {/* Opcjonalnie: <Eye className="h-4 w-4" /> */}
+            Weryfikuj
+          </Button>
+        </div>
+      );
+    },
   },
-},
 ]
