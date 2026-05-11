@@ -1,0 +1,24 @@
+package pl.edu.agh.project_manager.controller.dto.invitation;
+
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.UUID;
+
+public record AdminUserInvitationRequest(
+        @NotBlank(message = "Email nie może być pusty")
+        @Email(message = "Niepoprawny format adresu email")
+        String email,
+
+        @NotNull(message = "Rola musi zostać określona")
+        AdminAssignableRole role,
+
+        UUID supervisorId
+) {
+    @AssertTrue(message = "Menedżer liniowy jest wymagany dla roli Employee")
+    boolean isSupervisorRequiredForRole() {
+        return role != AdminAssignableRole.COMMON || supervisorId != null;
+    }
+}

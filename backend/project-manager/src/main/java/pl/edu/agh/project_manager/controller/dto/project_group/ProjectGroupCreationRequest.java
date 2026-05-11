@@ -1,0 +1,33 @@
+package pl.edu.agh.project_manager.controller.dto.project_group;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import pl.edu.agh.project_manager.domain.enums.GroupType;
+import pl.edu.agh.project_manager.service.command.project.ProjectGroupCreationCommand;
+
+import java.util.List;
+import java.util.UUID;
+
+public record ProjectGroupCreationRequest(
+        @NotBlank(message = "Nazwa portfela/grupy nie może być pusta")
+        String name,
+
+        @NotBlank(message = "opis portfela/grupy nie może być pusta")
+        String description,
+
+        @NotNull(message = "Typ grupy nie może być pusty")
+        GroupType groupType,
+
+        List<@NotNull UUID> projectIds
+) {
+
+    public ProjectGroupCreationCommand toCommand(UUID ownerId) {
+        return new ProjectGroupCreationCommand(
+                this.name,
+                this.description,
+                this.groupType,
+                this.projectIds,
+                ownerId
+        );
+    }
+}
