@@ -26,4 +26,15 @@ public class Qualification {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private QualificationStatus status = QualificationStatus.WAITING;
+
+    public void accept() {
+        this.status = QualificationStatus.ACCEPTED;
+        if (!skill.isValid()) {
+            skill.setValid(true);
+        }
+    }
+
+    public void reject() {
+        this.status = QualificationStatus.REJECTED;
+    }
 }

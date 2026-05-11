@@ -1,7 +1,10 @@
 package pl.edu.agh.project_manager.service.project;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import pl.edu.agh.project_manager.controller.dto.project.ProjectMembersResponse;
 import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
@@ -10,6 +13,7 @@ import pl.edu.agh.project_manager.domain.entity.project.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.projectgroup.ProjectGroup;
 import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.entity.project.ProjectMilestone;
+import pl.edu.agh.project_manager.domain.enums.GroupType;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.project.ProjectRepository;
@@ -18,9 +22,11 @@ import pl.edu.agh.project_manager.service.command.project.MilestoneCommand;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
+import pl.edu.agh.project_manager.service.command.project.SearchProjectCommand;
 import pl.edu.agh.project_manager.service.projectgroup.ProjectGroupsService;
 import pl.edu.agh.project_manager.service.user.UserService;
 
@@ -54,23 +60,6 @@ public class ProjectService {
         Project savedProject = projectRepository.save(project);
 
         return savedProject.getId();
-    }
-
-    @Transactional
-    public List<ProjectResponse> getAccessibleProjects(UserPrincipal userPrincipal) {
-
-        UserRole role = userPrincipal.userRole();
-
-        List<Project> projects = switch (role) {
-            case ADMINISTRATOR, AUTHORITY -> projectRepository.findAll();
-            case PROJECT_MANAGER          -> projectRepository.findAllByProjectManagerId(userPrincipal.userId());
-            case LINEAR_MANAGER, COMMON   -> projectRepository.findAllByMemberId(userPrincipal.userId());
-            default                       -> List.of();
-        };
-
-        return projects.stream()
-                .map(ProjectResponse::from)
-                .toList();
     }
 
     public ProjectResponse getProject(UUID projectId) {
@@ -154,4 +143,30 @@ public class ProjectService {
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find project: " + projectId));
     }
 
+    @Transactional
+    public List<ProjectResponse> searchProjects(SearchProjectCommand command) {
+        Specification<Project> spec = Specification
+                .where(ProjectSpecification.accessibleByUser(command.user()))
+                .and(buildSearchFilter(command));
+
+        return projectRepository.findAll(spec).stream()
+                .map(ProjectResponse::from)
+                .toList();
+    }
+
+    private Specification<Project> buildSearchFilter(SearchProjectCommand command) {
+        Specification<Project> spec = (root, query, cb) -> cb.conjunction();
+
+        if (command.query() != null && !command.query().isBlank()) {
+            spec = spec.and(ProjectSpecification.withSearchPattern(command.query()));
+        }
+
+        if (command.groupId() != null) {
+            spec = spec.and(ProjectSpecification.inGroup(command.groupId()));
+        } else if (Boolean.TRUE.equals(command.unassignedOnly())) {
+            spec = spec.and(ProjectSpecification.unassigned());
+        }
+
+        return spec;
+    }
 }
