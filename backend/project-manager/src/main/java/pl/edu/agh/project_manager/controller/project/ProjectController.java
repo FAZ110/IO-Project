@@ -8,7 +8,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.project_manager.controller.dto.project.*;
+import pl.edu.agh.project_manager.domain.enums.GroupType;
 import pl.edu.agh.project_manager.security.UserPrincipal;
+import pl.edu.agh.project_manager.service.command.project.SearchProjectCommand;
 import pl.edu.agh.project_manager.service.project.ProjectService;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 
@@ -36,10 +38,18 @@ public class ProjectController {
     @GetMapping
     @PreAuthorize("hasAnyRole('PROJECT_MANAGER', 'AUTHORITY', 'LINEAR_MANAGER', 'COMMON', 'ADMINISTRATOR')")
     public ResponseEntity<List<ProjectResponse>> getAllProjects(
-            @AuthenticationPrincipal UserPrincipal userPrincipal
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "groupId", required = false) UUID groupId,
+            @RequestParam(value = "unassignedOnly", required = false, defaultValue = "false") Boolean unassignedOnly
     ) {
-        List<ProjectResponse> projects = projectService.getAccessibleProjects(userPrincipal);
-        return ResponseEntity.ok(projects);
+        SearchProjectCommand command = new SearchProjectCommand(
+                userPrincipal,
+                query,
+                groupId,
+                unassignedOnly
+        );
+        return ResponseEntity.ok(projectService.searchProjects(command));
     }
 
     @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectAccess.canAccessProject(#projectId, authentication.principal)")
