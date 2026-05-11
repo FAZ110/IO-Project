@@ -38,7 +38,7 @@ public class SmtpEmailSender implements EmailSender {
 
         message.setTo(command.email());
         message.setFrom(fromEmail);
-        message.setSubject("Zaproszenie od kierownika liniowego");
+        message.setSubject("Zaproszenie do systemu");
         message.setText("Link do rejestracji w systemie:\n" + registrationLink);
 
         mailSender.send(message);
