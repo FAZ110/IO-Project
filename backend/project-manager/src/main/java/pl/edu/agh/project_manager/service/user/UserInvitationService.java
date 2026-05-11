@@ -2,14 +2,15 @@ package pl.edu.agh.project_manager.service.user;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import pl.edu.agh.project_manager.domain.entity.user.ActivationToken;
 import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
+import pl.edu.agh.project_manager.domain.event.SystemNewEmployeeEvent;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
-import pl.edu.agh.project_manager.infrastructure.email.ConsoleEmailSender;
 import pl.edu.agh.project_manager.service.command.invitation.AdminInviteUserCommand;
 import pl.edu.agh.project_manager.repository.user.ActivationTokenRepository;
 import pl.edu.agh.project_manager.repository.user.UserRepository;
@@ -26,6 +27,7 @@ public class UserInvitationService {
     private final UserRepository userRepository;
     private final ActivationTokenRepository tokenRepository;
     private final EmailSender emailSender;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void inviteUser(AdminInviteUserCommand command) {
@@ -46,6 +48,14 @@ public class UserInvitationService {
 
         var newUser = createInvitedUser(email, role, supervisor);
         userRepository.save(newUser);
+
+        if (supervisor != null) {
+            eventPublisher.publishEvent(new SystemNewEmployeeEvent(
+                    newUser.getId(),
+                    supervisor,
+                    "Do twojego zespołu zaproszono nowego pracownika: " + email
+            ));
+        }
 
         var activationToken = createTokenForUser(newUser);
 
