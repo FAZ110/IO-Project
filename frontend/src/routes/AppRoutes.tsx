@@ -16,6 +16,7 @@ import { AuthenticatedRoute } from '@/routes/AuthenticatedRoute';
 import { AuthorizedRoute } from '@/routes/AuthorizedRoute';
 import { EmployeeAssignmentsPage } from '@/pages/EmployeeAssignmentsPage';
 import { QualificationRequestsPage } from '@/pages/QualificationRequestsPage';
+import { CreateProjectGroupPage } from '@/pages/CreateProjectGroupPage';
 
 export const AppRoutes = () => {
   return (
@@ -43,6 +44,7 @@ export const AppRoutes = () => {
           {/* PROJECT MANAGER ROUTES */}
           <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER]} />}>
               <Route path={PATHS.CREATE_PROJECT} element={<CreateProjectPage />} />
+              <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
           </Route>
 
           {/* ADMIN ROUTES */}
@@ -50,11 +52,15 @@ export const AppRoutes = () => {
             <Route path={PATHS.ADMIN_USERS} element={<AdminUsersPage />} />
             <Route path={PATHS.ADMIN_USER_DETAILS(`:${ROUTE_PARAMS.USER_ID}`)} element={<AdminUserDetailsPage />} />
           </Route>
+
+          <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER, UserRole.AUTHORITY]} />}>
+            <Route path={PATHS.CREATE_PROJECT_GROUP} element={<CreateProjectGroupPage />} />
+          </Route>
         </Route>
       </Route>
 
       {/* FALLBACK - 404 */}
-      <Route path="*" element={<Navigate to={PATHS.ROOT} replace />} />      
+      <Route path="*" element={<Navigate to={PATHS.ROOT} replace />} />
     </Routes>
   );
 };

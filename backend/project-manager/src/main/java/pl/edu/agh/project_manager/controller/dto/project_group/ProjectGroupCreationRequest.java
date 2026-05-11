@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import pl.edu.agh.project_manager.domain.enums.GroupType;
 import pl.edu.agh.project_manager.service.command.project.ProjectGroupCreationCommand;
 
+import java.util.List;
 import java.util.UUID;
 
 public record ProjectGroupCreationRequest(
@@ -15,7 +16,9 @@ public record ProjectGroupCreationRequest(
         String description,
 
         @NotNull(message = "Typ grupy nie może być pusty")
-        GroupType groupType
+        GroupType groupType,
+
+        List<@NotNull UUID> projectIds
 ) {
 
     public ProjectGroupCreationCommand toCommand(UUID ownerId) {
@@ -23,6 +26,7 @@ public record ProjectGroupCreationRequest(
                 this.name,
                 this.description,
                 this.groupType,
+                this.projectIds,
                 ownerId
         );
     }

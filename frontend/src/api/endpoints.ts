@@ -22,8 +22,6 @@ export const ENDPOINTS = {
     },
     PROJECT: {
         BASE: '/projects',
-        LIST: '/projects',
-        CREATE: '/projects',
         DETAIL: (id: string) => `/projects/${id}`,
         RISK: {
             LIST: (projectId: string) => `/projects/${projectId}/risks`

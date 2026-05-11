@@ -1,5 +1,6 @@
 package pl.edu.agh.project_manager.repository.project;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -41,4 +42,7 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     @EntityGraph(attributePaths = {"projectManager", "projectManager.qualifications"})
     @Query("SELECT DISTINCT p FROM Project p JOIN p.members m WHERE m.user.id = :userId")
     List<Project> findAllByMemberId(@Param("userId") UUID userId);
+
+    @EntityGraph(attributePaths = {"projectManager"})
+    List<Project> findAll(Specification<Project> spec);
 }

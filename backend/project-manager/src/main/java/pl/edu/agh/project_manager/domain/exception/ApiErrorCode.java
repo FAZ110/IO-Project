@@ -34,6 +34,8 @@ public enum ApiErrorCode {
     INVALID_QUALIFICATION_STATE("QUAL_002", HttpStatus.BAD_REQUEST, "Qualification is not in WAITING state"),
     QUALIFICATION_OWNER_NOT_SUBORDINATE("QUAL_003", HttpStatus.FORBIDDEN, "Qualification owner is not subordinate for manager"),
 
+    NOTIFICATION_NOT_FOUND("NOTIF_001", HttpStatus.NOT_FOUND, "Notification not found"),
+
     ROLE_NOT_IN_PROJECT("REQ_001", HttpStatus.BAD_REQUEST, "Role must exist within the provided project"),
     USER_ALREADY_IN_PROJECT("REQ_002", HttpStatus.CONFLICT, "User is already a member of this project"),
     USER_HAS_ONGOING_REQUEST("REQ_003", HttpStatus.CONFLICT, "User already has a pending request for this project"),

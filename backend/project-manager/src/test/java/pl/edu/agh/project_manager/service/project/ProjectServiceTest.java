@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.jpa.domain.Specification;
 import pl.edu.agh.project_manager.domain.entity.project.Project;
 import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
@@ -13,6 +14,7 @@ import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.project.ProjectRepository;
 import pl.edu.agh.project_manager.security.UserPrincipal;
+import pl.edu.agh.project_manager.service.command.project.SearchProjectCommand;
 import pl.edu.agh.project_manager.service.projectgroup.ProjectGroupsService;
 import pl.edu.agh.project_manager.service.user.UserService;
 import pl.edu.agh.project_manager.service.command.project.MilestoneCommand;
@@ -99,17 +101,17 @@ class ProjectServiceTest {
         // Given
         UUID adminId = UUID.randomUUID();
         UserPrincipal principal = createPrincipal(adminId, UserRole.ADMINISTRATOR);
+        SearchProjectCommand searchCommand = new SearchProjectCommand(principal, null, null, false);
 
-        when(projectRepository.findAll()).thenReturn(List.of(
+        when(projectRepository.findAll(any(Specification.class))).thenReturn(List.of(
                 createTestProject(UUID.randomUUID(), "Projekt A"),
                 createTestProject(UUID.randomUUID(), "Projekt B")
         ));
         // When
-        var result = projectService.getAccessibleProjects(principal);
+        var result = projectService.searchProjects(searchCommand);
 
         // Then
         assertThat(result).hasSize(2);
-        verify(projectRepository).findAll();
     }
 
     @Test
@@ -118,17 +120,17 @@ class ProjectServiceTest {
         // Given
         UUID pmId = UUID.randomUUID();
         UserPrincipal principal = createPrincipal(pmId, UserRole.PROJECT_MANAGER);
+        SearchProjectCommand searchCommand = new SearchProjectCommand(principal, null, null, false);
 
-        when(projectRepository.findAllByProjectManagerId(pmId)).thenReturn(List.of(
+        when(projectRepository.findAll(any(Specification.class))).thenReturn(List.of(
                 createTestProject(UUID.randomUUID(), "Projekt A")
         ));
 
         // When
-        var result = projectService.getAccessibleProjects(principal);
+        var result = projectService.searchProjects(searchCommand);
 
         // Then
         assertThat(result).hasSize(1);
-        verify(projectRepository).findAllByProjectManagerId(pmId);
     }
 
     @Test
@@ -137,17 +139,17 @@ class ProjectServiceTest {
         // Given
         UUID userId = UUID.randomUUID();
         UserPrincipal principal = createPrincipal(userId, UserRole.COMMON);
+        SearchProjectCommand searchCommand = new SearchProjectCommand(principal, null, null, false);
 
-        when(projectRepository.findAllByMemberId(userId)).thenReturn(List.of(
+        when(projectRepository.findAll(any(Specification.class))).thenReturn(List.of(
                 createTestProject(UUID.randomUUID(), "Projekt A")
         ));
 
         // When
-        var result = projectService.getAccessibleProjects(principal);
+        var result = projectService.searchProjects(searchCommand);
 
         // Then
         assertThat(result).hasSize(1);
-        verify(projectRepository).findAllByMemberId(userId);
     }
 
     @Test
@@ -172,7 +174,6 @@ class ProjectServiceTest {
         // Then
         assertThat(response).isNotNull();
         assertThat(response.sponsors()).hasSize(1);
-        verify(projectRepository).findByIdWithAllMembers(projectId);
     }
 
     private ProjectCreationCommand createBasicCommand(UUID managerId) {

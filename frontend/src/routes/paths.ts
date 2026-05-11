@@ -19,4 +19,5 @@ export const PATHS = {
   CREATE_PROJECT: `/create-project`,
   PROJECT: (id: string) => `project/${id}`,
   QUALIFICATION_REQUESTS: '/qualification-requests',
+  CREATE_PROJECT_GROUP: `/create-project-group`
 } as const;
