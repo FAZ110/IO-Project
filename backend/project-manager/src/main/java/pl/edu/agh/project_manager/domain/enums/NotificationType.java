@@ -1,0 +1,15 @@
+package pl.edu.agh.project_manager.domain.enums;
+
+public enum NotificationType {
+
+    ASSIGNMENT_REQUESTED,
+    ASSIGNMENT_ACCEPTED,
+    ASSIGNMENT_REJECTED,
+
+    QUALIFICATION_REQUESTED,
+    QUALIFICATION_ACCEPTED,
+    QUALIFICATION_REJECTED,
+
+    SYSTEM_NEW_EMPLOYEE
+
+}

@@ -27,6 +27,12 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SEND_GRID_VERIFY_EMAIL: ${SEND_GRID_VERIFY_EMAIL}
+      APP_FRONTEND_URL: ${APP_FRONTEND_URL}
     depends_on:
       db:
         condition: service_healthy

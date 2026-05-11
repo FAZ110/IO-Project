@@ -13,10 +13,12 @@ import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.enums.GroupType;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
+import pl.edu.agh.project_manager.repository.project.ProjectRepository;
 import pl.edu.agh.project_manager.repository.projectgroup.ProjectGroupRepository;
 import pl.edu.agh.project_manager.repository.user.UserRepository;
 import pl.edu.agh.project_manager.service.command.project.ProjectGroupCreationCommand;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,6 +36,9 @@ class ProjectGroupServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ProjectRepository projectRepository;
 
     @InjectMocks
     private ProjectGroupsService projectGroupsService;
@@ -119,13 +124,14 @@ class ProjectGroupServiceTest {
         // Given
         UUID userId = UUID.randomUUID();
         ProjectGroupCreationCommand command = new ProjectGroupCreationCommand(
-                "New Program", "Desc", GroupType.PROGRAM, userId
+                "New Program", "Desc", GroupType.PROGRAM, new ArrayList<>(), userId
         );
         User owner = User.builder().id(userId).build();
         ProjectGroup savedGroup = ProjectGroup.builder().id(UUID.randomUUID()).build();
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(owner));
         when(projectGroupRepository.save(any(ProjectGroup.class))).thenReturn(savedGroup);
+        when(projectRepository.findAllById(new ArrayList<>())).thenReturn(new ArrayList<>());
 
         // When
         UUID resultId = projectGroupsService.createGroup(command);
@@ -141,7 +147,7 @@ class ProjectGroupServiceTest {
         // Given
         UUID userId = UUID.randomUUID();
         ProjectGroupCreationCommand command = new ProjectGroupCreationCommand(
-                "New Program", "Desc", GroupType.PROGRAM, userId
+                "New Program", "Desc", GroupType.PROGRAM, new ArrayList<>(), userId
         );
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
