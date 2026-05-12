@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Check, CheckCircle2, Loader2, Filter } from 'lucide-react';
+import { Bell, Check, Loader2, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
@@ -18,7 +18,7 @@ import {
 } from '../notification.hooks';
 import { getNotificationUrl } from '../notification.utils';
 import type { NotificationType } from '../notification.types';
-import { cn } from '@/lib/utils';
+import {NotificationBellItem} from "@/features/notification/components/NotificationBellItem.tsx";
 
 export const NotificationBell = () => {
   const navigate = useNavigate();
@@ -102,48 +102,12 @@ export const NotificationBell = () => {
             </div>
           ) : (
             notifications.map((notification) => (
-              <div
+              <NotificationBellItem
                 key={notification.id}
-                className={cn(
-                  "relative flex group transition-colors border-b last:border-b-0",
-                  !notification.isRead ? "bg-blue-50/20 hover:bg-blue-50/60" : "bg-white hover:bg-slate-50 opacity-60 grayscale-[30%]"
-                )}
-              >
-                <button
-                  onClick={() => handleNotificationClick(notification.type, notification.referenceId, notification.id, notification.isRead)}
-                  className="w-full text-left flex flex-col items-start p-4 pr-10"
-                >
-                  <div className="flex justify-between w-full mb-1">
-                    <span className={cn(
-                      "text-xs font-semibold uppercase tracking-wider",
-                      !notification.isRead ? "text-blue-700" : "text-slate-500"
-                    )}>
-                      Aktywność
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-medium">
-                      {new Date(notification.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <p className={cn(
-                    "text-sm line-clamp-2 mt-1",
-                    !notification.isRead ? "text-slate-900 font-medium" : "text-slate-500"
-                  )}>
-                    {notification.message}
-                  </p>
-                </button>
-
-                {!notification.isRead && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => handleMarkAsReadOnly(e, notification.id)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 text-slate-400 hover:text-blue-600 hover:bg-blue-100 opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Oznacz jako przeczytane"
-                  >
-                    <CheckCircle2 className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
+                notification={notification}
+                onClick={handleNotificationClick}
+                onMarkAsRead={handleMarkAsReadOnly}
+              />
             ))
           )}
         </div>

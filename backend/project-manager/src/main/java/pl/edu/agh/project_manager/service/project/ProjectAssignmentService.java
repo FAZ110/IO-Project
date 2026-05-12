@@ -123,9 +123,15 @@ public class ProjectAssignmentService {
         }
 
         eventPublisher.publishEvent(new AssignmentAcceptedEvent(
-                assignment.getId(),
+                project.getId(),
                 project.getProjectManager(),
                 "Zaakceptowano przypisanie pracownika " + user.getFullName() + " do projektu " + project.getTitle()
+        ));
+
+        eventPublisher.publishEvent(new AssignmentAcceptedEvent(
+                project.getId(),
+                user,
+                "Zostałeś dodany do projektu: " + project.getTitle()
         ));
     }
 
@@ -138,7 +144,7 @@ public class ProjectAssignmentService {
         assignment.setStatus(AssignmentStatus.REJECTED);
 
         eventPublisher.publishEvent(new AssignmentRejectedEvent(
-                assignment.getId(),
+                assignment.getProject().getId(),
                 assignment.getProject().getProjectManager(),
                 "Odrzucono przypisanie pracownika " + assignment.getUser().getName() + " do projektu " + assignment.getProject().getTitle()
         ));

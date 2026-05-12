@@ -5,7 +5,9 @@ export const ROUTE_PARAMS = {
 
 export const QUERY_PARAMS = {
   ACTIVATION_TOKEN: 'token',
-  EMAIL: 'email'
+  EMAIL: 'email',
+  REQUEST_ID: 'requestId',
+  USER_ID: 'userId'
 } as const;
 
 export const PATHS = {

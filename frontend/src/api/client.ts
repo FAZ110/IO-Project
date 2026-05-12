@@ -19,6 +19,22 @@ const api = axios.create({
   withCredentials: true,
 });
 
+export const refreshAccessToken = async () => {
+  try {
+    const refreshResponse = await axios.post(
+      `${API_BASE_URL}${ENDPOINTS.AUTH.REFRESH}`,
+      {},
+      { withCredentials: true }
+    );
+    const newAccessToken = refreshResponse.data.accessToken;
+    setAccessToken(newAccessToken);
+    return newAccessToken;
+  } catch (error) {
+    setAccessToken(null);
+    window.dispatchEvent(new Event('auth-logout'));
+    throw error;
+  }
+};
 
 api.interceptors.request.use(
   (config) => {
@@ -46,24 +62,10 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refreshResponse = await axios.post(
-          `${api.defaults.baseURL}${ENDPOINTS.AUTH.REFRESH}`,
-          {},
-          { withCredentials: true }
-        );
-
-        const newAccessToken = refreshResponse.data.accessToken;
-        setAccessToken(newAccessToken)
-
+        const newAccessToken = await refreshAccessToken();
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-
         return api(originalRequest);
-
       } catch (refreshError) {
-        setAccessToken(null);
-
-        window.dispatchEvent(new Event('auth-logout'));
-
         return Promise.reject(refreshError);
       }
     }

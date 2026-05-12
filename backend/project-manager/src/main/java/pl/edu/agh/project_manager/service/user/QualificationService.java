@@ -21,6 +21,7 @@ import pl.edu.agh.project_manager.repository.user.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +59,18 @@ public class QualificationService {
             }
         }
 
+        if (user.getSupervisor() != null && !savedQualifications.isEmpty()) {
+            String skillsJoined = savedQualifications.stream()
+                    .map(q -> q.getSkill().getName())
+                    .collect(Collectors.joining(", "));
+
+            eventPublisher.publishEvent(new QualificationRequestedEvent(
+                    user.getId(),
+                    user.getSupervisor(),
+                    user.getFullName() + " zgłasza nowe umiejętności: " + skillsJoined
+            ));
+        }
+
         return savedQualifications.stream()
                 .map(q -> new QualificationResponse(q.getId(), q.getSkill().getName(), q.getStatus()))
                 .toList();
@@ -71,15 +84,6 @@ public class QualificationService {
                 .build();
         user.addQualification(qualification);
         Qualification saved =  qualificationRepository.save(qualification);
-
-        // FIXME: na ten moment przy jednym zgłoszeniu 5 skilli przychodziłoby 5 powiadomień, raczej tak nie chcemy, ale na razie nie wiem jak będzie wyglądało to na froncie, więc zostawiam zakomentowane
-//        if (user.getSupervisor() != null) {
-//            eventPublisher.publishEvent(new QualificationRequestedEvent(
-//                    saved.getId(),
-//                    user.getSupervisor(),
-//                    user.getFullName() + " zgłasza umiejętność: " + skill.getName()
-//            ));
-//        }
 
         return saved;
     }
