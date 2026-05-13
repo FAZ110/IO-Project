@@ -97,7 +97,7 @@ public class ProjectAssignmentServiceTest {
         assertThatExceptionOfType(ApplicationException.class)
                 .isThrownBy(() -> assignmentService.createAssignment(projectId, command))
                 .extracting(ApplicationException::getErrorCode)
-                .isEqualTo(ApiErrorCode.VALIDATION_ERROR);
+                .isEqualTo(ApiErrorCode.ASSIGNMENT_INVALID_DATES);
 
         verify(assignmentRepository, never()).save(any());
     }

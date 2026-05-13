@@ -10,24 +10,22 @@ import java.util.UUID;
 public record AssignmentResponse(
         UUID id,
         UUID projectId,
-        UUID userId,
+        String projectName,
         String roleName,
-        LocalDate startDate,
-        LocalDate endDate,
-        Integer utilizationPercentage,
-        AssignmentStatus status,
+        String employeeName,
+        String employeeSurname,
+        AssignmentStatusResponse status,
         LocalDateTime createdAt
 ) {
     public static AssignmentResponse from(ProjectAssignment assignment) {
         return new AssignmentResponse(
                 assignment.getId(),
                 assignment.getProject().getId(),
-                assignment.getUser().getId(),
+                assignment.getProject().getTitle(),
                 assignment.getRoleName(),
-                assignment.getStartDate(),
-                assignment.getEndDate(),
-                assignment.getUtilizationPercentage(),
-                assignment.getStatus(),
+                assignment.getUser().getName(),
+                assignment.getUser().getSurname(),
+                AssignmentStatusResponse.from(assignment.getStatus()),
                 assignment.getCreatedAt()
         );
     }

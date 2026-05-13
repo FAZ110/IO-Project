@@ -9,6 +9,7 @@ export const ENDPOINTS = {
         LIST: '/users',
         DETAIL: (id: string) => `/users/${id}`,
         RESEND_INVITATION: '/users/invitation',
+        WORKLOAD: (id?: string) => `/users/${id}/workload`,
         SEARCH_USERS: '/users/search'
     },
     ME: {
@@ -22,15 +23,12 @@ export const ENDPOINTS = {
     },
     PROJECT: {
         BASE: '/projects',
-        DETAIL: (id: string) => `/projects/${id}`,
-        RISK: {
-            LIST: (projectId: string) => `/projects/${projectId}/risks`
-        },
-        MEMBERS: (projectId: string) => `/projects/${projectId}/members`,
-        ROLES: {
-            STATUS_LIST: (projectId: string) => `/projects/${projectId}/roles/status`,
-            ALLOCATE: (roleId: string) => `/roles/${roleId}/allocation-requests`
-        }
+        DETAILS: (id: string) => ({
+            BASE: `/projects/${id}`,
+            RISKS: `/projects/${id}/risks`,
+            MEMBERS: `/projects/${id}/members`,
+            ASSIGNMENTS: `/projects/${id}/assignments`
+        }),
     },
     PROJECT_GROUP: {
         LIST_ALL: '/groups',

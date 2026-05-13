@@ -25,8 +25,7 @@ export const CreateProjectForm = () => {
       sponsors: [],
       committee: [],
       milestones: [],
-      risks: [],
-      roles: [],
+      risks: []
     },
   });
 
@@ -38,8 +37,8 @@ export const CreateProjectForm = () => {
   const [committeeQuery, setCommitteeQuery] = useState("");
   const [committeeQueryValue] = useDebounce(committeeQuery, 300);
 
-  const { data: foundSponsors = [] } = useSearchUsers(sponsorsQueryValue);
-  const { data: foundCommittee = [] } = useSearchUsers(committeeQueryValue);
+  const { users: foundSponsors = [] } = useSearchUsers(sponsorsQueryValue);
+  const { users: foundCommittee = [] } = useSearchUsers(committeeQueryValue);
 
   const mutation = useCreateProject();
   const navigate = useNavigate();

@@ -168,14 +168,14 @@ public class ProjectAssignmentService {
     private void validateAssignmentDates(LocalDate startDate, LocalDate endDate, Project project) {
         if (startDate.isAfter(endDate)) {
             throw new ApplicationException(
-                    ApiErrorCode.VALIDATION_ERROR,
+                    ApiErrorCode.ASSIGNMENT_INVALID_DATES,
                     "Start date cannot be after end date"
             );
         }
 
         if (startDate.isBefore(project.getStartDate()) || endDate.isAfter(project.getEndDate())) {
             throw new ApplicationException(
-                    ApiErrorCode.VALIDATION_ERROR,
+                    ApiErrorCode.ASSIGNMENT_INVALID_DATES,
                     "Assignment dates must fit within project start and end dates"
             );
         }

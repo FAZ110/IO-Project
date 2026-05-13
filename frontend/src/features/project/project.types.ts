@@ -1,4 +1,4 @@
-import type { BasicUserResponse, UserResponse } from "@/features/user-management";
+import type { SimpleUserResponse, UserResponse } from "@/features/user-management";
 
 export interface ProjectCreationRequest {
     title: string;
@@ -10,13 +10,12 @@ export interface ProjectCreationRequest {
     committee: string[];
     milestones: Milestone[];
     risks: Risk[];
-    roles: ProjectRole[]; // TODO: do usuniecia
 }
 
 export interface ProjectMembersResponse {
-    sponsors: BasicUserResponse[];
-    committees: BasicUserResponse[];
-    employees: BasicUserResponse[];
+    sponsors: SimpleUserResponse[];
+    committees: SimpleUserResponse[];
+    employees: SimpleUserResponse[];
 }
 
 export interface Risk {
@@ -59,28 +58,11 @@ export interface ProjectDetailsResponse {
     manager: UserResponse;
 }
 
-export interface ProjectRole {
-    name: string;
-    utilizationPercentages: number[];
-}
-
-export const ProjectRoleStatus = {
-    OPEN: 'OPEN',
-    PENDING: 'PENDING',
-    FILLED: 'FILLED'
-} as const;
-
-export type ProjectRoleStatus = typeof ProjectRoleStatus[keyof typeof ProjectRoleStatus];
-
-export interface ProjectRoleStatusResponse {
-    id: string;
-    roleName: string;
-    status: ProjectRoleStatus;
-    utilizationPercentages: number[];
-}
-
-export interface EmployeeAssignmentRequest {
-    userId: string;
+export interface CreateEmployeeAssignmentRequest {
     projectId: string;
-    roleId: string;
+    userId: string;
+    startDate: string;
+    endDate: string;
+    utilizationPercentage: number;
+    roleName: string;
 }

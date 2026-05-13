@@ -7,14 +7,16 @@ import java.util.UUID;
 public record SimpleUserResponse(
         UUID id,
         String name,
-        String surname
+        String surname,
+        String email
 ) {
 
     public static SimpleUserResponse fromUser(User user) {
         return new SimpleUserResponse(
                 user.getId(),
                 user.getName(),
-                user.getSurname()
+                user.getSurname(),
+                user.getEmail()
         );
     }
 }
