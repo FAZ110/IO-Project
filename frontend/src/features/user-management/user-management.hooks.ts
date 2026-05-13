@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { userManagementService } from './user-management.service';
-import type { InviteUserRequest, UserListParams } from './user-management.types';
+import { UserSearchableRole, type InviteUserRequest, type UserListParams } from './user-management.types';
 import { usersKeys } from './query-keys';
 
 export const useUsersQuery = (page: number, size: number, filters: UserListParams = {}) => {
@@ -66,4 +66,11 @@ export const useUserWorkload = (userId?: string) => {
     isLoadingWorkload: workloadQuery.isLoading,
     isErrorWorkload: workloadQuery.isError,
   };
+}
+export const useSearchLinearManagers = (searchTerm: string) => {
+    return useQuery({
+        queryKey: usersKeys.search(searchTerm, UserSearchableRole.LINEAR_MANAGER).queryKey,
+        queryFn: () => userManagementService.searchUsers(searchTerm, UserSearchableRole.LINEAR_MANAGER),
+        enabled: searchTerm.length >= 2
+    });
 }

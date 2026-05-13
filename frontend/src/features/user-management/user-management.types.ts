@@ -3,7 +3,22 @@ import type { ChartInterval } from '@/features/employee-assignments/employee-ass
 
 export type UserStatus = 'PENDING' | 'ACTIVE' | 'EXPIRED';
 
-export type AdminAssignableRole = Exclude<UserRole, 'ADMINISTRATOR'>;
+export const AdminAssignableRole = {
+  COMMON: 'COMMON',
+  AUTHORITY: 'AUTHORITY',
+  LINEAR_MANAGER: 'LINEAR_MANAGER',
+  PROJECT_MANAGER: 'PROJECT_MANAGER',
+} as const;
+export type AdminAssignableRole = typeof AdminAssignableRole[keyof typeof AdminAssignableRole];
+
+export const UserSearchableRole = {
+  COMMON: 'COMMON',
+  AUTHORITY: 'AUTHORITY',
+  LINEAR_MANAGER: 'LINEAR_MANAGER',
+  PROJECT_MANAGER: 'PROJECT_MANAGER',
+  ADMINISTRATOR: 'ADMINISTRATOR',
+} as const;
+export type UserSearchableRole = typeof UserSearchableRole[keyof typeof UserSearchableRole];
 
 export interface UserResponse {
   id: string;
@@ -31,6 +46,7 @@ export interface BasicUserResponse {
 export interface InviteUserRequest {
   email: string;
   role: AdminAssignableRole;
+  supervisorId?: string;
 }
 
 export interface UserListParams {

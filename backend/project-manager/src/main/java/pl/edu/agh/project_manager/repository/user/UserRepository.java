@@ -6,6 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import pl.edu.agh.project_manager.domain.entity.user.User;
+import pl.edu.agh.project_manager.domain.enums.UserRole;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,4 +27,7 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
 
     @Query("SELECT u FROM User u WHERE LOWER(CONCAT(u.name, ' ', u.surname)) LIKE LOWER(CONCAT('%', :query, '%'))")
     List<User> searchUserByFullName(@Param("query") String query);
+
+    @Query("SELECT u FROM User u WHERE LOWER(CONCAT(u.name, ' ', u.surname)) LIKE LOWER(CONCAT('%', :query, '%')) AND u.userRole = :role")
+    List<User> searchUserByFullNameAndRole(@Param("query") String query, @Param("role") UserRole role);
 }

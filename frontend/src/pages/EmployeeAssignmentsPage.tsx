@@ -5,13 +5,13 @@ import type { EmployeeAssignment } from "@/features/employee-assignments/employe
 import { EmployeeAssignmentDetails } from "@/features/employee-assignments/components/EmployeeAssignmentDetails";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DataTable } from "@/components/ui/data-table";
+import { TablePageShell } from "@/components/layout/TablePageShell";
 
 export const EmployeeAssignmentsPage = () => {
   const { employeeAssignments, areAssignmentsLoading } = useEmployeeAssignments();
   const { rejectRequest } = useEmployeeAssignmentsActions();
 
   const [selectedAssignment, setSelectedAssignment] = useState<EmployeeAssignment | null>(null);
-  const isModalOpen = !!selectedAssignment;
 
   const handleReject = useCallback((assignment: EmployeeAssignment) => {
     rejectRequest(assignment.id);
@@ -25,24 +25,14 @@ export const EmployeeAssignmentsPage = () => {
   const handleCloseModal = () => setSelectedAssignment(null);
 
   return (
-    <div className="container mx-auto py-10">
-      <div className="flex flex-col gap-6">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Wnioski projektowe</h1>
-          <p className="text-muted-foreground">
-            Zarządzaj wnioskami o udział pracowników w projektach.
-          </p>
-        </div>
+    <TablePageShell 
+      title="Wnioski projektowe" 
+      description="Zarządzaj wnioskami o udział pracowników w projektach."
+      isLoading={areAssignmentsLoading}
+    >
+      <DataTable columns={columns} data={employeeAssignments ?? []} />
 
-        {areAssignmentsLoading ? (
-          <div className="flex h-24 items-center justify-center">
-            <p>Ładowanie wniosków...</p>
-          </div>
-        ) : (
-          <DataTable columns={columns} data={employeeAssignments ?? []} />
-        )}
-
-        <Dialog open={isModalOpen} onOpenChange={(open) => !open && handleCloseModal()}>
+        <Dialog open={!!selectedAssignment} onOpenChange={(open) => !open && handleCloseModal()}>
           <DialogContent className="w-[calc(100vw-2rem)] max-w-xl overflow-x-hidden">
             <DialogHeader>
               <DialogTitle>Szczegóły weryfikacji</DialogTitle>
@@ -54,8 +44,7 @@ export const EmployeeAssignmentsPage = () => {
               onClose={handleCloseModal}
             />}
           </DialogContent>
-        </Dialog>
-      </div>
-    </div>
+      </Dialog>
+    </TablePageShell>
   );
 };

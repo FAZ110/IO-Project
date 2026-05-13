@@ -95,9 +95,13 @@ public class UserService {
     }
 
     public List<SimpleUserResponse> searchUsers(String search) {
-        List<User> users = userRepository.searchUserByFullName(search);
+        return userRepository.searchUserByFullName(search).stream()
+                .map(SimpleUserResponse::fromUser)
+                .toList();
+    }
 
-        return users.stream()
+    public List<SimpleUserResponse> searchUsersByRole(String search, UserRole role) {
+        return userRepository.searchUserByFullNameAndRole(search, role).stream()
                 .map(SimpleUserResponse::fromUser)
                 .toList();
     }

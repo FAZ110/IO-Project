@@ -37,5 +37,15 @@ export const projectService = {
 
     createEmployeeAssignment: async (data: CreateEmployeeAssignmentRequest): Promise<void> => {
         await api.post<void>(ENDPOINTS.PROJECT.DETAILS(data.projectId).ASSIGNMENTS, data);
-    }
+    },
+
+  searchProjectsWithinGroup: async (searchTerm: string): Promise<ProjectDetailsResponse[]> => {
+    const response = await api.get<ProjectDetailsResponse[]>(ENDPOINTS.PROJECT.BASE, {
+      params: {
+        query: searchTerm,
+        unassignedOnly: true
+      }
+    });
+    return response.data;
+  }
 };

@@ -2,15 +2,18 @@ package pl.edu.agh.project_manager.service.projectgroup;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.project_manager.controller.dto.project_group.AllGroupsResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.GroupOwnerResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupDetailsResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupResponse;
+import pl.edu.agh.project_manager.domain.entity.project.Project;
 import pl.edu.agh.project_manager.domain.entity.projectgroup.ProjectGroup;
 import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.enums.GroupType;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
+import pl.edu.agh.project_manager.repository.project.ProjectRepository;
 import pl.edu.agh.project_manager.repository.projectgroup.ProjectGroupRepository;
 import pl.edu.agh.project_manager.repository.user.UserRepository;
 import pl.edu.agh.project_manager.service.command.project.ProjectGroupCreationCommand;
@@ -24,6 +27,7 @@ public class ProjectGroupsService {
 
     private final ProjectGroupRepository projectGroupRepository;
     private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
 
     public AllGroupsResponse getAllGroups() {
         return new AllGroupsResponse(getWalletGroups(), getProgramGroups());
@@ -56,6 +60,7 @@ public class ProjectGroupsService {
         );
     }
 
+    @Transactional
     public UUID createGroup(ProjectGroupCreationCommand command) {
         User owner = userRepository.findById(command.ownerId())
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find user with id: " + command.ownerId()));
@@ -63,6 +68,7 @@ public class ProjectGroupsService {
         ProjectGroup projectGroup = buildProjectGroups(command, owner);
 
         ProjectGroup savedGroup = projectGroupRepository.save(projectGroup);
+        addProjectToProjectGroup(command.projectIds(), projectGroup);
 
         return savedGroup.getId();
     }
@@ -86,5 +92,15 @@ public class ProjectGroupsService {
     public ProjectGroup getProjectGroupOrThrow(UUID groupId) {
         return projectGroupRepository.findById(groupId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_GROUP_NOT_FOUND, "Cannot find group: " + groupId));
+    }
+
+    private void addProjectToProjectGroup(List<UUID> projectIds, ProjectGroup projectGroups) {
+        List<Project> projects = projectRepository.findAllById(projectIds);
+
+        if (projects.size() != projectIds.size()) {
+            throw new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find all projects with provided ids");
+        }
+
+        projects.forEach(projectGroups::addProject);
     }
 }

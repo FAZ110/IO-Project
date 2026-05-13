@@ -1,6 +1,6 @@
 import api from '@/api/client';
 import { ENDPOINTS } from '@/api/endpoints';
-import type { AddQualificationRequest, QualificationResponse, SkillSuggestion } from './qualifications.types';
+import type { AddQualificationRequest, QualificationDetailsResponse, QualificationRequestResponse, QualificationResponse, QualificationUpdateRequest, SkillSuggestion } from './qualifications.types';
 
 export const qualificationsService = {
   getMyQualifications: async (): Promise<QualificationResponse[]> => {
@@ -21,4 +21,20 @@ export const qualificationsService = {
     const res = await api.get<SkillSuggestion[]>(ENDPOINTS.SKILLS, { params: { query } });
     return res.data;
   },
+
+  getUsersWithWaitingQualifications: async (): Promise<QualificationRequestResponse[]> => {
+    const res = await api.get<QualificationRequestResponse[]>(ENDPOINTS.APPROVALS.QUALIFICATIONS);
+    return res.data;
+  },
+
+  getQualificationRequestDetails: async (userId: string): Promise<QualificationDetailsResponse[]> => {
+    const res = await api.get<QualificationDetailsResponse[]>(ENDPOINTS.APPROVALS.QUALIFICATION_DETAILS, {
+      params: { userId }
+    });
+    return res.data;
+  },
+
+  updateQualificationRequests: async (requests: QualificationUpdateRequest[]): Promise<void> => {
+    await api.post(ENDPOINTS.APPROVALS.QUALIFICATIONS_BULK_UPDATE, requests);
+  }
 };

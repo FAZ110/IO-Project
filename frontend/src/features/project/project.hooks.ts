@@ -45,6 +45,14 @@ export const useProjectMembers = (id: string) => {
         enabled: !!id
     });
 };
+export const useSearchProjectsWithinGroup = (query: string) => {
+  return useQuery({
+    queryKey: PROJECT_KEYS.search(query),
+    queryFn: () => projectService.searchProjectsWithinGroup(query),
+    enabled: query.length >= 2
+  });
+};
+
 
 export const useCreateEmployeeAssignment = (projectId: string) => {
     const queryClient = useQueryClient();

@@ -1,6 +1,6 @@
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { useInviteUserMutation } from '../user-management.hooks';
-import type { InviteUserRequest } from '../user-management.types';
+import { AdminAssignableRole, type InviteUserRequest } from '../user-management.types';
 import { InviteUserModalView } from './InviteUserModal.view';
 
 interface InviteUserModalProps {
@@ -8,10 +8,15 @@ interface InviteUserModalProps {
 }
 
 export const InviteUserModal = ({ onClose }: InviteUserModalProps) => {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<InviteUserRequest>();
+  const methods = useForm<InviteUserRequest>();
+  const { handleSubmit, reset, setError } = methods;
   const inviteMutation = useInviteUserMutation();
 
   const onSubmit = handleSubmit((data) => {
+    if (data.role === AdminAssignableRole.COMMON && !data.supervisorId) {
+      setError('supervisorId', { message: 'Menedżer liniowy jest wymagany dla roli Employee' });
+      return;
+    }
     inviteMutation.mutate(data, {
       onSuccess: () => {
         reset();
@@ -21,12 +26,8 @@ export const InviteUserModal = ({ onClose }: InviteUserModalProps) => {
   });
 
   return (
-    <InviteUserModalView
-      register={register}
-      onSubmit={onSubmit}
-      onClose={onClose}
-      isPending={inviteMutation.isPending}
-      errors={errors}
-    />
+    <FormProvider {...methods}>
+      <InviteUserModalView onSubmit={onSubmit} onClose={onClose} isPending={inviteMutation.isPending} />
+    </FormProvider>
   );
 };
