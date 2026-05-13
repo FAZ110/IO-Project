@@ -10,8 +10,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.project_manager.controller.dto.PagedResponse;
+import pl.edu.agh.project_manager.controller.dto.project.ProjectAssignmentUserWorkloadResponse;
 import pl.edu.agh.project_manager.controller.dto.user.SimpleUserResponse;
 import pl.edu.agh.project_manager.controller.dto.user.UserResponse;
+import pl.edu.agh.project_manager.domain.entity.project.ProjectAssignment;
 import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
@@ -19,6 +21,7 @@ import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.project.ProjectRepository;
 import pl.edu.agh.project_manager.repository.user.UserRepository;
+import pl.edu.agh.project_manager.util.assignments.AssignmentsUtil;
 
 import java.util.ArrayList;
 import java.util.List;

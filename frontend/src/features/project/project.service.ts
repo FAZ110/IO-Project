@@ -4,8 +4,7 @@ import type {
     ProjectCreationRequest,
     ProjectResponse,
     ProjectDetailsResponse,
-    ProjectRoleStatusResponse,
-    EmployeeAssignmentRequest,
+    CreateEmployeeAssignmentRequest,
     RiskResponse,
     ProjectMembersResponse
 } from './project.types';
@@ -22,27 +21,22 @@ export const projectService = {
     },
 
     getDetails: async (id: string): Promise<ProjectDetailsResponse> => {
-        const response = await api.get<ProjectDetailsResponse>(ENDPOINTS.PROJECT.DETAIL(id));
+        const response = await api.get<ProjectDetailsResponse>(ENDPOINTS.PROJECT.DETAILS(id).BASE);
         return response.data;
     },
 
     getProjectMembers: async (id: string): Promise<ProjectMembersResponse> => {
-        const response = await api.get<ProjectMembersResponse>(ENDPOINTS.PROJECT.MEMBERS(id));
+        const response = await api.get<ProjectMembersResponse>(ENDPOINTS.PROJECT.DETAILS(id).MEMBERS);
         return response.data;
     },
 
     getRisks: async (projectId: string): Promise<RiskResponse[]> => {
-        const response = await api.get<RiskResponse[]>(ENDPOINTS.PROJECT.RISK.LIST(projectId));
+        const response = await api.get<RiskResponse[]>(ENDPOINTS.PROJECT.DETAILS(projectId).RISKS);
         return response.data;
     },
 
-    getProjectRolesStatus: async (projectId: string): Promise<ProjectRoleStatusResponse[]> => {
-        const response = await api.get<ProjectRoleStatusResponse[]>(ENDPOINTS.PROJECT.ROLES.STATUS_LIST(projectId));
-        return response.data;
-    },
-
-    createEmployeeAssignment: async (data: EmployeeAssignmentRequest): Promise<void> => {
-        await api.post<void>(ENDPOINTS.APPROVALS.ASSIGNMENTS, data);
+    createEmployeeAssignment: async (data: CreateEmployeeAssignmentRequest): Promise<void> => {
+        await api.post<void>(ENDPOINTS.PROJECT.DETAILS(data.projectId).ASSIGNMENTS, data);
     },
 
   searchProjectsWithinGroup: async (searchTerm: string): Promise<ProjectDetailsResponse[]> => {

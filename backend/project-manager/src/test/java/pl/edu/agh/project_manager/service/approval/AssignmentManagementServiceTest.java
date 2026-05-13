@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.agh.project_manager.controller.dto.employee_requests.ChartIntervalResponse;
+import pl.edu.agh.project_manager.controller.dto.common.ChartIntervalResponse;
 import pl.edu.agh.project_manager.controller.dto.employee_requests.EmployeeAssignmentDetailsResponse;
 import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.entity.project.ProjectAssignment;

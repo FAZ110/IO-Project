@@ -22,6 +22,7 @@ public enum ApiErrorCode {
     INVALID_ROLE_UTILIZATION("PROJ_005", HttpStatus.BAD_REQUEST, "Role utilization percentages must match timeline segments length"),
     PROJECT_ROLE_NOT_FOUND("PROJ_006", HttpStatus.NOT_FOUND, "Cannot find provided project role"),
     PROJECT_NOT_FOUND("PROJ_007", HttpStatus.NOT_FOUND, "Cannot find provided project"),
+    ASSIGNMENT_INVALID_DATES("PROJ_008", HttpStatus.BAD_REQUEST, "Invalid dates for assignment"),
 
     ACTIVATION_TOKEN_NOT_FOUND("AUTH_001", HttpStatus.NOT_FOUND, "Activation token is invalid or does not exist"),
     ACTIVATION_TOKEN_EXPIRED("AUTH_002", HttpStatus.BAD_REQUEST, "Activation token has expired"),
@@ -45,8 +46,8 @@ public enum ApiErrorCode {
     INVALID_CURRENT_PASSWORD("USR_003", HttpStatus.UNAUTHORIZED, "Current password is incorrect"),
     PASSWORD_SAME_AS_CURRENT("USR_004", HttpStatus.BAD_REQUEST, "New password must be different from current password"),
 
-    VALIDATION_ERROR("GEN_001", HttpStatus.BAD_REQUEST, "Validation failed"),
     ACCESS_DENIED("GEN_002", HttpStatus.FORBIDDEN, "Access denied"),
+    VALIDATION_FAILED("GEN_998", HttpStatus.BAD_REQUEST, "Validation failed"),
     INTERNAL_SERVER_ERROR("GEN_999", HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected internal server error");
 
     private final String code;

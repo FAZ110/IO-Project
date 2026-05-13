@@ -6,7 +6,7 @@ export const prepareStackedData = (current: ChartInterval[], requested: ChartInt
   const dates = [...new Set([...current, ...requested].flatMap(i => [i.startDate, i.endDate]))].sort();
 
   return dates.map(date => ({
-    date,
+    date: new Date(date).getTime(),
     current: current.find(i => i.startDate <= date && date < i.endDate)?.percentage || 0,
     requested: requested.find(i => i.startDate <= date && date < i.endDate)?.percentage || 0,
   }));

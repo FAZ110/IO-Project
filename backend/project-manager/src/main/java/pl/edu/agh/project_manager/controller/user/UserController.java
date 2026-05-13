@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.project_manager.controller.dto.PagedResponse;
 import pl.edu.agh.project_manager.controller.dto.invitation.AdminUserInvitationRequest;
 import pl.edu.agh.project_manager.controller.dto.invitation.ResendInvitationRequest;
+import pl.edu.agh.project_manager.controller.dto.project.ProjectAssignmentUserWorkloadResponse;
 import pl.edu.agh.project_manager.controller.dto.user.SimpleUserResponse;
 import pl.edu.agh.project_manager.controller.dto.user.UserResponse;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
+import pl.edu.agh.project_manager.service.approval.AssignmentManagementService;
 import pl.edu.agh.project_manager.service.user.UserInvitationService;
 import pl.edu.agh.project_manager.service.user.UserService;
 import pl.edu.agh.project_manager.service.command.invitation.AdminInviteUserCommand;
@@ -27,6 +29,7 @@ import java.util.UUID;
 class UserController {
     private final UserInvitationService invitationService;
     private final UserService userService;
+    private final AssignmentManagementService assignmentManagementService;
 
     @GetMapping("/users")
     @PreAuthorize("isAuthenticated()")
@@ -86,5 +89,10 @@ class UserController {
             return ResponseEntity.ok(userService.searchUsersByRole(search, mappedRole));
         }
         return ResponseEntity.ok(userService.searchUsers(search));
+    }
+
+    @GetMapping("/users/{userId}/workload")
+    public ResponseEntity<ProjectAssignmentUserWorkloadResponse> getUserWorkload(@PathVariable UUID userId) {
+        return ResponseEntity.ok(assignmentManagementService.getUserWorkload(userId));
     }
 }

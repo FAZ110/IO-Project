@@ -1,4 +1,5 @@
 import type { UserRole } from '@/features/auth/auth.types';
+import type { ChartInterval } from '@/features/employee-assignments/employee-assignments.types';
 
 export type UserStatus = 'PENDING' | 'ACTIVE' | 'EXPIRED';
 
@@ -33,13 +34,7 @@ export interface SimpleUserResponse {
   id: string,
   name: string,
   surname: string
-}
-
-export interface BasicUserResponse {
-  id: string,
-  email: string,
-  name: string,
-  surname: string
+  email: string
 }
 
 export interface InviteUserRequest {
@@ -52,4 +47,8 @@ export interface UserListParams {
   userRole?: UserRole;
   status?: UserStatus;
   search?: string;
+}
+
+export interface UserWorkloadResponse {
+  workload: ChartInterval[];
 }

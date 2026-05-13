@@ -32,8 +32,8 @@ export const EmployeeAssignmentsPage = () => {
     >
       <DataTable columns={columns} data={employeeAssignments ?? []} />
 
-      <Dialog open={!!selectedAssignment} onOpenChange={(open) => !open && setSelectedAssignment(null)}>
-        <DialogContent className="w-[calc(100vw-2rem)] max-w-2xl overflow-x-hidden">
+        <Dialog open={!!selectedAssignment} onOpenChange={(open) => !open && handleCloseModal()}>
+          <DialogContent className="w-[calc(100vw-2rem)] max-w-xl overflow-x-hidden">
             <DialogHeader>
               <DialogTitle>Szczegóły weryfikacji</DialogTitle>
             </DialogHeader>

@@ -1,5 +1,7 @@
 package pl.edu.agh.project_manager.controller.dto.employee_requests;
 
+import pl.edu.agh.project_manager.controller.dto.common.ChartIntervalResponse;
+
 import java.util.List;
 
 public record EmployeeAssignmentDetailsResponse(
