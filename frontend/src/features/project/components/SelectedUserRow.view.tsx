@@ -36,7 +36,7 @@ export const SelectedUserRow = ({ user, unsetUser }: SelectedUserRowProps) => {
                 {user.name} {user.surname}
               </span>
               <span className="mt-1 truncate text-xs text-muted-foreground">
-                ID: {user.id}
+                {user.email}
               </span>
             </div>
           </div>

@@ -1,14 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Users, Crown, ShieldCheck } from "lucide-react";
-import type { BasicUserResponse } from "@/features/user-management/user-management.types";
+import type { SimpleUserResponse } from "@/features/user-management/user-management.types";
 import {useProjectMembers} from "@/features/project/project.hooks.ts";
 
 interface ProjectMembersSideBarProps {
   projectId: string;
 }
 
-const MemberRow = ({ user }: { user: BasicUserResponse }) => {
+const MemberRow = ({ user }: { user: SimpleUserResponse }) => {
   const initials = `${user.name?.charAt(0) || ''}${user.surname?.charAt(0) || ''}`.toUpperCase();
 
   return (

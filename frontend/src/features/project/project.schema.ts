@@ -25,7 +25,7 @@ export const CreateProjectFormSchema = z.object({
 export type CreateProjectFormData = z.infer<typeof CreateProjectFormSchema>;
 
 export const CreateAssignmentSchema = z.object({
-  projectId: z.string(),
+  projectId: z.uuid("Nieprawidłowy format ID projektu"),
   userId: z.string().min(1, "Musisz wybrać pracownika"),
   roleName: z.string().min(2, "Nazwa roli jest za krótka"),
   utilizationPercentage: z.number().min(1).max(100),

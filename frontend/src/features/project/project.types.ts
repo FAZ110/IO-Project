@@ -1,4 +1,4 @@
-import type { BasicUserResponse, UserResponse } from "@/features/user-management";
+import type { SimpleUserResponse, UserResponse } from "@/features/user-management";
 
 export interface ProjectCreationRequest {
     title: string;
@@ -13,9 +13,9 @@ export interface ProjectCreationRequest {
 }
 
 export interface ProjectMembersResponse {
-    sponsors: BasicUserResponse[];
-    committees: BasicUserResponse[];
-    employees: BasicUserResponse[];
+    sponsors: SimpleUserResponse[];
+    committees: SimpleUserResponse[];
+    employees: SimpleUserResponse[];
 }
 
 export interface Risk {

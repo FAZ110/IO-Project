@@ -139,7 +139,7 @@ export const CreateAssignmentModal = ({ project }: CreateAssignmentModalProps) =
                                       {user.name} {user.surname}
                                     </span>
                                     <span className="text-xs text-muted-foreground">
-                                      {user.id}
+                                      {user.email}
                                     </span>
                                   </div>
                                 </CommandItem>
