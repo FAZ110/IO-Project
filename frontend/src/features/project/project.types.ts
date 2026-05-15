@@ -40,6 +40,7 @@ export interface ProjectResponse {
     isActive: boolean;
     startDate: string;
     endDate: string;
+    groupId?: string | null;
 }
 
 export interface Milestone {
@@ -56,6 +57,7 @@ export interface ProjectDetailsResponse {
     endDate: string;
     isActive: boolean;
     manager: UserResponse;
+    groupId?: string | null;
 }
 
 export interface CreateEmployeeAssignmentRequest {

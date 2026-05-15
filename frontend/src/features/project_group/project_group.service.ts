@@ -8,6 +8,11 @@ export const projectGroupService = {
         return [ ...data.wallets, ...data.programs];
     },
 
+    getAllGroups: async (): Promise<AllGroupsResponse> => {
+        const { data } = await apiClient.get<AllGroupsResponse>(ENDPOINTS.PROJECT_GROUP.LIST_ALL);
+        return data;
+    },
+
     createGroup: async (projectGroupData: ProjectGroupCreationRequest): Promise<string> => {
         const response = await apiClient.post<ProjectGroupCreatedResponse>(ENDPOINTS.PROJECT_GROUP.CREATE, projectGroupData);
         return response.data.id;

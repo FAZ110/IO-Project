@@ -13,7 +13,8 @@ public record ProjectResponse(
         LocalDate startDate,
         LocalDate endDate,
         Boolean isActive,
-        UserResponse manager
+        UserResponse manager,
+        UUID groupId
 ) {
     public static ProjectResponse from(Project project) {
         return new ProjectResponse(
@@ -23,7 +24,8 @@ public record ProjectResponse(
                 project.getStartDate(),
                 project.getEndDate(),
                 project.getIsActive(),
-                UserResponse.from(project.getProjectManager())
+                UserResponse.from(project.getProjectManager()),
+                project.getProjectGroup() != null ? project.getProjectGroup().getId() : null
         );
     }
 }
