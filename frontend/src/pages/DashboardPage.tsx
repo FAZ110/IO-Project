@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { PATHS } from '@/routes/paths';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/providers/AuthContext';
@@ -13,16 +13,15 @@ import {
     PieChart,
     Briefcase,
     TrendingUp,
-    AlertCircle
 } from 'lucide-react';
-import { ProjectCardView } from '@/features/dashboard/components/ProjectCard/ProjectCard.view';
 import { useProjects } from '@/features/project/project.hooks';
+import { DashboardProjectList } from '@/features/dashboard/components/DashboardProjectList/DashboardProjectList';
 
 export const DashboardPage = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    const { data: projects = [], isLoading, isError } = useProjects();
+    const { data: projects = [] } = useProjects();
 
     const stats = useMemo(() => {
         const total = projects.length;
@@ -49,9 +48,14 @@ export const DashboardPage = () => {
                         </p>
                     </div>
                     {user?.role === UserRole.PROJECT_MANAGER && (
-                        <Button variant="secondary" onClick={() => navigate(PATHS.CREATE_PROJECT)} className="gap-2 bg-white text-slate-800 hover:bg-slate-100 shadow-lg px-6 py-6 text-lg font-bold rounded-2xl transition-transform hover:scale-105 shrink-0">
-                            <Plus size={22} /> Nowy projekt
-                        </Button>
+                        <div className="flex gap-4">
+                            <Button variant="secondary" onClick={() => navigate(PATHS.CREATE_PROJECT_GROUP)} className="gap-2 bg-white text-slate-800 hover:bg-slate-100 shadow-lg px-6 py-6 text-lg font-bold rounded-2xl transition-transform hover:scale-105 shrink-0">
+                                <Briefcase size={22} /> Nowa grupa
+                            </Button>
+                            <Button variant="secondary" onClick={() => navigate(PATHS.CREATE_PROJECT)} className="gap-2 bg-blue-600 text-white hover:bg-blue-700 shadow-lg px-6 py-6 text-lg font-bold rounded-2xl transition-transform hover:scale-105 shrink-0">
+                                <Plus size={22} /> Nowy projekt
+                            </Button>
+                        </div>
                     )}
                 </div>
             </div>
@@ -60,10 +64,10 @@ export const DashboardPage = () => {
                 <div className="lg:col-span-8 space-y-6">
                     <div className="flex justify-between items-center border-b border-gray-100 pb-4">
                         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                            Twoje Projekty
+                            Twoje Projekty i Grupy
                             <span className="bg-gray-100 text-gray-600 text-sm py-1 px-3 rounded-full border">
-                {stats.total}
-              </span>
+                                {stats.total} projektów
+                            </span>
                         </h2>
 
                         <div className="flex items-center gap-2">
@@ -78,54 +82,15 @@ export const DashboardPage = () => {
                         </div>
                     </div>
 
-                    {isError && (
-                        <div className="flex flex-col items-center justify-center py-12 px-4 bg-red-50 border border-red-100 rounded-3xl text-red-600">
-                            <AlertCircle size={40} className="mb-4 opacity-80" />
-                            <h3 className="font-bold text-lg">Wystąpił błąd</h3>
-                            <p>Nie udało się załadować projektów. Spróbuj odświeżyć stronę.</p>
-                        </div>
-                    )}
+                    <DashboardProjectList />
 
-                    {isLoading && !isError && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {[1, 2, 3, 4].map(i => <div key={i} className="h-48 bg-gray-100 animate-pulse rounded-2xl" />)}
-                        </div>
-                    )}
-
-                    {!isLoading && !isError && projects.length === 0 && (
-                        <div className="text-center py-16 bg-white rounded-3xl border border-gray-100 shadow-sm">
-                            <div className="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <Briefcase className="text-slate-400" size={24} />
-                            </div>
-                            <p className="text-slate-500 mb-6 font-medium text-lg">Nie masz jeszcze żadnych projektów.</p>
-                            {user?.role === UserRole.PROJECT_MANAGER && (
-                                <Button onClick={() => navigate(PATHS.CREATE_PROJECT)} className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl">
-                                    Utwórz pierwszy projekt
-                                </Button>
-                            )}
-                        </div>
-                    )}
-
-                    {!isLoading && !isError && projects.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {projects.map((project) => (
-                                <Link
-                                    key={project.id}
-                                    to={PATHS.PROJECT(project.id)}
-                                    className="block transition-transform hover:-translate-y-1"
-                                >
-                                    <ProjectCardView project={project} />
-                                </Link>
-                            ))}
-                        </div>
-                    )}
                 </div>
 
                 <div className="lg:col-span-4 space-y-4">
                     <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-6">
                         <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
                             <PieChart size={20} className="text-blue-600" />
-                            Podsumowanie portfela
+                            Podsumowanie struktury
                         </h3>
 
                         <div className="grid grid-cols-2 gap-4">
