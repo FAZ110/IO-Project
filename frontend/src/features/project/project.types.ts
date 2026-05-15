@@ -1,4 +1,5 @@
 import type { SimpleUserResponse, UserResponse } from "@/features/user-management";
+import type { GroupBasicResponse } from '@/features/project_group/project_group.types';
 
 export interface ProjectCreationRequest {
     title: string;
@@ -40,13 +41,15 @@ export interface ProjectResponse {
     isActive: boolean;
     startDate: string;
     endDate: string;
-    groupId?: string | null;
+    group?: GroupBasicResponse | null;
+    manager: UserResponse;
 }
 
 export interface Milestone {
     date: string;
     name: string;
     description?: string;
+    group?: GroupBasicResponse | null;
 }
 
 export interface ProjectDetailsResponse {
@@ -57,7 +60,7 @@ export interface ProjectDetailsResponse {
     endDate: string;
     isActive: boolean;
     manager: UserResponse;
-    groupId?: string | null;
+    group?: GroupBasicResponse | null;
 }
 
 export interface CreateEmployeeAssignmentRequest {

@@ -32,3 +32,9 @@ export interface ProjectGroupCreationRequest {
 export interface ProjectGroupCreatedResponse {
     id: string
 }
+
+export interface GroupBasicResponse {
+    id: string;
+    name: string;
+    groupType: 'WALLET' | 'PROGRAM';
+}

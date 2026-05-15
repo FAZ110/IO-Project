@@ -2,7 +2,7 @@ package pl.edu.agh.project_manager.service.project;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -62,6 +62,7 @@ public class ProjectService {
         return savedProject.getId();
     }
 
+    @Transactional(readOnly = true)
     public ProjectResponse getProject(UUID projectId) {
         Project project = projectRepository.findByIdWithManager(projectId)
                 .orElseThrow(() -> new ApplicationException(
@@ -72,6 +73,7 @@ public class ProjectService {
         return ProjectResponse.from(project);
     }
 
+    @Transactional(readOnly = true)
     public ProjectMembersResponse getProjectMembers(UUID projectId) {
         Project project = projectRepository.findByIdWithAllMembers(projectId)
                 .orElseThrow(() -> new ApplicationException(
@@ -143,7 +145,7 @@ public class ProjectService {
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find project: " + projectId));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<ProjectResponse> searchProjects(SearchProjectCommand command) {
         Specification<Project> spec = Specification
                 .where(ProjectSpecification.accessibleByUser(command.user()))
