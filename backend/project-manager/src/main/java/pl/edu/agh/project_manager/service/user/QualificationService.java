@@ -60,14 +60,15 @@ public class QualificationService {
         }
 
         if (user.getSupervisor() != null && !savedQualifications.isEmpty()) {
-            String skillsJoined = savedQualifications.stream()
+            List<String> skillsList = savedQualifications.stream()
                     .map(q -> q.getSkill().getName())
-                    .collect(Collectors.joining(", "));
+                    .toList();
 
             eventPublisher.publishEvent(new QualificationRequestedEvent(
                     user.getId(),
                     user.getSupervisor(),
-                    user.getFullName() + " zgłasza nowe umiejętności: " + skillsJoined
+                    user.getFullName(),
+                    skillsList
             ));
         }
 

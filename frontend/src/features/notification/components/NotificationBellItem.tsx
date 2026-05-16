@@ -1,9 +1,9 @@
-import type {MouseEvent} from "react";
-import {CheckCircle2, ChevronDown, ChevronUp} from 'lucide-react';
+import React, { memo, useState } from "react";
+import type { MouseEvent } from "react";
+import { CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { NotificationResponse } from '../notification.types';
-import {useState} from "react";
 
 interface NotificationBellItemProps {
   notification: NotificationResponse;
@@ -11,7 +11,11 @@ interface NotificationBellItemProps {
   onMarkAsRead: (e: MouseEvent, id: string) => void;
 }
 
-export const NotificationBellItem = ({ notification, onClick, onMarkAsRead }: NotificationBellItemProps) => {
+export const NotificationBellItem: React.FC<NotificationBellItemProps> = memo(({
+                                                                                 notification,
+                                                                                 onClick,
+                                                                                 onMarkAsRead
+                                                                               }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpand = (e: MouseEvent) => {
@@ -27,10 +31,7 @@ export const NotificationBellItem = ({ notification, onClick, onMarkAsRead }: No
       )}
       onClick={() => onClick(notification.type, notification.referenceId, notification.id, notification.isRead)}
     >
-      <button
-        onClick={() => onClick(notification.type, notification.referenceId, notification.id, notification.isRead)}
-        className="w-full text-left flex flex-col items-start p-4 pr-10"
-      >
+      <div className="w-full text-left flex flex-col items-start p-4 pr-10">
         <div className="flex justify-between w-full mb-1">
           <span className={cn(
             "text-xs font-semibold uppercase tracking-wider",
@@ -65,7 +66,7 @@ export const NotificationBellItem = ({ notification, onClick, onMarkAsRead }: No
             </div>
           )}
         </div>
-      </button>
+      </div>
 
       {!notification.isRead && (
         <div className="absolute right-2 inset-y-0 flex items-center z-20">
@@ -89,4 +90,4 @@ export const NotificationBellItem = ({ notification, onClick, onMarkAsRead }: No
       )}
     </div>
   );
-};
+});

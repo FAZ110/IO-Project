@@ -90,20 +90,18 @@ public class QualificationManagementService {
         }
 
         acceptedSkillsByUser.forEach((user, skills) -> {
-            String skillsJoined = String.join(", ", skills);
             eventPublisher.publishEvent(new QualificationAcceptedEvent(
                     user.getId(),
                     user,
-                    "Zatwierdzono Twoje kwalifikacje: " + skillsJoined
+                    skills
             ));
         });
 
         rejectedSkillsByUser.forEach((user, skills) -> {
-            String skillsJoined = String.join(", ", skills);
             eventPublisher.publishEvent(new QualificationRejectedEvent(
                     user.getId(),
                     user,
-                    "Odrzucono wnioski o kwalifikacje: " + skillsJoined
+                    skills
             ));
         });
     }

@@ -8,7 +8,8 @@ import java.util.UUID;
 public record AssignmentRequestedEvent(
         UUID assignmentId,
         User recipient,
-        String message
+        String projectName,
+        String employeeFullName
 ) implements NotificationEvent {
 
     @Override
@@ -19,5 +20,10 @@ public record AssignmentRequestedEvent(
     @Override
     public NotificationType type() {
         return NotificationType.ASSIGNMENT_REQUESTED;
+    }
+
+    @Override
+    public String buildMessage() {
+        return "Kierownik projektu " + projectName + " prosi o alokację pracownika " + employeeFullName;
     }
 }

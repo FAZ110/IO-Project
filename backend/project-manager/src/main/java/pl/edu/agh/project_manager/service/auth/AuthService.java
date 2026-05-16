@@ -61,13 +61,10 @@ public class AuthService {
         tokenRepository.delete(activationToken);
 
         if (user.getUserRole() == UserRole.COMMON && user.getSupervisor() != null) {
-            String message = String.format("Nowy pracownik %s aktywował swoje konto i dołączył do Twojego zespołu.",
-                    user.getFullName());
-
             eventPublisher.publishEvent(new SystemNewEmployeeEvent(
                     user.getId(),
                     user.getSupervisor(),
-                    message
+                    user.getFullName()
             ));
         }
 
