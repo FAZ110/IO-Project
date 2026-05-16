@@ -53,7 +53,6 @@ export const useSearchUsers = (searchTerm: string) => {
   }
 }
 
-
 export const useUserWorkload = (userId?: string) => {
   const workloadQuery = useQuery({
     queryKey: usersKeys.workload(userId).queryKey,
@@ -67,10 +66,28 @@ export const useUserWorkload = (userId?: string) => {
     isErrorWorkload: workloadQuery.isError,
   };
 }
-export const useSearchLinearManagers = (searchTerm: string) => {
-    return useQuery({
-        queryKey: usersKeys.search(searchTerm, UserSearchableRole.LINEAR_MANAGER).queryKey,
-        queryFn: () => userManagementService.searchUsers(searchTerm, UserSearchableRole.LINEAR_MANAGER),
-        enabled: searchTerm.length >= 2
-    });
+
+export const usePotentialSupervisors = (searchTerm: string) => {
+  const linearManagersQuery = useQuery({
+    queryKey: usersKeys.search(searchTerm, UserSearchableRole.LINEAR_MANAGER).queryKey,
+    queryFn: () => userManagementService.searchUsers(searchTerm, UserSearchableRole.LINEAR_MANAGER),
+    enabled: searchTerm.length >= 2
+  });
+
+  const authorityQuery = useQuery({
+    queryKey: usersKeys.search(searchTerm, UserSearchableRole.AUTHORITY).queryKey,
+    queryFn: () => userManagementService.searchUsers(searchTerm, UserSearchableRole.AUTHORITY),
+    enabled: searchTerm.length >= 2
+  });
+
+  const combinedData = [
+    ...(linearManagersQuery.data || []),
+    ...(authorityQuery.data || [])
+  ];
+
+  return {
+    data: combinedData,
+    isLoading: linearManagersQuery.isLoading || authorityQuery.isLoading,
+    isError: linearManagersQuery.isError || authorityQuery.isError
+  };
 }

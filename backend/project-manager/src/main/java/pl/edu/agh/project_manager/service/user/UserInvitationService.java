@@ -26,26 +26,36 @@ public class UserInvitationService {
     private final UserRepository userRepository;
     private final ActivationTokenRepository tokenRepository;
     private final EmailSender emailSender;
-    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void inviteUser(AdminInviteUserCommand command) {
-        processInvitation(command.email(), command.role(), command.supervisorId());
-    }
-
-    private void processInvitation(String email, UserRole role, UUID supervisorId) {
-        if (userRepository.existsByEmail(email)) {
+        if (userRepository.existsByEmail(command.email())) {
             throw new ApplicationException(ApiErrorCode.INVITATION_USER_ALREADY_EXISTS);
         }
 
-        var supervisor = fetchSupervisor(supervisorId);
+        User supervisor = fetchAndValidateSupervisor(command.supervisorId());
 
-        var newUser = createInvitedUser(email, role, supervisor);
+        User newUser = createInvitedUser(command.email(), command.role(), supervisor);
         userRepository.save(newUser);
 
         var activationToken = createTokenForUser(newUser);
 
-        sendInvitationEmail(email, activationToken);
+        sendInvitationEmail(command.email(), activationToken);
+    }
+
+    private User fetchAndValidateSupervisor(UUID supervisorId) {
+        if (supervisorId == null) {
+            return null;
+        }
+
+        User supervisor = userRepository.findById(supervisorId)
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.USER_NOT_FOUND));
+
+        if (supervisor.getUserRole() != UserRole.LINEAR_MANAGER && supervisor.getUserRole() != UserRole.AUTHORITY) {
+            throw new ApplicationException(ApiErrorCode.INVALID_SUPERVISOR_ROLE);
+        }
+
+        return supervisor;
     }
 
     private String createTokenForUser(User user) {
