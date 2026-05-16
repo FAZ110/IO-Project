@@ -9,9 +9,10 @@ public record SearchProjectCommand(
         UserPrincipal user,
         String query,
         UUID groupId,
+        Boolean isActive,
         Boolean unassignedOnly
 ) {
-    public SearchProjectCommand toCommand(UserPrincipal user, String query, UUID groupId, Boolean unassignedOnly) {
-        return new SearchProjectCommand(user, query, groupId, unassignedOnly);
+    public SearchProjectCommand toCommand(UserPrincipal user, String query, UUID groupId, Boolean isActive, Boolean unassignedOnly) {
+        return new SearchProjectCommand(user, query, groupId, isActive, unassignedOnly);
     }
 }

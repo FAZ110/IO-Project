@@ -52,5 +52,11 @@ export const NAV_ITEMS: NavItem[] = [
     path: PATHS.CREATE_PROJECT_GROUP,
     icon: FolderPlus,
     roles: [UserRole.PROJECT_MANAGER, UserRole.AUTHORITY]
+  },
+  {
+    label: "Rejestr projektów",
+    path: PATHS.PROJECT_REGISTRY,
+    icon: ClipboardList,
+    roles: [UserRole.PROJECT_MANAGER, UserRole.LINEAR_MANAGER, UserRole.AUTHORITY, UserRole.COMMON, UserRole.ADMINISTRATOR]
   }
 ];

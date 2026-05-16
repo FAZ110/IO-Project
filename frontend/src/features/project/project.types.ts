@@ -66,3 +66,10 @@ export interface CreateEmployeeAssignmentRequest {
     utilizationPercentage: number;
     roleName: string;
 }
+
+export interface SearchProjectsRequest {
+    query?: string;
+    unassignedOnly?: boolean;
+    groupId?: string;
+    isActive?: boolean;
+}

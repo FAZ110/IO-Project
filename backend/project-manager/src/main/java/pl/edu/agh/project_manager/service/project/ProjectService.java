@@ -161,6 +161,10 @@ public class ProjectService {
             spec = spec.and(ProjectSpecification.withSearchPattern(command.query()));
         }
 
+        if (command.isActive() != null) {
+            spec = spec.and(ProjectSpecification.isActive(command.isActive()));
+        }
+
         if (command.groupId() != null) {
             spec = spec.and(ProjectSpecification.inGroup(command.groupId()));
         } else if (Boolean.TRUE.equals(command.unassignedOnly())) {

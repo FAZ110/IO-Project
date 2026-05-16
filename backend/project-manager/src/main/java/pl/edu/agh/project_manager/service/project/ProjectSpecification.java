@@ -38,4 +38,7 @@ public class ProjectSpecification {
         return (root, query, cb) -> cb.isNull(root.get("projectGroup"));
     }
 
+    public static Specification<Project> isActive(Boolean isActive) {
+        return (root, query, cb) -> cb.equal(root.get("isActive"), isActive);
+    }
 }
