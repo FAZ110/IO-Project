@@ -38,15 +38,15 @@ export const AppRoutes = () => {
           <Route path={PATHS.NOTIFICATION} element={<NotificationPage />} />
 
           {/* LINEAR MANAGER ROUTES */}
-          <Route element={<AuthorizedRoute allowedRoles={[UserRole.LINEAR_MANAGER]} />}>
+          <Route element={<AuthorizedRoute allowedRoles={[UserRole.LINEAR_MANAGER, UserRole.AUTHORITY]} />}>
             <Route path={PATHS.PROJECT_REQUESTS} element={<EmployeeAssignmentsPage />} />
             <Route path={PATHS.QUALIFICATION_REQUESTS} element={<QualificationRequestsPage />} />
           </Route>
 
           {/* PROJECT MANAGER ROUTES */}
-          <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER]} />}>
-              <Route path={PATHS.CREATE_PROJECT} element={<CreateProjectPage />} />
-              <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
+          <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER, UserRole.AUTHORITY]} />}>
+            <Route path={PATHS.CREATE_PROJECT} element={<CreateProjectPage />} />
+            <Route path={PATHS.CREATE_PROJECT_GROUP} element={<CreateProjectGroupPage />} />
           </Route>
 
           {/* ADMIN ROUTES */}
@@ -55,9 +55,7 @@ export const AppRoutes = () => {
             <Route path={PATHS.ADMIN_USER_DETAILS(`:${ROUTE_PARAMS.USER_ID}`)} element={<AdminUserDetailsPage />} />
           </Route>
 
-          <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER, UserRole.AUTHORITY]} />}>
-            <Route path={PATHS.CREATE_PROJECT_GROUP} element={<CreateProjectGroupPage />} />
-          </Route>
+
         </Route>
       </Route>
 
