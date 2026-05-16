@@ -67,7 +67,7 @@ export const useUserWorkload = (userId?: string) => {
   };
 }
 
-export const useSearchLinearManagers = (searchTerm: string) => {
+export const usePotentialSupervisors = (searchTerm: string) => {
   const linearManagersQuery = useQuery({
     queryKey: usersKeys.search(searchTerm, UserSearchableRole.LINEAR_MANAGER).queryKey,
     queryFn: () => userManagementService.searchUsers(searchTerm, UserSearchableRole.LINEAR_MANAGER),

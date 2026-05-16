@@ -92,7 +92,11 @@ export const Navbar = () => {
                 );
               }
 
-              const active = item.path && location.pathname === item.path && isActive(item.path);
+              const active = item.path && (
+                item.path === PATHS.ROOT
+                  ? location.pathname === PATHS.ROOT
+                  : isActive(item.path)
+              );
 
               return (
                 <Link

@@ -2,6 +2,7 @@ import type { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-f
 import type { LoginRequest } from "../auth.types";
 import { UserCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DEMO_ACCOUNTS } from "../auth.constants.ts"
 
 interface LoginViewProps {
   register: UseFormRegister<LoginRequest>;
@@ -10,13 +11,6 @@ interface LoginViewProps {
   errors: FieldErrors<LoginRequest>;
   setValue: UseFormSetValue<LoginRequest>;
 }
-
-const DEMO_ACCOUNTS = [
-  { label: 'Project Manager', email: 'pm@dev.com', pass: 'password123' },
-  { label: 'Kierownik Liniowy', email: 'linear@dev.com', pass: 'password123' },
-  { label: 'Władze Wydziału', email: 'authority@dev.com', pass: 'password123' },
-  { label: 'Zwykły Pracownik', email: 'common@dev.com', pass: 'password123' },
-];
 
 export const LoginView = ({ register, onSubmit, isPending, errors, setValue }: LoginViewProps) => {
 
