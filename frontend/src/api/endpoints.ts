@@ -45,5 +45,12 @@ export const ENDPOINTS = {
         QUALIFICATIONS: '/approvals/qualifications',
         QUALIFICATION_DETAILS: '/approvals/qualifications/details',
         QUALIFICATIONS_BULK_UPDATE: '/approvals/qualifications/bulk-update'
+    },
+    NOTIFICATIONS: {
+      BASE: '/notifications',
+      STREAM: '/notifications/stream',
+      UNREAD_COUNT: 'notifications/unread-count',
+      MARK_READ: (id: string) => `/notifications/${id}/mark-as-read`,
+      MARK_ALL_READ: '/notifications/mark-all-as-read',
     }
 } as const;

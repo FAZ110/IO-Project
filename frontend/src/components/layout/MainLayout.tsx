@@ -1,7 +1,10 @@
 import { Outlet } from 'react-router-dom';
 import { Navbar } from './Navbar';
+import { useNotificationStream } from '@/features/notification/notification.hooks';
 
 export const MainLayout = () => {
+  useNotificationStream();
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />

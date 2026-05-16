@@ -8,7 +8,8 @@ import java.util.UUID;
 public record AssignmentRejectedEvent(
         UUID assignmentId,
         User recipient,
-        String message
+        String employeeName,
+        String projectName
 ) implements NotificationEvent {
 
     @Override
@@ -19,5 +20,10 @@ public record AssignmentRejectedEvent(
     @Override
     public NotificationType type() {
         return NotificationType.ASSIGNMENT_REJECTED;
+    }
+
+    @Override
+    public String buildMessage() {
+        return "Odrzucono przypisanie pracownika " + employeeName + " do projektu " + projectName;
     }
 }

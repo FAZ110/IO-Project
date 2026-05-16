@@ -46,9 +46,16 @@ class NotificationServiceTest {
         User recipient = new User();
         recipient.setId(UUID.randomUUID());
         UUID assignmentId = UUID.randomUUID();
-        String message = "Prośba o przypisanie";
 
-        AssignmentRequestedEvent event = new AssignmentRequestedEvent(assignmentId, recipient, message);
+        String projectName = "Projekt Apollo";
+        String employeeName = "Jan Kowalski";
+
+        AssignmentRequestedEvent event = new AssignmentRequestedEvent(
+                assignmentId,
+                recipient,
+                projectName,
+                employeeName
+        );
 
         ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 
@@ -56,11 +63,12 @@ class NotificationServiceTest {
                 .id(UUID.randomUUID())
                 .recipient(recipient)
                 .type(NotificationType.ASSIGNMENT_REQUESTED)
-                .message(message)
+                .message(event.buildMessage())
                 .referenceId(assignmentId)
                 .isRead(false)
                 .createdAt(LocalDateTime.now())
                 .build();
+
         when(notificationRepository.save(any(Notification.class))).thenReturn(savedMock);
 
         // When
@@ -69,7 +77,10 @@ class NotificationServiceTest {
         // Then
         verify(notificationRepository).save(notificationCaptor.capture());
         Notification capturedNotification = notificationCaptor.getValue();
+
         assertEquals(NotificationType.ASSIGNMENT_REQUESTED, capturedNotification.getType());
+
+        assertEquals("Kierownik projektu Projekt Apollo prosi o alokację pracownika Jan Kowalski", capturedNotification.getMessage());
 
         verify(notificationSender).send(any(NotificationResponse.class), eq(recipient.getId()));
     }

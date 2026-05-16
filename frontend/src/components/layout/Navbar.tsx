@@ -3,7 +3,6 @@ import { useAuth } from '@/providers/AuthContext';
 import { useAuthActions } from '@/features/auth/auth.hooks';
 import { PATHS } from '@/routes/paths';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,11 +16,11 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   LogOut,
   Briefcase,
-  Bell,
   UserCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS } from '@/routes/navigation';
+import {NotificationBell} from "@/features/notification/components/NotificationBell.tsx";
 
 export const Navbar = () => {
   const { user } = useAuth();
@@ -30,9 +29,6 @@ export const Navbar = () => {
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname.startsWith(path);
-
-  // TODO: powiadomienia
-  const unreadNotifications = 3;
 
   const initials = `${user?.firstName?.charAt(0) || ''}${user?.lastName?.charAt(0) || ''}`.toUpperCase();
 
@@ -80,14 +76,7 @@ export const Navbar = () => {
 
         <div className="flex items-center gap-2">
 
-          <Button variant="ghost" size="icon" className="relative text-slate-500 hover:text-slate-900 cursor-pointer">
-            <Bell className="h-5 w-5" />
-            {unreadNotifications > 0 && (
-              <Badge variant="destructive" className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full p-0 text-[10px]">
-                {unreadNotifications}
-              </Badge>
-            )}
-          </Button>
+          <NotificationBell />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

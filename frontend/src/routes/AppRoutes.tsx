@@ -7,6 +7,7 @@ import { CreateProjectPage } from '@/pages/CreateProjectPage';
 import { ProjectDetailsPage } from '@/pages/ProjectDetailsPage.tsx';
 import { AdminUsersPage } from '../pages/AdminUsersPage';
 import { AdminUserDetailsPage } from '../pages/AdminUserDetailsPage';
+import { NotificationPage } from "@/pages/NotificationPage.tsx";
 import { ROUTE_PARAMS } from './paths';
 import { UserRole } from '@/features/auth/auth.types';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -34,6 +35,7 @@ export const AppRoutes = () => {
           <Route path={PATHS.ROOT} element={<DashboardPage />} />
           <Route path={PATHS.PROFILE} element={<ProfilePage />} />
           <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
+          <Route path={PATHS.NOTIFICATION} element={<NotificationPage />} />
 
           {/* LINEAR MANAGER ROUTES */}
           <Route element={<AuthorizedRoute allowedRoles={[UserRole.LINEAR_MANAGER]} />}>

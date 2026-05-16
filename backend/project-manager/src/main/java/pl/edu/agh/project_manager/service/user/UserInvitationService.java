@@ -43,14 +43,6 @@ public class UserInvitationService {
         var newUser = createInvitedUser(email, role, supervisor);
         userRepository.save(newUser);
 
-        if (supervisor != null) {
-            eventPublisher.publishEvent(new SystemNewEmployeeEvent(
-                    newUser.getId(),
-                    supervisor,
-                    "Do twojego zespołu zaproszono nowego pracownika: " + email
-            ));
-        }
-
         var activationToken = createTokenForUser(newUser);
 
         sendInvitationEmail(email, activationToken);

@@ -34,7 +34,7 @@ public class NotificationService {
     @TransactionalEventListener
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void onNotificationEvent(NotificationEvent event) {
-        create(event.recipient(), event.type(), event.message(), event.referenceId());
+        create(event.recipient(), event.type(), event.buildMessage(), event.referenceId());
     }
 
     private void create(User recipient, NotificationType type, String message, UUID referenceId) {
@@ -49,6 +49,11 @@ public class NotificationService {
 
         NotificationResponse response = NotificationResponse.from(savedNotification);
         notificationSender.send(response, recipient.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public Integer getUnreadCount(UUID userId) {
+        return notificationRepository.countAllByRecipientIdAndIsReadFalse(userId);
     }
 
     @Transactional(readOnly = true)

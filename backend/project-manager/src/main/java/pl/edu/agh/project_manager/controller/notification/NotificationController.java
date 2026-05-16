@@ -15,6 +15,7 @@ import pl.edu.agh.project_manager.infrastructure.notification.SseSubscriber;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.notification.NotificationService;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -29,6 +30,12 @@ public class NotificationController {
     public ResponseEntity<SseEmitter> streamNotifications(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         SseEmitter emitter = sseSubscriber.subscribe(userPrincipal.userId());
         return ResponseEntity.ok(emitter);
+    }
+
+    @GetMapping("/unread-count")
+    public ResponseEntity<Map<String, Integer>> getUnreadCount(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        int count = notificationService.getUnreadCount(userPrincipal.userId());
+        return ResponseEntity.ok(Map.of("count", count));
     }
 
     @GetMapping
