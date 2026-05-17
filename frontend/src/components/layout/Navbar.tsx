@@ -1,9 +1,8 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthContext';
 import { useAuthActions } from '@/features/auth/auth.hooks';
 import { PATHS } from '@/routes/paths';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,29 +16,25 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   LogOut,
   Briefcase,
-  Bell,
-  UserCircle
+  UserCircle,
+  ChevronDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS } from '@/routes/navigation';
+import { NotificationBell } from "@/features/notification/components/NotificationBell.tsx";
 
 export const Navbar = () => {
   const { user } = useAuth();
   const { logoutUser, isLoggingOut } = useAuthActions();
-  const navigate = useNavigate();
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname.startsWith(path);
 
-  // TODO: powiadomienia
-  const unreadNotifications = 3;
-
   const initials = `${user?.firstName?.charAt(0) || ''}${user?.lastName?.charAt(0) || ''}`.toUpperCase();
-
   const visibleNavItems = NAV_ITEMS.filter((item) => {
-    if (!item.roles) return true;
-    if (!user) return false;
-    return item.roles.includes(user.role);
+    if (item.roles && user && !item.roles.includes(user.role)) return false;
+    if (item.children && item.children.length === 0) return false;
+    return true;
   });
 
   return (
@@ -54,19 +49,66 @@ export const Navbar = () => {
 
           <div className="hidden md:flex gap-1">
             {visibleNavItems.map((item) => {
-              const active = location.pathname === item.path && isActive(item.path);
+              if (item.children) {
+                const isChildActive = item.children.some(child => child.path && isActive(child.path));
+
+                return (
+                  <DropdownMenu key={item.label}>
+                    <DropdownMenuTrigger
+                      className={cn(
+                        "flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md transition-colors outline-none cursor-pointer",
+                        isChildActive
+                          ? "bg-blue-50 text-blue-700"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      )}
+                    >
+                      <item.icon className="h-4 w-4" />
+                      {item.label}
+                      <ChevronDown className="h-3 w-3 ml-0.5 opacity-50" />
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent align="start" className="w-56 p-1">
+                      {item.children.map((child) => {
+                        const childActive = child.path && location.pathname === child.path;
+                        return (
+                          <DropdownMenuItem key={child.label} asChild className="p-2 cursor-pointer rounded-md mb-0.5 last:mb-0">
+                            <Link
+                              to={child.path!}
+                              className={cn(
+                                "flex items-center gap-2.5 w-full transition-colors",
+                                childActive
+                                  ? "bg-blue-50 text-blue-700 font-medium"
+                                  : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                              )}
+                            >
+                              <child.icon className={cn("h-[18px] w-[18px]", childActive ? "text-blue-600" : "text-slate-500")} />
+                              <span className="text-sm">{child.label}</span>
+                            </Link>
+                          </DropdownMenuItem>
+                        );
+                      })}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                );
+              }
+
+              const active = item.path && (
+                item.path === PATHS.ROOT
+                  ? location.pathname === PATHS.ROOT
+                  : isActive(item.path)
+              );
 
               return (
                 <Link
-                  key={item.path}
-                  to={item.path}
+                  key={item.label}
+                  to={item.path!}
                   className={cn(
                     "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                    !item.isCritical && (active 
-                      ? "bg-slate-100 text-slate-900" 
-                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"),
-                    item.isCritical && (active 
-                      ? "bg-red-50 text-red-700" 
+                    !item.isCritical && (active
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"),
+                    item.isCritical && (active
+                      ? "bg-red-50 text-red-700"
                       : "text-red-600 hover:bg-red-50 hover:text-red-700")
                   )}
                 >
@@ -75,19 +117,11 @@ export const Navbar = () => {
                 </Link>
               );
             })}
-         </div>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
-
-          <Button variant="ghost" size="icon" className="relative text-slate-500 hover:text-slate-900 cursor-pointer">
-            <Bell className="h-5 w-5" />
-            {unreadNotifications > 0 && (
-              <Badge variant="destructive" className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full p-0 text-[10px]">
-                {unreadNotifications}
-              </Badge>
-            )}
-          </Button>
+          <NotificationBell />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -100,7 +134,7 @@ export const Navbar = () => {
               </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent className="w-64" align="end" forceMount>
+            <DropdownMenuContent className="w-64 p-1" align="end" forceMount>
               <DropdownMenuLabel className="font-normal p-3">
                 <div className="flex flex-col space-y-1.5">
                   <p className="text-sm font-medium leading-none text-slate-900">
@@ -117,9 +151,11 @@ export const Navbar = () => {
               <DropdownMenuSeparator />
 
               <DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => navigate(PATHS.PROFILE)} className="cursor-pointer flex items-center gap-2 py-2">
-                  <UserCircle className="h-4 w-4 text-slate-500" />
-                  <span>Mój Profil</span>
+                <DropdownMenuItem asChild className="cursor-pointer p-2 rounded-md mb-0.5">
+                  <Link to={PATHS.PROFILE} className="flex items-center gap-2.5 w-full">
+                    <UserCircle className="h-[18px] w-[18px] text-slate-500" />
+                    <span className="text-sm">Mój Profil</span>
+                  </Link>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
 
@@ -128,15 +164,14 @@ export const Navbar = () => {
               <DropdownMenuItem
                 disabled={isLoggingOut}
                 onClick={() => logoutUser()}
-                className="cursor-pointer flex items-center gap-2 py-2 text-slate-600 hover:text-slate-900"
+                className="cursor-pointer flex items-center gap-2.5 p-2 rounded-md text-slate-600 hover:text-slate-900"
               >
-                <LogOut className={cn("h-4 w-4", isLoggingOut && "animate-pulse")} />
-                <span>{isLoggingOut ? 'Wylogowywanie...' : 'Wyloguj'}</span>
+                <LogOut className={cn("h-[18px] w-[18px]", isLoggingOut && "animate-pulse")} />
+                <span className="text-sm">{isLoggingOut ? 'Wylogowywanie...' : 'Wyloguj'}</span>
               </DropdownMenuItem>
 
             </DropdownMenuContent>
           </DropdownMenu>
-
         </div>
       </div>
     </nav>

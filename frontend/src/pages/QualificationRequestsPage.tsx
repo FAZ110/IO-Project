@@ -5,17 +5,31 @@ import { QualificationRequestDetails } from "@/features/qualifications/component
 import { getColumns } from "@/features/qualifications/qualifications.columns";
 import { useWaitingQualificationsSummaryQuery } from "@/features/qualifications/qualifications.hooks";
 import type { QualificationRequestResponse } from "@/features/qualifications/qualifications.types";
-import { useMemo, useState } from "react";
+import {useCallback, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 
 export const QualificationRequestsPage = () => {
   const { waitingQualificationsSummary, isLoading } = useWaitingQualificationsSummaryQuery();
-  const [selectedRequest, setselectedRequest] = useState<QualificationRequestResponse | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const userIdFromUrl = searchParams.get('userId');
+
+  const selectedRequest = useMemo(() => {
+    if (!userIdFromUrl || !waitingQualificationsSummary) return null;
+    return waitingQualificationsSummary.find(req => req.userId === userIdFromUrl) || null;
+  }, [userIdFromUrl, waitingQualificationsSummary]);
+
+  const handleOpenModal = useCallback((user: QualificationRequestResponse) => {
+    setSearchParams({ userId: user.userId });
+  }, [setSearchParams]);
+
+  const handleCloseModal = useCallback(() => {
+    searchParams.delete('userId');
+    setSearchParams(searchParams, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const columns = useMemo(() => getColumns({
-    onVerify: (user) => setselectedRequest(user)
-  }), []);
-
-  const handleCloseModal = () => setselectedRequest(null);
+    onVerify: handleOpenModal
+  }), [handleOpenModal]);
 
   return (
     <TablePageShell

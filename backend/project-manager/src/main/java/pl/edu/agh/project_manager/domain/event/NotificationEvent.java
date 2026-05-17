@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface NotificationEvent {
     User recipient();
-    String message();
     UUID referenceId();
     NotificationType type();
+    String buildMessage();
 }

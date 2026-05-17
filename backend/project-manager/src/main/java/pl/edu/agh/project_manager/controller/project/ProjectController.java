@@ -23,7 +23,7 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @PostMapping
-    @PreAuthorize("hasRole('PROJECT_MANAGER')")
+    @PreAuthorize("hasAnyRole('PROJECT_MANAGER', 'AUTHORITY')")
     public ResponseEntity<UUID> createProject(
             @Valid @RequestBody ProjectCreationRequest projectCreationRequest,
             @AuthenticationPrincipal UserPrincipal userPrincipal

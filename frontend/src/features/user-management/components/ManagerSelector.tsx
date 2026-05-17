@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useDebounce } from 'use-debounce';
-import { useSearchLinearManagers } from '../user-management.hooks';
+import { usePotentialSupervisors } from '../user-management.hooks';
 import type { SimpleUserResponse } from '../user-management.types';
 
 interface ManagerSelectorProps {
@@ -14,7 +14,7 @@ export const ManagerSelector = ({ onSelect, error }: ManagerSelectorProps) => {
   const [selectedManager, setSelectedManager] = useState<SimpleUserResponse | null>(null);
 
   const [debouncedSearch] = useDebounce(searchInput, 300);
-  const { data: foundManagers = [] } = useSearchLinearManagers(debouncedSearch);
+  const { data: foundManagers = [] } = usePotentialSupervisors(debouncedSearch);
 
   const handleSelect = (manager: SimpleUserResponse) => {
     setSelectedManager(manager);
