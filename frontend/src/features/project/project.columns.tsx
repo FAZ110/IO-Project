@@ -1,11 +1,10 @@
 import type { ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
-import type { ProjectDetailsResponse } from "./project.types"
+import type { ProjectResponse } from "./project.types"
 import { Link } from "react-router-dom"
-import type { UserResponse } from "../user-management"
 import { PATHS } from "@/routes/paths"
 
-export const getColumns = (): ColumnDef<ProjectDetailsResponse>[] => [
+export const getColumns = (): ColumnDef<ProjectResponse>[] => [
   {
     accessorKey: "title",
     header: "Nazwa projektu",
@@ -20,18 +19,6 @@ export const getColumns = (): ColumnDef<ProjectDetailsResponse>[] => [
         </Link>
       )
     },
-  },
-  {
-    accessorKey: "manager",
-    header: "Kierownik projektu",
-    cell: ({ row }) => {
-      const manager = row.getValue("manager") as UserResponse
-      return (
-        <div>
-          {manager.name} {manager.surname}
-        </div>
-      )
-    }
   },
   {
     accessorKey: "isActive",

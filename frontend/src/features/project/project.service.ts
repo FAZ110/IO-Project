@@ -2,7 +2,6 @@ import api from "@/api/client";
 import { ENDPOINTS } from "@/api/endpoints.ts";
 import type {
   ProjectCreationRequest,
-  ProjectResponse,
   ProjectDetailsResponse,
   CreateEmployeeAssignmentRequest,
   RiskResponse,
@@ -12,8 +11,8 @@ import type {
 import { buildProjectSearchParams } from "./project.utils";
 
 export const projectService = {
-  getAllProjects: async (): Promise<ProjectResponse[]> => {
-    const { data } = await api.get<ProjectResponse[]>(ENDPOINTS.PROJECT.BASE);
+  getAllProjects: async (): Promise<ProjectDetailsResponse[]> => {
+    const { data } = await api.get<ProjectDetailsResponse[]>(ENDPOINTS.PROJECT.BASE);
     return data;
   },
 
@@ -44,10 +43,10 @@ export const projectService = {
   searchProjects: async (request: SearchProjectsRequest): Promise<ProjectDetailsResponse[]> => {
     const params = buildProjectSearchParams(request);
 
-    const response = await api.get<ProjectDetailsResponse[]>(ENDPOINTS.PROJECT.BASE, {
+    const { data } = await api.get<ProjectDetailsResponse[]>(ENDPOINTS.PROJECT.BASE, {
       params,
     });
 
-    return response.data;
+    return data;
   },
 };
