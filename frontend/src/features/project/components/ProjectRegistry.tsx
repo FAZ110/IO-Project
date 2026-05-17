@@ -23,8 +23,6 @@ export const ProjectRegistry = () => {
   });
 
   const { data: groupsData } = useProjectGroupsWithType();
-  const wallets = groupsData?.wallets ?? [];
-  const programs = groupsData?.programs ?? [];
 
   const columns = getColumns();
 
@@ -50,7 +48,7 @@ export const ProjectRegistry = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all-wallets">Wszystkie portfele</SelectItem>
-              {wallets.map((group) => (
+              {groupsData?.wallets.map((group) => (
                 <SelectItem key={group.id} value={group.id}>
                   {group.name}
                 </SelectItem>
@@ -71,7 +69,7 @@ export const ProjectRegistry = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all-programs">Wszystkie programy</SelectItem>
-              {programs.map((group) => (
+              {groupsData?.programs.map((group) => (
                 <SelectItem key={group.id} value={group.id}>
                   {group.name}
                 </SelectItem>

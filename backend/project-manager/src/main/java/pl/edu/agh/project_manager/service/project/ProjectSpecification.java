@@ -1,11 +1,7 @@
 package pl.edu.agh.project_manager.service.project;
 
-import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 import pl.edu.agh.project_manager.domain.entity.project.Project;
-import pl.edu.agh.project_manager.domain.entity.user.User;
-import pl.edu.agh.project_manager.security.UserPrincipal;
-
 import java.util.UUID;
 
 public class ProjectSpecification {
@@ -14,19 +10,6 @@ public class ProjectSpecification {
         return (root, query1, cb) -> {
             String pattern = "%" + query.toLowerCase() + "%";
             return cb.like(cb.lower(root.get("title")), pattern);
-        };
-    }
-
-    public static Specification<Project> accessibleByUser(UserPrincipal user) {
-        return (root, query, cb) -> switch (user.userRole()) {
-            case PROJECT_MANAGER ->
-                    cb.equal(root.get("projectManager").get("id"), user.userId());
-            case LINEAR_MANAGER, COMMON -> {
-                Join<Project, User> membersJoin = root.join("members");
-                query.distinct(true);
-                yield cb.equal(membersJoin.get("id"), user.userId());
-            }
-            case ADMINISTRATOR, AUTHORITY -> cb.conjunction();
         };
     }
 

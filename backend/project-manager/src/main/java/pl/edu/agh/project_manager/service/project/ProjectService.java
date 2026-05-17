@@ -145,9 +145,9 @@ public class ProjectService {
 
     @Transactional
     public List<ProjectResponse> searchProjects(SearchProjectCommand command) {
+
         Specification<Project> spec = Specification
-                .where(ProjectSpecification.accessibleByUser(command.user()))
-                .and(buildSearchFilter(command));
+                .where(buildSearchFilter(command));
 
         return projectRepository.findAll(spec).stream()
                 .map(ProjectResponse::from)

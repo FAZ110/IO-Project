@@ -3,6 +3,7 @@ import { projectService } from "@/features/project/project.service.ts";
 import { toast } from "sonner";
 import { PROJECT_KEYS, ROLES_KEYS } from "@/features/project/project.keys.ts";
 import type { SearchProjectsRequest } from "@/features/project/project.types.ts";
+import { hasProjectSearchFilters } from "@/features/project/project.utils.ts";
 
 export const useProjects = () => {
   return useQuery({
@@ -48,18 +49,11 @@ export const useProjectMembers = (id: string) => {
 };
 
 export const useSearchProjects = (request: SearchProjectsRequest) => {
-  const hasFilters = Boolean(
-    (request.query && request.query.trim().length >= 2) ||
-    request.unassignedOnly !== undefined ||
-    request.groupId ||
-    request.isActive !== undefined,
-  );
+  const hasFilters = hasProjectSearchFilters(request);
 
   return useQuery({
     queryKey: PROJECT_KEYS.search(request),
-    queryFn: () => hasFilters
-      ? projectService.searchProjects(request)
-      : projectService.getAllProjects(),
+    queryFn: () => (hasFilters ? projectService.searchProjects(request) : projectService.getAllProjects()),
   });
 };
 

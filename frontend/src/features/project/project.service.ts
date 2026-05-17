@@ -9,6 +9,7 @@ import type {
   ProjectMembersResponse,
   SearchProjectsRequest,
 } from "./project.types";
+import { buildProjectSearchParams } from "./project.utils";
 
 export const projectService = {
   getAllProjects: async (): Promise<ProjectResponse[]> => {
@@ -41,23 +42,7 @@ export const projectService = {
   },
 
   searchProjects: async (request: SearchProjectsRequest): Promise<ProjectDetailsResponse[]> => {
-    const params: Record<string, string | boolean> = {};
-
-    if (request.query) {
-      params.query = request.query;
-    }
-
-    if (request.unassignedOnly !== undefined) {
-      params.unassignedOnly = request.unassignedOnly;
-    }
-
-    if (request.groupId) {
-      params.groupId = request.groupId;
-    }
-
-    if (request.isActive !== undefined) {
-      params.isActive = request.isActive;
-    }
+    const params = buildProjectSearchParams(request);
 
     const response = await api.get<ProjectDetailsResponse[]>(ENDPOINTS.PROJECT.BASE, {
       params,
