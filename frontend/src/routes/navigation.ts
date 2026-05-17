@@ -3,7 +3,7 @@ import {
   ClipboardList,
   FolderPlus,
   ShieldAlert,
-  GraduationCap, PlusSquare, FolderOpen
+  GraduationCap, PlusSquare, FolderOpen, Briefcase
 } from 'lucide-react';
 import { UserRole } from '@/features/auth/auth.types';
 import { PATHS } from '@/routes/paths';
@@ -29,7 +29,7 @@ export const NAV_ITEMS: NavItem[] = [
     roles: [UserRole.AUTHORITY, UserRole.LINEAR_MANAGER, UserRole.PROJECT_MANAGER, UserRole.COMMON],
     children: [
       // TODO: Gdy juz beda rejestry mozna tutaj odkomentowac
-      // { label: 'Rejestr projektów', path: PATHS.PROJECTS_REGISTRY, icon: Briefcase },
+      { label: 'Rejestr projektów', path: PATHS.PROJECTS_REGISTRY, icon: Briefcase },
       // { label: 'Rejestr pracowników', path: PATHS.EMPLOYEES_REGISTRY, icon: Users },
     ]
   },
@@ -57,17 +57,5 @@ export const NAV_ITEMS: NavItem[] = [
     icon: ShieldAlert,
     roles: [UserRole.ADMINISTRATOR],
     isCritical: true,
-  },
-  {
-    label: "Nowy portfel/program",
-    path: PATHS.CREATE_PROJECT_GROUP,
-    icon: FolderPlus,
-    roles: [UserRole.PROJECT_MANAGER, UserRole.AUTHORITY]
-  },
-  {
-    label: "Rejestr projektów",
-    path: PATHS.PROJECT_REGISTRY,
-    icon: ClipboardList,
-    roles: [UserRole.PROJECT_MANAGER, UserRole.LINEAR_MANAGER, UserRole.AUTHORITY, UserRole.COMMON, UserRole.ADMINISTRATOR]
   }
 ];

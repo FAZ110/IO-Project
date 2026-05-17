@@ -36,7 +36,7 @@ export const AppRoutes = () => {
           <Route path={PATHS.ROOT} element={<DashboardPage />} />
           <Route path={PATHS.PROFILE} element={<ProfilePage />} />
           <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
-          <Route path={PATHS.PROJECT_REGISTRY} element={<ProjectRegistryPage />} />
+          <Route path={PATHS.PROJECTS_REGISTRY} element={<ProjectRegistryPage />} />
           <Route path={PATHS.NOTIFICATION} element={<NotificationPage />} />
 
           {/* LINEAR MANAGER ROUTES */}
