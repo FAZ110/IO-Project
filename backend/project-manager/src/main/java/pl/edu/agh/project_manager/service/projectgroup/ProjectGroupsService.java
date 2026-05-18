@@ -7,6 +7,7 @@ import pl.edu.agh.project_manager.controller.dto.project_group.AllGroupsResponse
 import pl.edu.agh.project_manager.controller.dto.project_group.GroupOwnerResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupDetailsResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupResponse;
+import pl.edu.agh.project_manager.controller.dto.project_group.ProjectGroupResponse;
 import pl.edu.agh.project_manager.domain.entity.project.Project;
 import pl.edu.agh.project_manager.domain.entity.projectgroup.ProjectGroup;
 import pl.edu.agh.project_manager.domain.entity.user.User;
@@ -29,8 +30,12 @@ public class ProjectGroupsService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
 
+    @Transactional(readOnly = true)
     public AllGroupsResponse getAllGroups() {
-        return new AllGroupsResponse(getWalletGroups(), getProgramGroups());
+        return new AllGroupsResponse(
+                projectGroupRepository.getSingleGroupByGroupType(GroupType.WALLET).stream().map(ProjectGroupResponse::from).toList(),
+                projectGroupRepository.getSingleGroupByGroupType(GroupType.PROGRAM).stream().map(ProjectGroupResponse::from).toList()
+        );
     }
 
     public List<SingleGroupResponse> getWalletGroups() {

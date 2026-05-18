@@ -1,3 +1,5 @@
+import type { ProjectResponse } from "@/features/project/project.types";
+
 export const PROJECT_GROUP_TYPE_VALUES = ["WALLET", "PROGRAM"] as const;
 
 export type ProjectGroupType = (typeof PROJECT_GROUP_TYPE_VALUES)[number];
@@ -17,9 +19,15 @@ export interface SingleGroupResponse {
     name: string
 }
 
+export interface ProjectGroupResponse {
+    id: string;
+    name: string;
+    projects: ProjectResponse[];
+}
+
 export interface AllGroupsResponse {
-    wallets: SingleGroupResponse[],
-    programs: SingleGroupResponse[]
+    wallets: ProjectGroupResponse[],
+    programs: ProjectGroupResponse[]
 }
 
 export interface ProjectGroupCreationRequest {
