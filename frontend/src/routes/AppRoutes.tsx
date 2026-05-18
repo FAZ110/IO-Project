@@ -17,8 +17,12 @@ import { AuthorizedRoute } from '@/routes/AuthorizedRoute';
 import { EmployeeAssignmentsPage } from '@/pages/EmployeeAssignmentsPage';
 import { QualificationRequestsPage } from '@/pages/QualificationRequestsPage';
 import { CreateProjectGroupPage } from '@/pages/CreateProjectGroupPage';
+import { useAuth } from '@/providers/AuthContext';
 
 export const AppRoutes = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === UserRole.ADMINISTRATOR;
+
   return (
     <Routes>
       {/* PUBLIC ROUTES */}
@@ -31,7 +35,7 @@ export const AppRoutes = () => {
       <Route element={<AuthenticatedRoute />}>
         <Route element={<MainLayout/>}>
           {/* GLOBAL ROUTES */}
-          <Route path={PATHS.ROOT} element={<DashboardPage />} />
+          <Route path={PATHS.ROOT} element={isAdmin ? <Navigate to={PATHS.ADMIN_USERS} replace /> : <DashboardPage />} />
           <Route path={PATHS.PROFILE} element={<ProfilePage />} />
           <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
 
@@ -44,7 +48,6 @@ export const AppRoutes = () => {
           {/* PROJECT MANAGER ROUTES */}
           <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER]} />}>
               <Route path={PATHS.CREATE_PROJECT} element={<CreateProjectPage />} />
-              <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
           </Route>
 
           {/* ADMIN ROUTES */}

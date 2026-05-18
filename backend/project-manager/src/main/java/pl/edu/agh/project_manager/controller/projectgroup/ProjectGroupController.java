@@ -26,8 +26,8 @@ public class ProjectGroupController {
     private final ProjectGroupsService projectGroupsService;
 
     @GetMapping("/groups")
-    public ResponseEntity<AllGroupsResponse> getAllGroups() {
-        return ResponseEntity.ok().body(projectGroupsService.getAllGroups());
+    public ResponseEntity<AllGroupsResponse> getAllGroups(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok().body(projectGroupsService.getAllGroups(userPrincipal));
     }
 
     @GetMapping("/groups/wallets")

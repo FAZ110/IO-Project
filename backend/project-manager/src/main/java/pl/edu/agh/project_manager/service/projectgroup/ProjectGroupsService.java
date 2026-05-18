@@ -1,6 +1,7 @@
 package pl.edu.agh.project_manager.service.projectgroup;
 
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.project_manager.controller.dto.project_group.AllGroupsResponse;
@@ -18,9 +19,13 @@ import pl.edu.agh.project_manager.repository.project.ProjectRepository;
 import pl.edu.agh.project_manager.repository.projectgroup.ProjectGroupRepository;
 import pl.edu.agh.project_manager.repository.user.UserRepository;
 import pl.edu.agh.project_manager.service.command.project.ProjectGroupCreationCommand;
+import pl.edu.agh.project_manager.security.UserPrincipal;
+import pl.edu.agh.project_manager.service.project.ProjectSpecification;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -31,11 +36,32 @@ public class ProjectGroupsService {
     private final ProjectRepository projectRepository;
 
     @Transactional(readOnly = true)
-    public AllGroupsResponse getAllGroups() {
-        return new AllGroupsResponse(
-                projectGroupRepository.getSingleGroupByGroupType(GroupType.WALLET).stream().map(ProjectGroupResponse::from).toList(),
-                projectGroupRepository.getSingleGroupByGroupType(GroupType.PROGRAM).stream().map(ProjectGroupResponse::from).toList()
-        );
+    public AllGroupsResponse getAllGroups(UserPrincipal userPrincipal) {
+        Specification<Project> spec = ProjectSpecification.accessibleByUser(userPrincipal);
+        List<UUID> accessibleProjectIds = projectRepository.findAll(spec).stream()
+                .map(Project::getId)
+                .collect(Collectors.toList());
+
+        List<ProjectGroupResponse> wallets = projectGroupRepository.getSingleGroupByGroupType(GroupType.WALLET).stream()
+                .map(group -> filterGroupProjects(group, accessibleProjectIds))
+                .filter(group -> !group.projects().isEmpty())
+                .collect(Collectors.toList());
+
+        List<ProjectGroupResponse> programs = projectGroupRepository.getSingleGroupByGroupType(GroupType.PROGRAM).stream()
+                .map(group -> filterGroupProjects(group, accessibleProjectIds))
+                .filter(group -> !group.projects().isEmpty())
+                .collect(Collectors.toList());
+
+        return new AllGroupsResponse(wallets, programs);
+    }
+
+    private ProjectGroupResponse filterGroupProjects(ProjectGroup group, List<UUID> accessibleProjectIds) {
+        ProjectGroupResponse fullResponse = ProjectGroupResponse.from(group);
+        List<pl.edu.agh.project_manager.controller.dto.project.ProjectResponse> filteredProjects = fullResponse.projects().stream()
+                .filter(project -> accessibleProjectIds.contains(project.id()))
+                .collect(Collectors.toList());
+
+        return new ProjectGroupResponse(fullResponse.id(), fullResponse.name(), filteredProjects);
     }
 
     public List<SingleGroupResponse> getWalletGroups() {
