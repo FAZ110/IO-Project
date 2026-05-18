@@ -7,6 +7,7 @@ import { CreateProjectPage } from '@/pages/CreateProjectPage';
 import { ProjectDetailsPage } from '@/pages/ProjectDetailsPage.tsx';
 import { AdminUsersPage } from '../pages/AdminUsersPage';
 import { AdminUserDetailsPage } from '../pages/AdminUserDetailsPage';
+import { NotificationPage } from "@/pages/NotificationPage.tsx"; // <-- Z ich kodu
 import { ROUTE_PARAMS } from './paths';
 import { UserRole } from '@/features/auth/auth.types';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -20,50 +21,49 @@ import { CreateProjectGroupPage } from '@/pages/CreateProjectGroupPage';
 import { useAuth } from '@/providers/AuthContext';
 
 export const AppRoutes = () => {
-  const { user } = useAuth();
-  const isAdmin = user?.role === UserRole.ADMINISTRATOR;
+    const { user } = useAuth();
+    const isAdmin = user?.role === UserRole.ADMINISTRATOR;
 
-  return (
-    <Routes>
-      {/* PUBLIC ROUTES */}
-      <Route element={<GuestRoute redirectTo={PATHS.ROOT} />}>
-        <Route path={PATHS.LOGIN} element={<LoginPage />} />
-        <Route path={PATHS.REGISTER} element={<RegisterPage />} />
-      </Route>
+    return (
+        <Routes>
+            {/* PUBLIC ROUTES */}
+            <Route element={<GuestRoute redirectTo={PATHS.ROOT} />}>
+                <Route path={PATHS.LOGIN} element={<LoginPage />} />
+                <Route path={PATHS.REGISTER} element={<RegisterPage />} />
+            </Route>
 
-      {/* PROTECTED ROUTES */}
-      <Route element={<AuthenticatedRoute />}>
-        <Route element={<MainLayout/>}>
-          {/* GLOBAL ROUTES */}
-          <Route path={PATHS.ROOT} element={isAdmin ? <Navigate to={PATHS.ADMIN_USERS} replace /> : <DashboardPage />} />
-          <Route path={PATHS.PROFILE} element={<ProfilePage />} />
-          <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
+            {/* PROTECTED ROUTES */}
+            <Route element={<AuthenticatedRoute />}>
+                <Route element={<MainLayout/>}>
+                    {/* GLOBAL ROUTES */}
+                    <Route path={PATHS.ROOT} element={isAdmin ? <Navigate to={PATHS.ADMIN_USERS} replace /> : <DashboardPage />} />
+                    <Route path={PATHS.PROFILE} element={<ProfilePage />} />
+                    <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
+                    <Route path={PATHS.NOTIFICATION} element={<NotificationPage />} />
 
-          {/* LINEAR MANAGER ROUTES */}
-          <Route element={<AuthorizedRoute allowedRoles={[UserRole.LINEAR_MANAGER]} />}>
-            <Route path={PATHS.PROJECT_REQUESTS} element={<EmployeeAssignmentsPage />} />
-            <Route path={PATHS.QUALIFICATION_REQUESTS} element={<QualificationRequestsPage />} />
-          </Route>
+                    {/* LINEAR MANAGER ROUTES */}
+                    <Route element={<AuthorizedRoute allowedRoles={[UserRole.LINEAR_MANAGER, UserRole.AUTHORITY]} />}>
+                        <Route path={PATHS.PROJECT_REQUESTS} element={<EmployeeAssignmentsPage />} />
+                        <Route path={PATHS.QUALIFICATION_REQUESTS} element={<QualificationRequestsPage />} />
+                    </Route>
 
-          {/* PROJECT MANAGER ROUTES */}
-          <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER]} />}>
-              <Route path={PATHS.CREATE_PROJECT} element={<CreateProjectPage />} />
-          </Route>
+                    {/* PROJECT MANAGER ROUTES */}
+                    <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER, UserRole.AUTHORITY]} />}>
+                        <Route path={PATHS.CREATE_PROJECT} element={<CreateProjectPage />} />
+                        <Route path={PATHS.CREATE_PROJECT_GROUP} element={<CreateProjectGroupPage />} />
+                    </Route>
 
-          {/* ADMIN ROUTES */}
-          <Route element={<AuthorizedRoute allowedRoles={[UserRole.ADMINISTRATOR]} />}>
-            <Route path={PATHS.ADMIN_USERS} element={<AdminUsersPage />} />
-            <Route path={PATHS.ADMIN_USER_DETAILS(`:${ROUTE_PARAMS.USER_ID}`)} element={<AdminUserDetailsPage />} />
-          </Route>
+                    {/* ADMIN ROUTES */}
+                    <Route element={<AuthorizedRoute allowedRoles={[UserRole.ADMINISTRATOR]} />}>
+                        <Route path={PATHS.ADMIN_USERS} element={<AdminUsersPage />} />
+                        <Route path={PATHS.ADMIN_USER_DETAILS(`:${ROUTE_PARAMS.USER_ID}`)} element={<AdminUserDetailsPage />} />
+                    </Route>
 
-          <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER, UserRole.AUTHORITY]} />}>
-            <Route path={PATHS.CREATE_PROJECT_GROUP} element={<CreateProjectGroupPage />} />
-          </Route>
-        </Route>
-      </Route>
+                </Route>
+            </Route>
 
-      {/* FALLBACK - 404 */}
-      <Route path="*" element={<Navigate to={PATHS.ROOT} replace />} />
-    </Routes>
-  );
+            {/* FALLBACK - 404 */}
+            <Route path="*" element={<Navigate to={PATHS.ROOT} replace />} />
+        </Routes>
+    );
 };

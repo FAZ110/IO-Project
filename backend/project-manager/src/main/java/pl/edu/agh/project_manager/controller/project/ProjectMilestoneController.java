@@ -22,7 +22,7 @@ public class ProjectMilestoneController {
     private final ProjectMilestoneService milestoneService;
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectAccess.canAccessProject(#projectId, authentication.principal)")
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR', 'AUTHORITY') or @projectAccess.canAccessProject(#projectId, authentication.principal)")
     public ResponseEntity<List<MilestoneResponse>> getMilestones(
             @PathVariable UUID projectId
     ) {

@@ -5,7 +5,9 @@ export const ROUTE_PARAMS = {
 
 export const QUERY_PARAMS = {
   ACTIVATION_TOKEN: 'token',
-  EMAIL: 'email'
+  EMAIL: 'email',
+  REQUEST_ID: 'requestId',
+  USER_ID: 'userId'
 } as const;
 
 export const PATHS = {
@@ -19,5 +21,6 @@ export const PATHS = {
   CREATE_PROJECT: `/create-project`,
   PROJECT: (id: string) => `project/${id}`,
   QUALIFICATION_REQUESTS: '/qualification-requests',
-  CREATE_PROJECT_GROUP: `/create-project-group`
+  CREATE_PROJECT_GROUP: `/create-project-group`,
+  NOTIFICATION: `notifications`
 } as const;

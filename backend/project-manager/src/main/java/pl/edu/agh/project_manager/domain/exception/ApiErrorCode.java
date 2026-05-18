@@ -29,6 +29,7 @@ public enum ApiErrorCode {
     BAD_CREDENTIALS("AUTH_003", HttpStatus.UNAUTHORIZED, "Invalid email or password"),
     MISSING_REFRESH_TOKEN("AUTH_004", HttpStatus.UNAUTHORIZED, "Refresh token is missing or cookie expired"),
     INVALID_REFRESH_TOKEN("AUTH_005", HttpStatus.UNAUTHORIZED, "Refresh token is invalid"),
+    INVALID_SUPERVISOR_ROLE("AUTH_006", HttpStatus.BAD_REQUEST, "Selected user cannot be a supervisor"),
     USER_NOT_PENDING("USR_002", HttpStatus.BAD_REQUEST, "Cannot resend invitation — user is not in PENDING status"),
 
     QUALIFICATION_NOT_FOUND("QUAL_001", HttpStatus.NOT_FOUND, "Qualification not found"),
