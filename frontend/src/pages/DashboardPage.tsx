@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PATHS } from '@/routes/paths';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,7 @@ import { DashboardProjectList } from '@/features/dashboard/components/DashboardP
 export const DashboardPage = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const [searchQuery, setSearchQuery] = useState('');
 
     const { data: projects = [] } = useProjects();
 
@@ -73,7 +74,12 @@ export const DashboardPage = () => {
                         <div className="flex items-center gap-2">
                             <div className="relative hidden sm:block">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                                <input placeholder="Szukaj..." className="pl-9 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 ring-blue-500 outline-none w-48 transition-all focus:w-64" />
+                                <input 
+                                    placeholder="Szukaj..." 
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="pl-9 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 ring-blue-500 outline-none w-48 transition-all focus:w-64" 
+                                />
                             </div>
                             <div className="flex bg-gray-100 p-1 rounded-xl">
                                 <Button variant="ghost" size="sm" className="bg-white shadow-sm rounded-lg px-2"><LayoutGrid size={16} /></Button>
@@ -82,7 +88,7 @@ export const DashboardPage = () => {
                         </div>
                     </div>
 
-                    <DashboardProjectList />
+                    <DashboardProjectList searchQuery={searchQuery} />
 
                 </div>
 
