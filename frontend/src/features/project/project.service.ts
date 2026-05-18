@@ -43,10 +43,10 @@ export const projectService = {
   searchProjects: async (request: SearchProjectsRequest): Promise<ProjectDetailsResponse[]> => {
     const params = buildProjectSearchParams(request);
 
-    const { data } = await api.get<ProjectDetailsResponse[]>(ENDPOINTS.PROJECT.BASE, {
+    const response = await api.get<ProjectDetailsResponse[]>(ENDPOINTS.PROJECT.BASE, {
       params,
     });
 
-    return data;
+    return response.data;
   },
 };

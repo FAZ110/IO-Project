@@ -24,8 +24,8 @@ export const generatePhasesFromMilestones = (milestones: Milestone[]) => {
 };
 
 export const getNextDateFromToday = (days: number) => {
-  const today = new Date();
-  const nextDate = new Date(today.getTime() + days * 24 * 60 * 60 * 1000);
+  const nextDate = new Date();
+  nextDate.setDate(nextDate.getDate() + days);
   return nextDate.toISOString().split("T")[0];
 };
 
