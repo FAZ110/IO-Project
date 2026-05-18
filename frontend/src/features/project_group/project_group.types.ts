@@ -26,8 +26,9 @@ export interface ProjectGroupResponse {
 }
 
 export interface AllGroupsResponse {
-    wallets: ProjectGroupResponse[],
-    programs: ProjectGroupResponse[]
+    wallets: ProjectGroupResponse[];
+    programs: ProjectGroupResponse[];
+    unassigned: ProjectResponse[];
 }
 
 export interface ProjectGroupCreationRequest {

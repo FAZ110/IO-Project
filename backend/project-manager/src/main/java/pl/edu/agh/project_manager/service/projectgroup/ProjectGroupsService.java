@@ -38,7 +38,8 @@ public class ProjectGroupsService {
     @Transactional(readOnly = true)
     public AllGroupsResponse getAllGroups(UserPrincipal userPrincipal) {
         Specification<Project> spec = ProjectSpecification.accessibleByUser(userPrincipal);
-        List<UUID> accessibleProjectIds = projectRepository.findAll(spec).stream()
+        List<Project> accessibleProjects = projectRepository.findAll(spec);
+        List<UUID> accessibleProjectIds = accessibleProjects.stream()
                 .map(Project::getId)
                 .collect(Collectors.toList());
 
@@ -52,7 +53,12 @@ public class ProjectGroupsService {
                 .filter(group -> !group.projects().isEmpty())
                 .collect(Collectors.toList());
 
-        return new AllGroupsResponse(wallets, programs);
+        List<pl.edu.agh.project_manager.controller.dto.project.ProjectResponse> unassigned = accessibleProjects.stream()
+                .filter(project -> project.getProjectGroup() == null)
+                .map(pl.edu.agh.project_manager.controller.dto.project.ProjectResponse::from)
+                .collect(Collectors.toList());
+
+        return new AllGroupsResponse(wallets, programs, unassigned);
     }
 
     private ProjectGroupResponse filterGroupProjects(ProjectGroup group, List<UUID> accessibleProjectIds) {

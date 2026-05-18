@@ -75,13 +75,14 @@ class ProjectGroupServiceTest {
     }
 
     @Test
-    @DisplayName("Should correct group types to WALLET and PROGRAMS and filter projects by access")
+    @DisplayName("Should correct group types and filter projects by access, including unassigned")
     @SuppressWarnings("unchecked")
     void getGroupTypes_Success() {
         UUID walletId = UUID.randomUUID();
         UUID programId = UUID.randomUUID();
         UUID projectId1 = UUID.randomUUID();
         UUID projectId2 = UUID.randomUUID();
+        UUID projectId3 = UUID.randomUUID();
         User owner = User.builder().name("John").surname("Doe").email("john@doe.com").build();
         
         UserPrincipal userPrincipal = new UserPrincipal(
@@ -104,6 +105,11 @@ class ProjectGroupServiceTest {
         project2.setTitle("P2");
         project2.setProjectManager(owner);
 
+        Project project3 = new Project();
+        project3.setId(projectId3);
+        project3.setTitle("P3");
+        project3.setProjectManager(owner);
+
         ProjectGroup wallet = ProjectGroup.builder()
                 .id(walletId)
                 .name("Wallet Alpha")
@@ -112,6 +118,8 @@ class ProjectGroupServiceTest {
                 .groupType(GroupType.WALLET)
                 .projects(new ArrayList<>(List.of(project1, project2)))
                 .build();
+        project1.setProjectGroup(wallet);
+        project2.setProjectGroup(wallet);
 
         ProjectGroup program = ProjectGroup.builder()
                 .id(programId)
@@ -121,9 +129,10 @@ class ProjectGroupServiceTest {
                 .groupType(GroupType.PROGRAM)
                 .projects(new ArrayList<>(List.of(project2)))
                 .build();
+        project2.setProjectGroup(program);
 
-        // User can only access project1
-        when(projectRepository.findAll(any(Specification.class))).thenReturn(List.of(project1));
+        // User can only access project1 and project3 (unassigned)
+        when(projectRepository.findAll(any(Specification.class))).thenReturn(List.of(project1, project3));
 
         when(projectGroupRepository.getSingleGroupByGroupType(GroupType.WALLET)).thenReturn(List.of(wallet));
         when(projectGroupRepository.getSingleGroupByGroupType(GroupType.PROGRAM)).thenReturn(List.of(program));
@@ -137,8 +146,10 @@ class ProjectGroupServiceTest {
         assertThat(response.wallets().getFirst().projects()).hasSize(1);
         assertThat(response.wallets().getFirst().projects().getFirst().id()).isEqualTo(projectId1);
         
-        // Program shouldn't be visible since user doesn't have access to project2
         assertThat(response.programs()).isEmpty();
+        
+        assertThat(response.unassigned()).hasSize(1);
+        assertThat(response.unassigned().getFirst().id()).isEqualTo(projectId3);
     }
 
     @Test

@@ -14,23 +14,28 @@ import {
     Briefcase,
     TrendingUp,
 } from 'lucide-react';
-import { useProjects } from '@/features/project/project.hooks';
 import { DashboardProjectList } from '@/features/dashboard/components/DashboardProjectList/DashboardProjectList';
+import { useAllProjectGroups } from '@/features/project_group/project_group.hooks';
 
 export const DashboardPage = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
 
-    const { data: projects = [] } = useProjects();
+    const { data: groups } = useAllProjectGroups();
 
     const stats = useMemo(() => {
+        const projects = [
+            ...(groups?.wallets.flatMap(w => w.projects) || []),
+            ...(groups?.programs.flatMap(p => p.projects) || []),
+            ...(groups?.unassigned || [])
+        ];
         const total = projects.length;
         const active = projects.filter(p => p.isActive === true).length;
         const inactive = total - active;
 
         return { total, active, inactive };
-    }, [projects]);
+    }, [groups]);
 
     return (
         <div className="p-6 md:p-8 max-w-400 mx-auto space-y-8 animate-in fade-in duration-500">
