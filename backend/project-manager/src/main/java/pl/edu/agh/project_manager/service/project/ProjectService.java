@@ -62,6 +62,7 @@ public class ProjectService {
         return savedProject.getId();
     }
 
+    @Transactional
     public ProjectResponse getProject(UUID projectId) {
         Project project = projectRepository.findByIdWithManager(projectId)
                 .orElseThrow(() -> new ApplicationException(
@@ -145,7 +146,6 @@ public class ProjectService {
 
     @Transactional
     public List<ProjectResponse> searchProjects(SearchProjectCommand command) {
-
         Specification<Project> spec = Specification
                 .where(buildSearchFilter(command));
 
