@@ -14,7 +14,8 @@ export const PROJECT_GROUP_TYPE_LABELS: Record<ProjectGroupType, string> = {
 
 export interface SingleGroupResponse {
     id: string,
-    name: string
+    name: string,
+    groupType: ProjectGroupType
 }
 
 export interface AllGroupsResponse {

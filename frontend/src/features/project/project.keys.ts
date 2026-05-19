@@ -1,9 +1,11 @@
+import type { SearchProjectsRequest } from "./project.types";
+
 export const PROJECT_KEYS = {
     all: ['projects'] as const,
     list: () => [...PROJECT_KEYS.all, 'list'] as const,
     details: () => [...PROJECT_KEYS.all, 'detail'] as const,
     detail: (id: string) => [...PROJECT_KEYS.details(), id] as const,
-    search: (query: string) => [...PROJECT_KEYS.all, 'search', query] as const,
+    search: (request: SearchProjectsRequest) => [...PROJECT_KEYS.all, 'search', request] as const,
     timeline: (projectId: string) => [...PROJECT_KEYS.detail(projectId), 'timeline'] as const,
 
     risks: (projectId: string) => [...PROJECT_KEYS.detail(projectId), 'risks'] as const,

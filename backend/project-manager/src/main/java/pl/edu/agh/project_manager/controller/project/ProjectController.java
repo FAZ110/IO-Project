@@ -40,12 +40,14 @@ public class ProjectController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam(value = "query", required = false) String query,
             @RequestParam(value = "groupId", required = false) UUID groupId,
+            @RequestParam(value = "isActive", required = false) Boolean isActive,
             @RequestParam(value = "unassignedOnly", required = false, defaultValue = "false") Boolean unassignedOnly
     ) {
         SearchProjectCommand command = new SearchProjectCommand(
                 userPrincipal,
                 query,
                 groupId,
+                isActive,
                 unassignedOnly
         );
         return ResponseEntity.ok(projectService.searchProjects(command));

@@ -18,6 +18,7 @@ import { AuthorizedRoute } from '@/routes/AuthorizedRoute';
 import { EmployeeAssignmentsPage } from '@/pages/EmployeeAssignmentsPage';
 import { QualificationRequestsPage } from '@/pages/QualificationRequestsPage';
 import { CreateProjectGroupPage } from '@/pages/CreateProjectGroupPage';
+import { ProjectRegistryPage } from '@/pages/ProjectRegistryPage';
 
 export const AppRoutes = () => {
   return (
@@ -35,6 +36,7 @@ export const AppRoutes = () => {
           <Route path={PATHS.ROOT} element={<DashboardPage />} />
           <Route path={PATHS.PROFILE} element={<ProfilePage />} />
           <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
+          <Route path={PATHS.PROJECTS_REGISTRY} element={<ProjectRegistryPage />} />
           <Route path={PATHS.NOTIFICATION} element={<NotificationPage />} />
 
           {/* LINEAR MANAGER ROUTES */}

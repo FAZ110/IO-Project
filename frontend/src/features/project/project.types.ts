@@ -1,5 +1,6 @@
 import type { SimpleUserResponse, UserResponse } from "@/features/user-management";
 import type { EmployeeAssignmentStatus } from "@/features/employee-assignments/employee-assignments.types";
+import type { SingleGroupResponse } from "../project_group/project_group.types";
 
 export interface ProjectCreationRequest {
     title: string;
@@ -29,11 +30,6 @@ export interface RiskResponse extends Risk {
     id: string;
 }
 
-export interface SingleGroupResponse {
-    id: string;
-    name: string;
-}
-
 export interface ProjectResponse {
     id: string;
     title: string;
@@ -57,6 +53,29 @@ export interface ProjectDetailsResponse {
     endDate: string;
     isActive: boolean;
     manager: UserResponse;
+    group: SingleGroupResponse;
+}
+
+export interface ProjectTimelineResponse {
+    milestones: Milestone[];
+    assignments: EmployeeWithAssignmentsResponse[];
+}
+
+export interface EmployeeWithAssignmentsResponse {
+    userId: string;
+    name: string;
+    surname: string;
+    email: string;
+    assignments: ProjectAssignmentResponse[];
+}
+
+export interface ProjectAssignmentResponse {
+    id: string;
+    roleName: string;
+    startDate: string;
+    endDate: string;
+    utilizationPercentage: number;
+    status: EmployeeAssignmentStatus;
 }
 
 export interface ProjectTimelineResponse {
@@ -88,4 +107,11 @@ export interface CreateEmployeeAssignmentRequest {
     endDate: string;
     utilizationPercentage: number;
     roleName: string;
+}
+
+export interface SearchProjectsRequest {
+    query?: string;
+    unassignedOnly?: boolean;
+    groupId?: string;
+    isActive?: boolean;
 }

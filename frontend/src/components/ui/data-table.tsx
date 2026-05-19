@@ -53,7 +53,10 @@ export function DataTable<TData, TValue>({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} style={{
+                    maxWidth: header.column.columnDef.size,
+                    minWidth: header.column.columnDef.size,
+                  }}>
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -74,7 +77,10 @@ export function DataTable<TData, TValue>({
                   className="even:bg-muted/50 hover:bg-muted/80 transition-colors"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} style={{
+                      maxWidth: cell.column.columnDef.size,
+                      minWidth: cell.column.columnDef.size,
+                    }}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
