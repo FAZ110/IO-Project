@@ -2,10 +2,9 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import type { ProjectDetailsResponse } from "./project.types";
 import { Link } from "react-router-dom";
-import type { UserResponse } from "../user-management";
 import { PATHS } from "@/routes/paths";
-import type { SingleGroupResponse } from "../project_group/project_group.types";
 import { PROJECT_GROUP_TYPE_LABELS } from "../project_group/project_group.types";
+
 
 export const getColumns = (): ColumnDef<ProjectDetailsResponse>[] => [
   {
@@ -27,7 +26,7 @@ export const getColumns = (): ColumnDef<ProjectDetailsResponse>[] => [
     header: "Kierownik projektu",
     meta: { className: "whitespace-normal break-all" },
     cell: ({ row }) => {
-      const manager = row.getValue("manager") as UserResponse;
+      const manager = row.original.manager;
       return (
         <div>
           {manager.name} {manager.surname}
@@ -38,18 +37,15 @@ export const getColumns = (): ColumnDef<ProjectDetailsResponse>[] => [
   },
   {
     accessorKey: "group",
-    header: "Prrtfel/Program",
+    header: "Portfel/Program",
     meta: { className: "whitespace-normal break-all" },
     cell: ({ row }) => {
-      const group = row.getValue("group") as SingleGroupResponse;
+      const group = row.original.group
       if (!group) return <div>-</div>;
-
-      const key = group.groupType as keyof typeof PROJECT_GROUP_TYPE_LABELS;
-      const label = PROJECT_GROUP_TYPE_LABELS[key];
 
       return (
         <div className="whitespace-normal">
-          <span className="break-all">{group.name ?? "-"}</span> <Badge variant="outline">{label}</Badge>
+          <span className="break-all">{group.name ?? "-"}</span> <Badge variant="outline">{PROJECT_GROUP_TYPE_LABELS[group.groupType]}</Badge>
         </div>
       );
     },
