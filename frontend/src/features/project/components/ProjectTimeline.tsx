@@ -7,6 +7,7 @@ import { useTimeline } from "../project.hooks";
 import { EmployeeAssignmentStatus } from "@/features/employee-assignments/employee-assignments.types";
 import { useNavigate } from "react-router-dom";
 import { PATHS } from "@/routes/paths";
+import type { ReactNode } from "react";
 
 const calculatePositionAndWidth = (start: Date, end: Date, projectStart: Date, projectEnd: Date) => {
   const totalProjectDuration = projectEnd.getTime() - projectStart.getTime();
@@ -21,9 +22,10 @@ const calculatePositionAndWidth = (start: Date, end: Date, projectStart: Date, p
 
 interface ProjectTimelineProps {
   project: ProjectDetailsResponse;
+  children?: ReactNode;
 }
 
-export const ProjectTimeline = ({ project }: ProjectTimelineProps) => {
+export const ProjectTimeline = ({ project, children }: ProjectTimelineProps) => {
   const { data: timelineData } = useTimeline(project.id);
   const navigate = useNavigate();
 
@@ -35,10 +37,10 @@ export const ProjectTimeline = ({ project }: ProjectTimelineProps) => {
   const markerGuideHeight = Math.max(assignmentsByUser.length * 56, 80);
 
   const getAssignmentStatusClasses = (status: EmployeeAssignmentStatus) => status === EmployeeAssignmentStatus.ACCEPTED
-    ? "bg-emerald-500 hover:bg-emerald-600 border-emerald-700/20"
+    ? "bg-emerald-500/95 hover:bg-emerald-600 border-emerald-800/35 ring-1 ring-inset ring-white/20 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.25)]"
     : status === EmployeeAssignmentStatus.PENDING
-      ? "bg-amber-400 hover:bg-amber-500 border-amber-600/20"
-      : "bg-indigo-500 hover:bg-indigo-600 border-indigo-700/20";
+      ? "bg-amber-400/95 hover:bg-amber-500 border-amber-700/30 ring-1 ring-inset ring-white/15 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12)]"
+      : "bg-indigo-500/95 hover:bg-indigo-600 border-indigo-800/35 ring-1 ring-inset ring-white/20 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.25)]";
 
   const getAssignmentStatusIcon = (status: EmployeeAssignmentStatus) => status === EmployeeAssignmentStatus.ACCEPTED
     ? <Check className="h-4 w-4 text-white" />
@@ -48,11 +50,12 @@ export const ProjectTimeline = ({ project }: ProjectTimelineProps) => {
 
   return (
     <Card className="w-full">
-      <CardHeader className="pb-3 border-b">
+      <CardHeader className="pb-3 border-b flex flex-row items-center justify-between gap-4">
         <CardTitle className="text-lg flex items-center gap-2 text-slate-800">
           <CalendarDays className="h-5 w-5 text-indigo-500" />
-          Harmonogram Projektu (Timeline)
+          Harmonogram projektu
         </CardTitle>
+        {children}
       </CardHeader>
       <CardContent className="pt-6 pb-5">
         <TooltipProvider>
@@ -92,8 +95,7 @@ export const ProjectTimeline = ({ project }: ProjectTimelineProps) => {
               {assignmentsByUser.map((employee) => {
                 const userName = `${employee.name} ${employee.surname}`;
                 const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase();
-                const userAssignments = employee.assignments;
-
+                
                 return (
                   <div key={employee.userId} className="grid grid-cols-[3rem_minmax(0,1fr)] items-center gap-3 sm:gap-4">
                     <div className="z-20 flex items-center justify-center">
@@ -112,14 +114,14 @@ export const ProjectTimeline = ({ project }: ProjectTimelineProps) => {
                             </Avatar>
                           </button>
                         </TooltipTrigger>
-                        <TooltipContent side="top" sideOffset={4} className="z-50 bg-slate-800 text-white border-0 shadow-md px-2 py-1 text-xs rounded-md" style={{ pointerEvents: 'none' }}>
+                        <TooltipContent side="top" className="z-50 bg-slate-800 text-white border-0 shadow-md px-2 py-1 text-xs rounded-md" style={{ pointerEvents: 'none' }}>
                           <p className="font-medium text-center whitespace-nowrap">{userName}</p>
                         </TooltipContent>
                       </Tooltip>
                     </div>
 
                     <div className="relative h-10 w-full rounded-md border border-slate-100 bg-slate-50/80 overflow-hidden">
-                      {userAssignments.map((assignment) => {
+                      {employee.assignments.map((assignment) => {
                         const assignmentStartDate = new Date(assignment.startDate);
                         const assignmentEndDate = new Date(assignment.endDate);
                         const position = calculatePositionAndWidth(assignmentStartDate, assignmentEndDate, projectStart, projectEnd);

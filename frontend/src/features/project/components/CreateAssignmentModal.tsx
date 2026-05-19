@@ -84,7 +84,12 @@ export const CreateAssignmentModal = ({ project }: CreateAssignmentModalProps) =
     <Form {...form}>
       <Dialog open={isOpenModal} onOpenChange={open => open ? setIsOpenModal(true) : closeModal()}>
         <DialogTrigger asChild>
-          <Button variant="outline">Stwórz wniosek</Button>
+          <Button
+            variant="outline"
+            className="border-slate-900 bg-slate-900 text-white hover:bg-slate-800 hover:text-white shadow-sm"
+          >
+            Stwórz wniosek
+          </Button>
         </DialogTrigger>
 
         <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto" data-project-id={project.id}>

@@ -75,10 +75,6 @@ public class Project {
     @Builder.Default
     private Set<User> committees = new HashSet<>();
 
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<ProjectAssignment> assignments = new ArrayList<>();
-
     public void addRisk(ProjectRisk risk) {
         this.risks.add(risk);
         risk.setProject(this);
