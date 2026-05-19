@@ -27,7 +27,8 @@ export const ENDPOINTS = {
             BASE: `/projects/${id}`,
             RISKS: `/projects/${id}/risks`,
             MEMBERS: `/projects/${id}/members`,
-            ASSIGNMENTS: `/projects/${id}/assignments`
+            ASSIGNMENTS: `/projects/${id}/assignments`,
+            TIMELINE: `/projects/${id}/timeline`
         }),
     },
     PROJECT_GROUP: {

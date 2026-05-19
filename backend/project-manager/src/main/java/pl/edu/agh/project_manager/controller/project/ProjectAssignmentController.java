@@ -33,10 +33,10 @@ public class ProjectAssignmentController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMINISTRATOR', 'AUTHORITY') or @projectAccess.canAccessProject(#projectId, authentication.principal)")
-    public ResponseEntity<List<AssignmentsByEmployeeResponse>> getAssignments(
+    public ResponseEntity<List<AssignmentResponse>> getAssignments(
             @PathVariable UUID projectId
     ) {
-        List<AssignmentsByEmployeeResponse> response = assignmentService.getProjectAssignments(projectId);
+        List<AssignmentResponse> response = assignmentService.getAssignments(projectId);
         return ResponseEntity.ok(response);
     }
 

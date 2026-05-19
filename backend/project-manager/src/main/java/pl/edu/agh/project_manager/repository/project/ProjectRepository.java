@@ -27,10 +27,6 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     @Query("SELECT p FROM Project p WHERE p.id = :id")
     Optional<Project> findByIdWithAllMembers(@Param("id") UUID id);
 
-    @EntityGraph(attributePaths = {"assignments", "assignments.user"})
-    @Query("SELECT p FROM Project p WHERE p.id = :id")
-    Optional<Project> findByIdWithAssignments(@Param("id") UUID id);
-
     boolean existsByIdAndProjectManagerId(UUID id, UUID projectManagerId);
 
     @Query("SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END FROM Project p JOIN p.members m WHERE p.id = :projectId AND m.user.id = :userId")
@@ -49,4 +45,7 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
 
     @EntityGraph(attributePaths = {"projectManager"})
     List<Project> findAll(Specification<Project> spec);
+
+    @EntityGraph(attributePaths = {"milestones"})
+    Optional<Project> findWithMilestonesById(UUID id);
 }

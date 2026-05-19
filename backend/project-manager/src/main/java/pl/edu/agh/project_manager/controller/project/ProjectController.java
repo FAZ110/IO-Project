@@ -68,6 +68,15 @@ public class ProjectController {
         ProjectMembersResponse project = projectService.getProjectMembers(projectId);
         return ResponseEntity.ok(project);
     }
+
+    @GetMapping("/{projectId}/timeline")
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR', 'AUTHORITY') or @projectAccess.canAccessProject(#projectId, authentication.principal)")
+    public ResponseEntity<ProjectTimelineResponse> getTimelineData(
+            @PathVariable UUID projectId
+    ) {
+        ProjectTimelineResponse response = projectService.getTimelineData(projectId);
+        return ResponseEntity.ok(response);
+    }
 }
 
 

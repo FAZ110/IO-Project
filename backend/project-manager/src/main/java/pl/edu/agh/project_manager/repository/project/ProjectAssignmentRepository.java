@@ -21,4 +21,11 @@ public interface ProjectAssignmentRepository extends JpaRepository<ProjectAssign
             "JOIN pa.user u " +
             "WHERE pa.id = :assignmentId AND u.supervisor.id = :managerId")
     boolean isManagerForAssignment(@Param("assignmentId") UUID assignmentId, @Param("managerId") UUID managerId);
+
+    @Query("SELECT pa FROM ProjectAssignment pa " +
+            "JOIN FETCH pa.user u " +
+            "WHERE pa.project.id = :projectId " +
+            "AND pa.status IN ('PENDING', 'ACCEPTED') " +
+            "ORDER BY pa.createdAt ASC")
+    List<ProjectAssignment> findByProjectIdOrderByCreatedAtAsc(@Param("projectId") UUID projectId);
 }

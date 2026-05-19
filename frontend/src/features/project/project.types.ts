@@ -1,4 +1,5 @@
 import type { SimpleUserResponse, UserResponse } from "@/features/user-management";
+import type { EmployeeAssignmentStatus } from "@/features/employee-assignments/employee-assignments.types";
 
 export interface ProjectCreationRequest {
     title: string;
@@ -58,8 +59,13 @@ export interface ProjectDetailsResponse {
     manager: UserResponse;
 }
 
+export interface ProjectTimelineResponse {
+    milestones: Milestone[];
+    assignments: EmployeeWithAssignmentsResponse[];
+}
+
 export interface EmployeeWithAssignmentsResponse {
-    id: string;
+    userId: string;
     name: string;
     surname: string;
     email: string;
@@ -68,10 +74,11 @@ export interface EmployeeWithAssignmentsResponse {
 
 export interface ProjectAssignmentResponse {
     id: string;
-    role: string;
+    roleName: string;
     startDate: string;
     endDate: string;
     utilizationPercentage: number;
+    status: EmployeeAssignmentStatus;
 }
 
 export interface CreateEmployeeAssignmentRequest {

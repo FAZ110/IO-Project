@@ -6,7 +6,8 @@ import type {
     ProjectDetailsResponse,
     CreateEmployeeAssignmentRequest,
     RiskResponse,
-    ProjectMembersResponse
+    ProjectMembersResponse,
+    ProjectTimelineResponse
 } from './project.types';
 
 export const projectService = {
@@ -49,8 +50,8 @@ export const projectService = {
     return response.data;
   },
 
-    getProjectAssignments: async (projectId: string) => {
-        const response = await api.get<ProjectMembersResponse>(ENDPOINTS.PROJECT.DETAILS(projectId).ASSIGNMENTS);
+    getProjectTimeline: async (projectId: string) => {
+        const response = await api.get<ProjectTimelineResponse>(ENDPOINTS.PROJECT.DETAILS(projectId).TIMELINE);
         return response.data;
     }
 };

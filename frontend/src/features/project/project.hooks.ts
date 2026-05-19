@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { projectService } from '@/features/project/project.service.ts';
 import { toast } from 'sonner';
-import { PROJECT_KEYS, ROLES_KEYS } from '@/features/project/project.keys.ts';
+import { PROJECT_KEYS } from '@/features/project/project.keys.ts';
 
 export const useProjects = () => {
     return useQuery({
@@ -59,7 +59,9 @@ export const useCreateEmployeeAssignment = (projectId: string) => {
 
     const assignmentMutation = useMutation({
         mutationFn: projectService.createEmployeeAssignment,
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ROLES_KEYS.status(projectId) })
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.timeline(projectId) });
+        }
     });
 
     return {
@@ -68,16 +70,10 @@ export const useCreateEmployeeAssignment = (projectId: string) => {
     }
 };
 
-export const useProjectAssignments = (projectId: string) => {
-    const membersQuery = useQuery({
-        queryKey: PROJECT_KEYS.assignments(projectId),
-        queryFn: () => projectService.getProjectAssignments(projectId),
+export const useTimeline = (projectId: string) => {
+    return useQuery({
+        queryKey: PROJECT_KEYS.timeline(projectId),
+        queryFn: () => projectService.getProjectTimeline(projectId),
         enabled: !!projectId
     });
-
-    return {
-        assignments: membersQuery.data,
-        isLoading: membersQuery.isLoading,
-        isError: membersQuery.isError
-    }
 };
