@@ -8,7 +8,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.project_manager.controller.dto.project.*;
-import pl.edu.agh.project_manager.domain.enums.GroupType;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.command.project.SearchProjectCommand;
 import pl.edu.agh.project_manager.service.project.ProjectService;
@@ -41,12 +40,14 @@ public class ProjectController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam(value = "query", required = false) String query,
             @RequestParam(value = "groupId", required = false) UUID groupId,
+            @RequestParam(value = "isActive", required = false) Boolean isActive,
             @RequestParam(value = "unassignedOnly", required = false, defaultValue = "false") Boolean unassignedOnly
     ) {
         SearchProjectCommand command = new SearchProjectCommand(
                 userPrincipal,
                 query,
                 groupId,
+                isActive,
                 unassignedOnly
         );
         return ResponseEntity.ok(projectService.searchProjects(command));

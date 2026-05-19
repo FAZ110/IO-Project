@@ -62,6 +62,7 @@ public class ProjectService {
         return savedProject.getId();
     }
 
+    @Transactional
     public ProjectResponse getProject(UUID projectId) {
         Project project = projectRepository.findByIdWithManager(projectId)
                 .orElseThrow(() -> new ApplicationException(
@@ -146,8 +147,7 @@ public class ProjectService {
     @Transactional
     public List<ProjectResponse> searchProjects(SearchProjectCommand command) {
         Specification<Project> spec = Specification
-                .where(ProjectSpecification.accessibleByUser(command.user()))
-                .and(buildSearchFilter(command));
+                .where(buildSearchFilter(command));
 
         return projectRepository.findAll(spec).stream()
                 .map(ProjectResponse::from)
@@ -159,6 +159,10 @@ public class ProjectService {
 
         if (command.query() != null && !command.query().isBlank()) {
             spec = spec.and(ProjectSpecification.withSearchPattern(command.query()));
+        }
+
+        if (command.isActive() != null) {
+            spec = spec.and(ProjectSpecification.isActive(command.isActive()));
         }
 
         if (command.groupId() != null) {

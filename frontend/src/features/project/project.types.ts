@@ -1,4 +1,5 @@
 import type { SimpleUserResponse, UserResponse } from "@/features/user-management";
+import type { SingleGroupResponse } from "../project_group/project_group.types";
 
 export interface ProjectCreationRequest {
     title: string;
@@ -28,11 +29,6 @@ export interface RiskResponse extends Risk {
     id: string;
 }
 
-export interface SingleGroupResponse {
-    id: string;
-    name: string;
-}
-
 export interface ProjectResponse {
     id: string;
     title: string;
@@ -56,6 +52,7 @@ export interface ProjectDetailsResponse {
     endDate: string;
     isActive: boolean;
     manager: UserResponse;
+    group: SingleGroupResponse;
 }
 
 export interface CreateEmployeeAssignmentRequest {
@@ -65,4 +62,11 @@ export interface CreateEmployeeAssignmentRequest {
     endDate: string;
     utilizationPercentage: number;
     roleName: string;
+}
+
+export interface SearchProjectsRequest {
+    query?: string;
+    unassignedOnly?: boolean;
+    groupId?: string;
+    isActive?: boolean;
 }
