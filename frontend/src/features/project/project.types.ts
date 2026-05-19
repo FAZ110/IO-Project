@@ -29,11 +29,6 @@ export interface RiskResponse extends Risk {
     id: string;
 }
 
-export interface SingleGroupResponse {
-    id: string;
-    name: string;
-}
-
 export interface ProjectResponse {
     id: string;
     title: string;
@@ -42,14 +37,12 @@ export interface ProjectResponse {
     startDate: string;
     endDate: string;
     group?: GroupBasicResponse | null;
-    manager: UserResponse;
 }
 
 export interface Milestone {
     date: string;
     name: string;
     description?: string;
-    group?: GroupBasicResponse | null;
 }
 
 export interface ProjectDetailsResponse {

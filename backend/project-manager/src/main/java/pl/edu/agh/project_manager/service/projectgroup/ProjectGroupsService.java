@@ -22,6 +22,7 @@ import pl.edu.agh.project_manager.service.command.project.ProjectGroupCreationCo
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.project.ProjectSpecification;
 import org.springframework.data.jpa.domain.Specification;
+import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -39,12 +40,12 @@ public class ProjectGroupsService {
     @Transactional(readOnly = true)
     public AllGroupsResponse getAllGroups(UserPrincipal userPrincipal) {
         Specification<Project> spec = ProjectSpecification.accessibleByUser(userPrincipal);
-        
+
         List<Project> accessibleProjects = projectRepository.findAll(spec);
 
-        List<pl.edu.agh.project_manager.controller.dto.project.ProjectResponse> unassigned = accessibleProjects.stream()
+        List<ProjectResponse> unassigned = accessibleProjects.stream()
                 .filter(p -> p.getProjectGroup() == null)
-                .map(pl.edu.agh.project_manager.controller.dto.project.ProjectResponse::from)
+                .map(ProjectResponse::from)
                 .collect(Collectors.toList());
 
         Map<ProjectGroup, List<Project>> groupedProjects = accessibleProjects.stream()
@@ -65,19 +66,10 @@ public class ProjectGroupsService {
     }
 
     private ProjectGroupResponse mapToGroupResponse(ProjectGroup group, List<Project> projects) {
-        List<pl.edu.agh.project_manager.controller.dto.project.ProjectResponse> projectDtos = projects.stream()
-                .map(pl.edu.agh.project_manager.controller.dto.project.ProjectResponse::from)
+        List<ProjectResponse> projectDtos = projects.stream()
+                .map(ProjectResponse::from)
                 .collect(Collectors.toList());
         return new ProjectGroupResponse(group.getId(), group.getName(), projectDtos);
-    }
-
-    private ProjectGroupResponse filterGroupProjects(ProjectGroup group, List<UUID> accessibleProjectIds) {
-        ProjectGroupResponse fullResponse = ProjectGroupResponse.from(group);
-        List<pl.edu.agh.project_manager.controller.dto.project.ProjectResponse> filteredProjects = fullResponse.projects().stream()
-                .filter(project -> accessibleProjectIds.contains(project.id()))
-                .collect(Collectors.toList());
-
-        return new ProjectGroupResponse(fullResponse.id(), fullResponse.name(), filteredProjects);
     }
 
     public List<SingleGroupResponse> getWalletGroups() {

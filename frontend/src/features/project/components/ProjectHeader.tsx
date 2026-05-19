@@ -2,6 +2,7 @@ import type { ProjectDetailsResponse } from "@/features/project";
 import { CalendarIcon, Folder, Briefcase } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {ProjectGroupType} from "@/features/project_group/project_group.types.ts";
 
 interface ProjectHeaderProps {
     details: ProjectDetailsResponse;
@@ -9,7 +10,7 @@ interface ProjectHeaderProps {
 
 export const ProjectHeader = ({ details }: ProjectHeaderProps) => {
     const groupName = details.group?.name;
-    const isWallet = details.group?.groupType === 'WALLET';
+    const isWallet = details.group?.groupType === ProjectGroupType.WALLET;
 
     return (
         <div className="flex flex-col gap-6 mb-8 md:flex-row md:items-start md:justify-between">

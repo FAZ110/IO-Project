@@ -45,5 +45,5 @@ export interface ProjectGroupCreatedResponse {
 export interface GroupBasicResponse {
     id: string;
     name: string;
-    groupType: 'WALLET' | 'PROGRAM';
+    groupType: ProjectGroupType;
 }

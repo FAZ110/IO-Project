@@ -2,6 +2,7 @@ package pl.edu.agh.project_manager.service.project;
 
 import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
+import jakarta.persistence.criteria.JoinType;
 import pl.edu.agh.project_manager.domain.entity.project.Project;
 import pl.edu.agh.project_manager.domain.entity.project.ProjectMember;
 import pl.edu.agh.project_manager.domain.entity.user.User;
@@ -28,8 +29,8 @@ public class ProjectSpecification {
                 yield cb.equal(membersJoin.get("user").get("id"), user.userId());
             }
             case AUTHORITY -> {
-                Join<Project, User> sponsorsJoin = root.join("sponsors", jakarta.persistence.criteria.JoinType.LEFT);
-                Join<Project, User> committeesJoin = root.join("committees", jakarta.persistence.criteria.JoinType.LEFT);
+                Join<Project, User> sponsorsJoin = root.join("sponsors", JoinType.LEFT);
+                Join<Project, User> committeesJoin = root.join("committees", JoinType.LEFT);
                 query.distinct(true);
                 yield cb.or(
                         cb.equal(sponsorsJoin.get("id"), user.userId()),
