@@ -24,6 +24,7 @@ import pl.edu.agh.project_manager.service.project.ProjectSpecification;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -38,27 +39,36 @@ public class ProjectGroupsService {
     @Transactional(readOnly = true)
     public AllGroupsResponse getAllGroups(UserPrincipal userPrincipal) {
         Specification<Project> spec = ProjectSpecification.accessibleByUser(userPrincipal);
+        
         List<Project> accessibleProjects = projectRepository.findAll(spec);
-        List<UUID> accessibleProjectIds = accessibleProjects.stream()
-                .map(Project::getId)
-                .collect(Collectors.toList());
-
-        List<ProjectGroupResponse> wallets = projectGroupRepository.getSingleGroupByGroupType(GroupType.WALLET).stream()
-                .map(group -> filterGroupProjects(group, accessibleProjectIds))
-                .filter(group -> !group.projects().isEmpty())
-                .collect(Collectors.toList());
-
-        List<ProjectGroupResponse> programs = projectGroupRepository.getSingleGroupByGroupType(GroupType.PROGRAM).stream()
-                .map(group -> filterGroupProjects(group, accessibleProjectIds))
-                .filter(group -> !group.projects().isEmpty())
-                .collect(Collectors.toList());
 
         List<pl.edu.agh.project_manager.controller.dto.project.ProjectResponse> unassigned = accessibleProjects.stream()
-                .filter(project -> project.getProjectGroup() == null)
+                .filter(p -> p.getProjectGroup() == null)
                 .map(pl.edu.agh.project_manager.controller.dto.project.ProjectResponse::from)
                 .collect(Collectors.toList());
 
+        Map<ProjectGroup, List<Project>> groupedProjects = accessibleProjects.stream()
+                .filter(p -> p.getProjectGroup() != null)
+                .collect(Collectors.groupingBy(Project::getProjectGroup));
+
+        List<ProjectGroupResponse> wallets = groupedProjects.entrySet().stream()
+                .filter(entry -> entry.getKey().getGroupType() == GroupType.WALLET)
+                .map(entry -> mapToGroupResponse(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+
+        List<ProjectGroupResponse> programs = groupedProjects.entrySet().stream()
+                .filter(entry -> entry.getKey().getGroupType() == GroupType.PROGRAM)
+                .map(entry -> mapToGroupResponse(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+
         return new AllGroupsResponse(wallets, programs, unassigned);
+    }
+
+    private ProjectGroupResponse mapToGroupResponse(ProjectGroup group, List<Project> projects) {
+        List<pl.edu.agh.project_manager.controller.dto.project.ProjectResponse> projectDtos = projects.stream()
+                .map(pl.edu.agh.project_manager.controller.dto.project.ProjectResponse::from)
+                .collect(Collectors.toList());
+        return new ProjectGroupResponse(group.getId(), group.getName(), projectDtos);
     }
 
     private ProjectGroupResponse filterGroupProjects(ProjectGroup group, List<UUID> accessibleProjectIds) {

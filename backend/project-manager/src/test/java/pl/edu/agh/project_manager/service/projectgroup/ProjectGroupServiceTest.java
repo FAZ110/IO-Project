@@ -131,11 +131,7 @@ class ProjectGroupServiceTest {
                 .build();
         project2.setProjectGroup(program);
 
-        // User can only access project1 and project3 (unassigned)
-        when(projectRepository.findAll(any(Specification.class))).thenReturn(List.of(project1, project3));
-
-        when(projectGroupRepository.getSingleGroupByGroupType(GroupType.WALLET)).thenReturn(List.of(wallet));
-        when(projectGroupRepository.getSingleGroupByGroupType(GroupType.PROGRAM)).thenReturn(List.of(program));
+        when(projectRepository.findAll(any(Specification.class))).thenReturn(List.of(project1, project2, project3));
 
         // When
         AllGroupsResponse response = projectGroupsService.getAllGroups(userPrincipal);
@@ -145,8 +141,11 @@ class ProjectGroupServiceTest {
         assertThat(response.wallets().getFirst().id()).isEqualTo(wallet.getId());
         assertThat(response.wallets().getFirst().projects()).hasSize(1);
         assertThat(response.wallets().getFirst().projects().getFirst().id()).isEqualTo(projectId1);
-        
-        assertThat(response.programs()).isEmpty();
+
+        assertThat(response.programs()).hasSize(1);
+        assertThat(response.programs().getFirst().id()).isEqualTo(program.getId());
+        assertThat(response.programs().getFirst().projects()).hasSize(1);
+        assertThat(response.programs().getFirst().projects().getFirst().id()).isEqualTo(projectId2);
         
         assertThat(response.unassigned()).hasSize(1);
         assertThat(response.unassigned().getFirst().id()).isEqualTo(projectId3);
