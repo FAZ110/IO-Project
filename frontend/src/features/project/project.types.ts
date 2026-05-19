@@ -58,6 +58,22 @@ export interface ProjectDetailsResponse {
     manager: UserResponse;
 }
 
+export interface EmployeeWithAssignmentsResponse {
+    id: string;
+    name: string;
+    surname: string;
+    email: string;
+    assignments: ProjectAssignmentResponse[];
+}
+
+export interface ProjectAssignmentResponse {
+    id: string;
+    role: string;
+    startDate: string;
+    endDate: string;
+    utilizationPercentage: number;
+}
+
 export interface CreateEmployeeAssignmentRequest {
     projectId: string;
     userId: string;

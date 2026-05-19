@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { projectService } from '@/features/project/project.service.ts';
 import { toast } from 'sonner';
-import {PROJECT_KEYS, ROLES_KEYS} from '@/features/project/project.keys.ts';
+import { PROJECT_KEYS, ROLES_KEYS } from '@/features/project/project.keys.ts';
 
 export const useProjects = () => {
     return useQuery({
@@ -22,7 +22,7 @@ export const useCreateProject = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: projectService.create,
+        mutationFn: projectService.createProject,
         onSuccess: () => {
             toast.success('Dodano projekt.');
             queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.all });
@@ -65,5 +65,19 @@ export const useCreateEmployeeAssignment = (projectId: string) => {
     return {
         createAssignment: assignmentMutation.mutate,
         isCreatingAssignment: assignmentMutation.isPending
+    }
+};
+
+export const useProjectAssignments = (projectId: string) => {
+    const membersQuery = useQuery({
+        queryKey: PROJECT_KEYS.assignments(projectId),
+        queryFn: () => projectService.getProjectAssignments(projectId),
+        enabled: !!projectId
+    });
+
+    return {
+        assignments: membersQuery.data,
+        isLoading: membersQuery.isLoading,
+        isError: membersQuery.isError
     }
 };

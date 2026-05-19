@@ -8,7 +8,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.project_manager.controller.dto.project.*;
-import pl.edu.agh.project_manager.domain.enums.GroupType;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.command.project.SearchProjectCommand;
 import pl.edu.agh.project_manager.service.project.ProjectService;

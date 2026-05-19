@@ -2,10 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { CalendarDays, MapPin } from "lucide-react";
-
-// interface ProjectTimelineProps {
-//   projectId: string;
-// }
+import type { ProjectDetailsResponse } from "../project.types";
+import { useProjectAssignments } from "../project.hooks";
 
 // Dane tymczasowe
 const MOCK_DATA = {
@@ -34,8 +32,13 @@ const calculatePositionAndWidth = (start: Date, end: Date, projectStart: Date, p
   return { left: `${leftPercent}%`, width: `${widthPercent}%` };
 };
 
-export const ProjectTimeline = (/*{ projectId }: ProjectTimelineProps*/) => {
+interface ProjectTimelineProps {
+  project: ProjectDetailsResponse;
+}
+
+export const ProjectTimeline = ({ project }: ProjectTimelineProps) => {
   const { projectStart, projectEnd, milestones, assignments } = MOCK_DATA;
+  const { assignments: _ } = useProjectAssignments(project.id);
 
   const assignmentsByUser = assignments.reduce((acc, curr) => {
     if (!acc[curr.userName]) acc[curr.userName] = [];

@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.project_manager.controller.dto.project.AssignmentCreateRequest;
 import pl.edu.agh.project_manager.controller.dto.project.AssignmentResponse;
+import pl.edu.agh.project_manager.controller.dto.project.AssignmentsByEmployeeResponse;
 import pl.edu.agh.project_manager.service.project.ProjectAssignmentService;
 
 import java.util.List;
@@ -32,10 +33,10 @@ public class ProjectAssignmentController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMINISTRATOR', 'AUTHORITY') or @projectAccess.canAccessProject(#projectId, authentication.principal)")
-    public ResponseEntity<List<AssignmentResponse>> getAssignments(
+    public ResponseEntity<List<AssignmentsByEmployeeResponse>> getAssignments(
             @PathVariable UUID projectId
     ) {
-        List<AssignmentResponse> response = assignmentService.getAssignments(projectId);
+        List<AssignmentsByEmployeeResponse> response = assignmentService.getProjectAssignments(projectId);
         return ResponseEntity.ok(response);
     }
 

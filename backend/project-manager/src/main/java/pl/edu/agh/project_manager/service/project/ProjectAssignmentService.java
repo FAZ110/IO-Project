@@ -5,6 +5,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.project_manager.controller.dto.project.AssignmentResponse;
+import pl.edu.agh.project_manager.controller.dto.project.AssignmentsByEmployeeResponse;
+import pl.edu.agh.project_manager.controller.dto.project.ProjectAssignmentResponse;
 import pl.edu.agh.project_manager.domain.entity.project.Project;
 import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.entity.project.ProjectAssignment;
@@ -15,12 +17,15 @@ import pl.edu.agh.project_manager.domain.event.AssignmentRequestedEvent;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.project.ProjectAssignmentRepository;
+import pl.edu.agh.project_manager.repository.project.ProjectRepository;
 import pl.edu.agh.project_manager.service.user.UserService;
 import pl.edu.agh.project_manager.service.command.project.AssignmentCommand;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +34,7 @@ public class ProjectAssignmentService {
     private final ProjectService projectService;
     private final UserService userService;
     private final ProjectAssignmentRepository assignmentRepository;
+    private final ProjectRepository projectRepository;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
@@ -63,12 +69,33 @@ public class ProjectAssignmentService {
     }
 
     @Transactional(readOnly = true)
-    public List<AssignmentResponse> getAssignments(UUID projectId) {
-        projectService.checkProjectExistsOrThrow(projectId);
+    public List<AssignmentsByEmployeeResponse> getProjectAssignments(UUID projectId) {
+        Project project = projectRepository.findByIdWithAssignments(projectId)
+                .orElseThrow(() -> new ApplicationException(
+                        ApiErrorCode.PROJECT_NOT_FOUND,
+                        "Cannot find provided project - " + projectId
+                ));
 
-        return assignmentRepository.findAllByProjectIdOrderByStartDateAsc(projectId)
-                .stream()
-                .map(AssignmentResponse::from)
+        return getEmployeeAssignmentsForProject(project);
+    }
+
+    private List<AssignmentsByEmployeeResponse> getEmployeeAssignmentsForProject(Project project) {
+        Map<User, List<ProjectAssignment>> assignmentsByUser = project.getAssignments().stream()
+                .collect(Collectors.groupingBy(ProjectAssignment::getUser));
+
+        return assignmentsByUser.entrySet().stream()
+                .map(entry -> {
+                    User employee = entry.getKey();
+                    List<ProjectAssignment> assignments = entry.getValue();
+
+                    return new AssignmentsByEmployeeResponse(
+                            employee.getId(),
+                            employee.getEmail(),
+                            employee.getName(),
+                            employee.getSurname(),
+                            assignments.stream().map(ProjectAssignmentResponse::from).toList()
+                    );
+                })
                 .toList();
     }
 

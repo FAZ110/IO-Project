@@ -1,7 +1,5 @@
 package pl.edu.agh.project_manager.service.project;
 
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,19 +11,16 @@ import pl.edu.agh.project_manager.domain.entity.project.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.projectgroup.ProjectGroup;
 import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.entity.project.ProjectMilestone;
-import pl.edu.agh.project_manager.domain.enums.GroupType;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.project.ProjectRepository;
-import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.command.project.MilestoneCommand;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import pl.edu.agh.project_manager.domain.enums.UserRole;
+
 import pl.edu.agh.project_manager.service.command.project.SearchProjectCommand;
 import pl.edu.agh.project_manager.service.projectgroup.ProjectGroupsService;
 import pl.edu.agh.project_manager.service.user.UserService;

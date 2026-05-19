@@ -15,7 +15,7 @@ export const projectService = {
         return data;
     },
 
-    create: async (projectData: ProjectCreationRequest): Promise<string> => {
+    createProject: async (projectData: ProjectCreationRequest): Promise<string> => {
         const response = await api.post<string>(ENDPOINTS.PROJECT.BASE, projectData);
         return response.data;
     },
@@ -47,5 +47,10 @@ export const projectService = {
       }
     });
     return response.data;
-  }
+  },
+
+    getProjectAssignments: async (projectId: string) => {
+        const response = await api.get<ProjectMembersResponse>(ENDPOINTS.PROJECT.DETAILS(projectId).ASSIGNMENTS);
+        return response.data;
+    }
 };
