@@ -6,11 +6,8 @@ import java.util.UUID;
 
 public record MilestoneResponse (
         UUID id,
-
         String name,
-
         String description,
-
         LocalDate date
 ) {
     public static MilestoneResponse from(ProjectMilestone milestone) {

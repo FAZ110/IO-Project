@@ -6,6 +6,7 @@ import type {
   CreateEmployeeAssignmentRequest,
   RiskResponse,
   ProjectMembersResponse,
+  ProjectTimelineResponse,
   SearchProjectsRequest,
 } from "./project.types";
 import { buildProjectSearchParams } from "./project.utils";
@@ -16,10 +17,10 @@ export const projectService = {
     return data;
   },
 
-  create: async (projectData: ProjectCreationRequest): Promise<string> => {
-    const response = await api.post<string>(ENDPOINTS.PROJECT.BASE, projectData);
-    return response.data;
-  },
+    createProject: async (projectData: ProjectCreationRequest): Promise<string> => {
+        const response = await api.post<string>(ENDPOINTS.PROJECT.BASE, projectData);
+        return response.data;
+    },
 
   getDetails: async (id: string): Promise<ProjectDetailsResponse> => {
     const response = await api.get<ProjectDetailsResponse>(ENDPOINTS.PROJECT.DETAILS(id).BASE);
@@ -46,7 +47,11 @@ export const projectService = {
     const response = await api.get<ProjectDetailsResponse[]>(ENDPOINTS.PROJECT.BASE, {
       params,
     });
-
     return response.data;
   },
+
+    getProjectTimeline: async (projectId: string) => {
+      const response = await api.get<ProjectTimelineResponse>(ENDPOINTS.PROJECT.DETAILS(projectId).TIMELINE);
+      return response.data;
+    }
 };

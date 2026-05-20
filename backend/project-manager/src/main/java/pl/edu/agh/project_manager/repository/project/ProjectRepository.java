@@ -45,4 +45,7 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
 
     @EntityGraph(attributePaths = {"projectManager", "projectGroup"})
     List<Project> findAll(Specification<Project> spec);
+
+    @EntityGraph(attributePaths = {"milestones"})
+    Optional<Project> findWithMilestonesById(UUID id);
 }

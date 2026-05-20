@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { projectService } from "@/features/project/project.service.ts";
 import { toast } from "sonner";
-import { PROJECT_KEYS, ROLES_KEYS } from "@/features/project/project.keys.ts";
+import {  PROJECT_KEYS  } from "@/features/project/project.keys.ts";
 import type { SearchProjectsRequest } from "@/features/project/project.types.ts";
 import { hasProjectSearchFilters } from "@/features/project/project.utils.ts";
 
@@ -23,13 +23,13 @@ export const useProjectDetails = (id: string) => {
 export const useCreateProject = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: projectService.create,
-    onSuccess: () => {
-      toast.success("Dodano projekt.");
-      queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.all });
-    },
-  });
+    return useMutation({
+        mutationFn: projectService.createProject,
+        onSuccess: () => {
+            toast.success('Dodano projekt.');
+            queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.all });
+        },
+    });
 };
 
 export const useProjectRisks = (id: string) => {
@@ -60,13 +60,23 @@ export const useSearchProjects = (request: SearchProjectsRequest) => {
 export const useCreateEmployeeAssignment = (projectId: string) => {
   const queryClient = useQueryClient();
 
-  const assignmentMutation = useMutation({
-    mutationFn: projectService.createEmployeeAssignment,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ROLES_KEYS.status(projectId) }),
-  });
+    const assignmentMutation = useMutation({
+        mutationFn: projectService.createEmployeeAssignment,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.timeline(projectId) });
+        }
+    });
 
   return {
     createAssignment: assignmentMutation.mutate,
     isCreatingAssignment: assignmentMutation.isPending,
   };
+};
+
+export const useTimeline = (projectId: string) => {
+    return useQuery({
+        queryKey: PROJECT_KEYS.timeline(projectId),
+        queryFn: () => projectService.getProjectTimeline(projectId),
+        enabled: !!projectId
+    });
 };
