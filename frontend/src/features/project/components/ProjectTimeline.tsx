@@ -10,8 +10,9 @@ import { PATHS } from "@/routes/paths";
 import type { ReactNode } from "react";
 
 const calculatePositionAndWidth = (start: Date, end: Date, projectStart: Date, projectEnd: Date) => {
-  const totalProjectDuration = projectEnd.getTime() - projectStart.getTime();
-  const taskDuration = end.getTime() - start.getTime();
+  const DAY_MS = 86400000; // one day in milliseconds — include end day as inclusive
+  const totalProjectDuration = projectEnd.getTime() - projectStart.getTime() + DAY_MS;
+  const taskDuration = end.getTime() - start.getTime() + DAY_MS;
   const timeOffset = start.getTime() - projectStart.getTime();
 
   const widthPercent = Math.min(Math.max((taskDuration / totalProjectDuration) * 100, 0), 100);
@@ -71,31 +72,51 @@ export const ProjectTimeline = ({ project, children }: ProjectTimelineProps) => 
                     const milestoneDate = new Date(milestone.date);
                     const position = calculatePositionAndWidth(milestoneDate, milestoneDate, projectStart, projectEnd);
                     return (
-                      <Tooltip key={`${milestone.name}-${milestone.date}-${index}`}>
-                        <TooltipTrigger asChild>
-                          <div
-                            className="absolute top-0 -translate-x-1/2 cursor-pointer group"
-                            style={{ left: position.left }}
-                          >
-                            <MapPin className="h-5 w-5 text-rose-500 fill-white group-hover:fill-rose-100 transition-colors" />
-                            <div className="w-px h-full bg-rose-200 absolute left-1/2 -translate-x-1/2 top-5 pointer-events-none" style={{ height: `${markerGuideHeight}px` }} />
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-[200px] z-50 bg-white border shadow-md text-slate-800">
-                          <p className="font-semibold">{milestone.name}</p>
-                          <p className="text-xs text-slate-500 mb-1">{milestoneDate.toLocaleDateString()}</p>
-                          <p className="text-sm">{milestone.description ?? ""}</p>
-                        </TooltipContent>
-                      </Tooltip>
+                        <Tooltip key={`${milestone.name}-${milestone.date}-${index}`}>
+                          <TooltipTrigger asChild>
+                            <div
+                              className="absolute top-0 -translate-x-1/2 cursor-pointer group"
+                              style={{ left: position.left }}
+                            >
+                              <MapPin className="h-7 w-7 text-rose-500 fill-white group-hover:fill-rose-100 transition-colors" />
+                              <div className="w-px h-full bg-rose-200 absolute left-1/2 -translate-x-1/2 top-6 pointer-events-none" style={{ height: `${markerGuideHeight}px` }} />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent className="z-50 bg-slate-700 text-white rounded-md shadow-md px-3 py-2.5 flex flex-col space-y-2 border border-slate-500 [&_svg]:hidden">
+                            <div className="text-xs font-semibold text-amber-300">{milestone.name}</div>
+                            <div className="text-xs text-slate-300 leading-tight">{milestoneDate.toLocaleDateString()}</div>
+                          </TooltipContent>
+                        </Tooltip>
                     );
                   })}
                 </div>
               </div>
 
-              {assignmentsByUser.map((employee) => {
+              {assignmentsByUser.length === 0 ? (
+                <div className="grid grid-cols-[3rem_minmax(0,1fr)] items-center gap-3 sm:gap-4">
+                  <div className="z-20 flex items-center justify-center">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="group rounded-full transition-transform">
+                          <Avatar className="h-8 w-8 ring-2 ring-white shadow-sm">
+                            <AvatarFallback className="bg-slate-100 text-slate-600 text-[12px] font-bold">?</AvatarFallback>
+                          </Avatar>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="z-50 bg-slate-800 text-white border-0 shadow-md px-2 py-1 text-xs rounded-md" style={{ pointerEvents: 'none' }}>
+                        <p className="font-medium text-center whitespace-nowrap">Brak przypisań</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+
+                  <div className="relative h-10 w-full rounded-md border border-slate-100 bg-slate-50/80 flex items-center justify-center text-sm text-slate-500">
+                    Brak przypisań do projektu
+                  </div>
+                </div>
+              ) : assignmentsByUser.map((employee) => {
                 const userName = `${employee.name} ${employee.surname}`;
                 const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase();
-                
+
                 return (
                   <div key={employee.userId} className="grid grid-cols-[3rem_minmax(0,1fr)] items-center gap-3 sm:gap-4">
                     <div className="z-20 flex items-center justify-center">

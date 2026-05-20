@@ -92,7 +92,7 @@ public class ProjectService {
                         "Cannot find provided project - " + projectId
                 ));
 
-        List<ProjectAssignment> assignments = assignmentRepository.findByProjectIdOrderByCreatedAtAsc(projectId);
+        List<ProjectAssignment> assignments = assignmentRepository.findActiveAndPendingByProjectIdOrderByCreatedAtAsc(projectId);
 
         return new ProjectTimelineResponse(
                 project.getMilestones().stream().map(MilestoneResponse::from).toList(),

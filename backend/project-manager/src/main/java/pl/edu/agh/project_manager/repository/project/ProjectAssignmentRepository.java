@@ -27,5 +27,5 @@ public interface ProjectAssignmentRepository extends JpaRepository<ProjectAssign
             "WHERE pa.project.id = :projectId " +
             "AND pa.status IN ('PENDING', 'ACCEPTED') " +
             "ORDER BY pa.createdAt ASC")
-    List<ProjectAssignment> findByProjectIdOrderByCreatedAtAsc(@Param("projectId") UUID projectId);
+    List<ProjectAssignment> findActiveAndPendingByProjectIdOrderByCreatedAtAsc(@Param("projectId") UUID projectId);
 }
