@@ -19,6 +19,8 @@ import { EmployeeAssignmentsPage } from '@/pages/EmployeeAssignmentsPage';
 import { QualificationRequestsPage } from '@/pages/QualificationRequestsPage';
 import { CreateProjectGroupPage } from '@/pages/CreateProjectGroupPage';
 import { ProjectRegistryPage } from '@/pages/ProjectRegistryPage';
+import { EmployeeRegistryPage } from '@/pages/EmployeeRegistryPage';
+import { EmployeeDetailsPage } from '@/pages/EmployeeDetailsPage';
 
 export const AppRoutes = () => {
   return (
@@ -37,6 +39,8 @@ export const AppRoutes = () => {
           <Route path={PATHS.PROFILE} element={<ProfilePage />} />
           <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
           <Route path={PATHS.PROJECTS_REGISTRY} element={<ProjectRegistryPage />} />
+          <Route path={PATHS.EMPLOYEES_REGISTRY} element={<EmployeeRegistryPage />} />
+          <Route path={PATHS.EMPLOYEE_DETAILS(`:${ROUTE_PARAMS.USER_ID}`)} element={<EmployeeDetailsPage />} />
           <Route path={PATHS.NOTIFICATION} element={<NotificationPage />} />
 
           {/* LINEAR MANAGER ROUTES */}

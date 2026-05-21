@@ -1,0 +1,1 @@
+export { EmployeeRegistryTable } from './EmployeeRegistryTable';
