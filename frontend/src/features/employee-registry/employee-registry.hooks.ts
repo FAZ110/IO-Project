@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import { useUsersQuery } from '@/features/user-management/user-management.hooks';
 import type { UserRole } from '@/features/auth/auth.types';
@@ -8,12 +8,13 @@ const PAGE_SIZE = 20;
 export const useEmployeeRegistry = () => {
   const [page, setPage] = useState(0);
   const [roleFilter, setRoleFilter] = useState<UserRole | undefined>(undefined);
-  const [searchInput, setSearchInput] = useState('');
+  const [searchInput, setSearchInputState] = useState('');
   const [debouncedSearch] = useDebounce(searchInput, 400);
 
-  useEffect(() => {
+  const setSearchInput = (value: string) => {
+    setSearchInputState(value);
     setPage(0);
-  }, [debouncedSearch]);
+  };
 
   const handleRoleChange = (userRole: UserRole | undefined) => {
     setRoleFilter(userRole);
