@@ -20,30 +20,79 @@ import {
 import { useState } from "react"
 import { Button } from "./button"
 
+interface ServerPagination {
+  pageIndex: number
+  pageCount: number
+  totalItems: number
+  onPageChange: (page: number) => void
+}
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  isLoading?: boolean
+  serverPagination?: ServerPagination
+  onRowClick?: (row: TData) => void
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isLoading,
+  serverPagination,
+  onRowClick,
 }: DataTableProps<TData, TValue>) {
-  const [pagination, setPagination] = useState<PaginationState>({
+  const [clientPagination, setClientPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
 
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    onPaginationChange: setPagination,
-    state: {
-      pagination,
-    },
-  })
+  const isServerSide = !!serverPagination;
+
+  const table = useReactTable(
+    isServerSide
+      ? {
+          data,
+          columns,
+          getCoreRowModel: getCoreRowModel(),
+          manualPagination: true,
+          pageCount: serverPagination.pageCount,
+          state: {
+            pagination: { pageIndex: serverPagination.pageIndex, pageSize: 20 },
+          },
+          onPaginationChange: () => {},
+        }
+      : {
+          data,
+          columns,
+          getCoreRowModel: getCoreRowModel(),
+          getPaginationRowModel: getPaginationRowModel(),
+          onPaginationChange: setClientPagination,
+          state: { pagination: clientPagination },
+        }
+  )
+
+  const totalItems = isServerSide ? serverPagination.totalItems : data.length
+  const currentPage = isServerSide
+    ? serverPagination.pageIndex + 1
+    : table.getState().pagination.pageIndex + 1
+  const pageCount = isServerSide ? serverPagination.pageCount : table.getPageCount()
+  const canPrev = isServerSide
+    ? serverPagination.pageIndex > 0
+    : table.getCanPreviousPage()
+  const canNext = isServerSide
+    ? serverPagination.pageIndex < serverPagination.pageCount - 1
+    : table.getCanNextPage()
+
+  const handlePrev = () => {
+    if (isServerSide) serverPagination.onPageChange(serverPagination.pageIndex - 1)
+    else table.previousPage()
+  }
+
+  const handleNext = () => {
+    if (isServerSide) serverPagination.onPageChange(serverPagination.pageIndex + 1)
+    else table.nextPage()
+  }
 
   return (
     <div className="flex-1 flex flex-col w-full">
@@ -59,22 +108,26 @@ export function DataTable<TData, TValue>({
                   }}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                      : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground animate-pulse">
+                  Ładowanie...
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="even:bg-muted/50 hover:bg-muted/80 transition-colors"
+                  onClick={() => onRowClick?.(row.original)}
+                  className={`even:bg-muted/50 hover:bg-muted/80 transition-colors ${onRowClick ? "cursor-pointer" : ""}`}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} style={{
@@ -99,21 +152,20 @@ export function DataTable<TData, TValue>({
 
       <div className="shrink-0 flex items-center justify-between px-4 py-4 border-t bg-muted/10">
         <div className="text-sm text-muted-foreground font-medium">
-          Łącznie: <span className="text-foreground">{data.length}</span> pozycji
+          Łącznie: <span className="text-foreground">{totalItems}</span> pozycji
         </div>
 
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center justify-center text-sm font-medium">
-            Strona {table.getPageCount() === 0 ? 0 : table.getState().pagination.pageIndex + 1} z{" "}
-            {table.getPageCount()}
+            Strona {pageCount === 0 ? 0 : currentPage} z {pageCount}
           </div>
 
           <div className="flex items-center space-x-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
+              onClick={handlePrev}
+              disabled={!canPrev}
               className="h-8 w-24"
             >
               Poprzednia
@@ -121,8 +173,8 @@ export function DataTable<TData, TValue>({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
+              onClick={handleNext}
+              disabled={!canNext}
               className="h-8 w-24"
             >
               Następna

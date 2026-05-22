@@ -1,39 +1,39 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useDebounce } from 'use-debounce';
 import { useUsersQuery } from '@/features/user-management/user-management.hooks';
-import type { UserListParams } from '@/features/user-management/user-management.types';
 import type { UserRole } from '@/features/auth/auth.types';
 
 const PAGE_SIZE = 20;
 
 export const useEmployeeRegistry = () => {
   const [page, setPage] = useState(0);
-  const [filters, setFilters] = useState<UserListParams>({ status: 'ACTIVE' });
+  const [roleFilter, setRoleFilter] = useState<UserRole | undefined>(undefined);
   const [searchInput, setSearchInput] = useState('');
+  const [debouncedSearch] = useDebounce(searchInput, 400);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setFilters(prev => ({ ...prev, search: searchInput || undefined }));
-      setPage(0);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [searchInput]);
+    setPage(0);
+  }, [debouncedSearch]);
 
   const handleRoleChange = (userRole: UserRole | undefined) => {
-    setFilters(prev => ({ ...prev, userRole }));
+    setRoleFilter(userRole);
     setPage(0);
   };
 
-  const { users, isLoading, isError } = useUsersQuery(page, PAGE_SIZE, filters);
+  const { users, isLoading, isError } = useUsersQuery(page, PAGE_SIZE, {
+    status: 'ACTIVE',
+    userRole: roleFilter,
+    search: debouncedSearch || undefined,
+  });
 
   return {
     users,
     isLoading,
     isError,
-    page,
     setPage,
     searchInput,
     setSearchInput,
-    filters,
+    roleFilter,
     handleRoleChange,
   };
 };
