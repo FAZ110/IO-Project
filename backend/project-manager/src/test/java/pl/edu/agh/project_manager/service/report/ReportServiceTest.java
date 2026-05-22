@@ -14,6 +14,7 @@ import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.security.access.ProjectAccess;
+import pl.edu.agh.project_manager.service.command.project.SearchProjectCommand;
 import pl.edu.agh.project_manager.service.project.ProjectRiskService;
 import pl.edu.agh.project_manager.service.project.ProjectService;
 
@@ -22,6 +23,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,6 +43,12 @@ class ReportServiceTest {
     
     @Mock
     private ProjectPdfGenerator projectPdfGenerator;
+
+    @Mock
+    private RiskPdfGenerator riskPdfGenerator;
+
+    @Mock
+    private PortfolioCsvGenerator portfolioCsvGenerator;
 
     @InjectMocks
     private ReportService reportService;
@@ -123,14 +131,40 @@ class ReportServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when generating PDF and no access")
-    void generateProjectCardPdf_NoAccess() {
+    @DisplayName("Should generate risks PDF when user has access")
+    void generateProjectRisksPdf_HasAccess() {
         // Given
-        when(projectAccess.canAccessProject(projectId, normalUser)).thenReturn(false);
+        when(projectAccess.canAccessProject(projectId, normalUser)).thenReturn(true);
+        List<RiskResponse> risks = List.of(new RiskResponse(UUID.randomUUID(), "R1", "D1", 50));
+        when(projectRiskService.getProjectRisks(projectId)).thenReturn(risks);
+        byte[] expectedPdf = "test-pdf".getBytes();
+        when(riskPdfGenerator.generate(risks, "project-risks-template")).thenReturn(expectedPdf);
 
-        // When & Then
-        assertThatThrownBy(() -> reportService.generateProjectCardPdf(projectId, normalUser))
-                .isInstanceOf(ApplicationException.class)
-                .hasMessageContaining("Brak dostępu");
+        // When
+        byte[] result = reportService.generateProjectRisksPdf(projectId, normalUser);
+
+        // Then
+        assertThat(result).isEqualTo(expectedPdf);
+        verify(projectRiskService).getProjectRisks(projectId);
+        verify(riskPdfGenerator).generate(risks, "project-risks-template");
+    }
+
+    @Test
+    @DisplayName("Should generate portfolio CSV")
+    void generatePortfolioCsv_Success() {
+        // Given
+        UUID groupId = UUID.randomUUID();
+        List<ProjectResponse> projects = List.of(new ProjectResponse(projectId, "Test", "Desc", null, null, true, null, null));
+        when(projectService.searchProjects(any(SearchProjectCommand.class))).thenReturn(projects);
+        byte[] expectedCsv = "test-csv".getBytes();
+        when(portfolioCsvGenerator.generate(projects)).thenReturn(expectedCsv);
+
+        // When
+        byte[] result = reportService.generatePortfolioCsv(groupId, normalUser);
+
+        // Then
+        assertThat(result).isEqualTo(expectedCsv);
+        verify(projectService).searchProjects(any(SearchProjectCommand.class));
+        verify(portfolioCsvGenerator).generate(projects);
     }
 }

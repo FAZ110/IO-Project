@@ -8,6 +8,7 @@ import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.security.access.ProjectAccess;
+import pl.edu.agh.project_manager.service.command.project.SearchProjectCommand;
 import pl.edu.agh.project_manager.service.project.ProjectRiskService;
 import pl.edu.agh.project_manager.service.project.ProjectService;
 
@@ -23,6 +24,8 @@ public class ReportService {
     private final ProjectAccess projectAccess;
     private final RiskCsvGenerator riskCsvGenerator;
     private final ProjectPdfGenerator projectPdfGenerator;
+    private final RiskPdfGenerator riskPdfGenerator;
+    private final PortfolioCsvGenerator portfolioCsvGenerator;
 
     public byte[] generateProjectRisksCsv(UUID projectId, UserPrincipal user) {
         checkAccess(projectId, user);
@@ -36,6 +39,19 @@ public class ReportService {
 
         ProjectResponse project = projectService.getProject(projectId);
         return projectPdfGenerator.generate(project, "project-card-template");
+    }
+
+    public byte[] generateProjectRisksPdf(UUID projectId, UserPrincipal user) {
+        checkAccess(projectId, user);
+
+        List<RiskResponse> risks = projectRiskService.getProjectRisks(projectId);
+        return riskPdfGenerator.generate(risks, "project-risks-template");
+    }
+
+    public byte[] generatePortfolioCsv(UUID groupId, UserPrincipal user) {
+        SearchProjectCommand command = new SearchProjectCommand(user, null, groupId, null, false);
+        List<ProjectResponse> projects = projectService.searchProjects(command);
+        return portfolioCsvGenerator.generate(projects);
     }
 
     private void checkAccess(UUID projectId, UserPrincipal user) {

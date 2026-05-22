@@ -15,13 +15,13 @@ import pl.edu.agh.project_manager.service.report.ReportService;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/projects/{projectId}/reports")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class ReportController {
 
     private final ReportService reportService;
 
-    @GetMapping("/risks/csv")
+    @GetMapping("/projects/{projectId}/reports/risks/csv")
     public ResponseEntity<byte[]> downloadRisksCsv(
             @PathVariable UUID projectId,
             @AuthenticationPrincipal UserPrincipal user
@@ -37,7 +37,7 @@ public class ReportController {
                 .body(csvData);
     }
 
-    @GetMapping("/card/pdf")
+    @GetMapping("/projects/{projectId}/reports/card/pdf")
     public ResponseEntity<byte[]> downloadProjectCardPdf(
             @PathVariable UUID projectId,
             @AuthenticationPrincipal UserPrincipal user
@@ -51,5 +51,37 @@ public class ReportController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(pdfData);
+    }
+
+    @GetMapping("/projects/{projectId}/reports/risks/pdf")
+    public ResponseEntity<byte[]> downloadRisksPdf(
+            @PathVariable UUID projectId,
+            @AuthenticationPrincipal UserPrincipal user
+    ) {
+        byte[] pdfData = reportService.generateProjectRisksPdf(projectId, user);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "rejestr_ryzyk.pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfData);
+    }
+
+    @GetMapping("/groups/{groupId}/reports/projects/csv")
+    public ResponseEntity<byte[]> downloadPortfolioCsv(
+            @PathVariable UUID groupId,
+            @AuthenticationPrincipal UserPrincipal user
+    ) {
+        byte[] csvData = reportService.generatePortfolioCsv(groupId, user);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("text/csv"));
+        headers.setContentDispositionFormData("attachment", "lista_projektow_grupy.csv");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(csvData);
     }
 }
