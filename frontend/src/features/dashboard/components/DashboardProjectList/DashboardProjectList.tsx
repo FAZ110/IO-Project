@@ -1,5 +1,5 @@
 import { DashboardProjectListView } from './DashboardProjectList.view';
-import { useAllProjectGroups } from '@/features/project_group/project_group.hooks';
+import {useAllProjectGroups} from '@/features/project_group/project_group.hooks';
 
 interface DashboardProjectListProps {
   searchQuery: string;

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.project_manager.controller.dto.project_group.AllGroupsResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.ProjectGroupCreationRequest;
 import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupDetailsResponse;
-import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupResponse;
+import pl.edu.agh.project_manager.controller.dto.project_group.GroupBasicResponse;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.projectgroup.ProjectGroupsService;
 import pl.edu.agh.project_manager.service.command.project.ProjectGroupCreationCommand;
@@ -31,12 +31,12 @@ public class ProjectGroupController {
     }
 
     @GetMapping("/groups/wallets")
-    public ResponseEntity<List<SingleGroupResponse>> getAllWallets() {
+    public ResponseEntity<List<GroupBasicResponse>> getAllWallets() {
         return ResponseEntity.ok().body(projectGroupsService.getWalletGroups());
     }
 
     @GetMapping("/groups/programs")
-    public ResponseEntity<List<SingleGroupResponse>> getAllPrograms() {
+    public ResponseEntity<List<GroupBasicResponse>> getAllPrograms() {
         return ResponseEntity.ok().body(projectGroupsService.getProgramGroups());
     }
 

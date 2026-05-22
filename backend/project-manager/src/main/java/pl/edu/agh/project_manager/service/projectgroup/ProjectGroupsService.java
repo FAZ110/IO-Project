@@ -1,13 +1,12 @@
 package pl.edu.agh.project_manager.service.projectgroup;
 
 import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.project_manager.controller.dto.project_group.AllGroupsResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.GroupOwnerResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupDetailsResponse;
-import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupResponse;
+import pl.edu.agh.project_manager.controller.dto.project_group.GroupBasicResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.ProjectGroupResponse;
 import pl.edu.agh.project_manager.domain.entity.project.Project;
 import pl.edu.agh.project_manager.domain.entity.projectgroup.ProjectGroup;
@@ -72,11 +71,11 @@ public class ProjectGroupsService {
         return new ProjectGroupResponse(group.getId(), group.getName(), projectDtos);
     }
 
-    public List<SingleGroupResponse> getWalletGroups() {
+    public List<GroupBasicResponse> getWalletGroups() {
         return getGroupsByType(GroupType.WALLET);
     }
 
-    public List<SingleGroupResponse> getProgramGroups() {
+    public List<GroupBasicResponse> getProgramGroups() {
         return getGroupsByType(GroupType.PROGRAM);
     }
 
@@ -112,10 +111,10 @@ public class ProjectGroupsService {
         return savedGroup.getId();
     }
 
-    private List<SingleGroupResponse> getGroupsByType(GroupType groupType) {
+    private List<GroupBasicResponse> getGroupsByType(GroupType groupType) {
         return projectGroupRepository.getSingleGroupByGroupType(groupType)
                 .stream()
-                .map(group -> new SingleGroupResponse(group.getId(), group.getName(), groupType))
+                .map(group -> new GroupBasicResponse(group.getId(), group.getName(), groupType))
                 .toList();
     }
 

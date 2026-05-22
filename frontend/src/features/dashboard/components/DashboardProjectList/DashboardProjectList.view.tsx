@@ -1,18 +1,18 @@
 import { Briefcase, Folder } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import type { ProjectResponse } from '@/features/project/project.types';
-import {GroupSection, type GroupWithProjects} from "@/features/dashboard/components/GroupSection/GroupSection.tsx";
-import {ProjectGrid} from "@/features/dashboard/components/ProjectGrid/ProjectGrid.tsx";
+import type { ProjectGroupResponse } from '@/features/project_group/project_group.types';
+import { GroupSection } from "@/features/dashboard/components/GroupSection/GroupSection.tsx";
+import { ProjectGrid } from "@/features/dashboard/components/ProjectGrid/ProjectGrid.tsx";
 
 export interface DashboardProjectListViewProps {
-    wallets: GroupWithProjects[];
-    programs: GroupWithProjects[];
-    unassignedProjects: ProjectResponse[];
-    isLoading: boolean;
-    isError: boolean;
-    onRetry: () => void;
+  wallets: ProjectGroupResponse[];
+  programs: ProjectGroupResponse[];
+  unassignedProjects: ProjectResponse[];
+  isLoading: boolean;
+  isError: boolean;
+  onRetry: () => void;
 }
-
 export const DashboardProjectListView = ({
                                              wallets,
                                              programs,
