@@ -12,7 +12,7 @@ export const ProjectCardView = ({ project }: ProjectCardViewProps) => {
       className="group bg-white hover:shadow-lg transition-all border border-gray-200 rounded-xl p-5 flex flex-col gap-4 cursor-pointer"
     >
       <div className="flex justify-between items-start gap-4">
-        <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
+        <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors truncate">
           {project.title || "Nienazwany projekt"}
         </h3>
         

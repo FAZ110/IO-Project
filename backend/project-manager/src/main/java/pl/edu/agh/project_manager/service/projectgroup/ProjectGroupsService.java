@@ -6,7 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.project_manager.controller.dto.project_group.AllGroupsResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.GroupOwnerResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupDetailsResponse;
-import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupResponse;
+import pl.edu.agh.project_manager.controller.dto.project_group.GroupBasicResponse;
+import pl.edu.agh.project_manager.controller.dto.project_group.ProjectGroupResponse;
 import pl.edu.agh.project_manager.domain.entity.project.Project;
 import pl.edu.agh.project_manager.domain.entity.projectgroup.ProjectGroup;
 import pl.edu.agh.project_manager.domain.entity.user.User;
@@ -17,9 +18,15 @@ import pl.edu.agh.project_manager.repository.project.ProjectRepository;
 import pl.edu.agh.project_manager.repository.projectgroup.ProjectGroupRepository;
 import pl.edu.agh.project_manager.repository.user.UserRepository;
 import pl.edu.agh.project_manager.service.command.project.ProjectGroupCreationCommand;
+import pl.edu.agh.project_manager.security.UserPrincipal;
+import pl.edu.agh.project_manager.service.project.ProjectSpecification;
+import org.springframework.data.jpa.domain.Specification;
+import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -29,15 +36,46 @@ public class ProjectGroupsService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
 
-    public AllGroupsResponse getAllGroups() {
-        return new AllGroupsResponse(getWalletGroups(), getProgramGroups());
+    @Transactional(readOnly = true)
+    public AllGroupsResponse getAllGroups(UserPrincipal userPrincipal) {
+        Specification<Project> spec = ProjectSpecification.accessibleByUser(userPrincipal);
+
+        List<Project> accessibleProjects = projectRepository.findAll(spec);
+
+        List<ProjectResponse> unassigned = accessibleProjects.stream()
+                .filter(p -> p.getProjectGroup() == null)
+                .map(ProjectResponse::from)
+                .collect(Collectors.toList());
+
+        Map<ProjectGroup, List<Project>> groupedProjects = accessibleProjects.stream()
+                .filter(p -> p.getProjectGroup() != null)
+                .collect(Collectors.groupingBy(Project::getProjectGroup));
+
+        List<ProjectGroupResponse> wallets = groupedProjects.entrySet().stream()
+                .filter(entry -> entry.getKey().getGroupType() == GroupType.WALLET)
+                .map(entry -> mapToGroupResponse(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+
+        List<ProjectGroupResponse> programs = groupedProjects.entrySet().stream()
+                .filter(entry -> entry.getKey().getGroupType() == GroupType.PROGRAM)
+                .map(entry -> mapToGroupResponse(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+
+        return new AllGroupsResponse(wallets, programs, unassigned);
     }
 
-    public List<SingleGroupResponse> getWalletGroups() {
+    private ProjectGroupResponse mapToGroupResponse(ProjectGroup group, List<Project> projects) {
+        List<ProjectResponse> projectDtos = projects.stream()
+                .map(ProjectResponse::from)
+                .collect(Collectors.toList());
+        return new ProjectGroupResponse(group.getId(), group.getName(), projectDtos);
+    }
+
+    public List<GroupBasicResponse> getWalletGroups() {
         return getGroupsByType(GroupType.WALLET);
     }
 
-    public List<SingleGroupResponse> getProgramGroups() {
+    public List<GroupBasicResponse> getProgramGroups() {
         return getGroupsByType(GroupType.PROGRAM);
     }
 
@@ -73,10 +111,10 @@ public class ProjectGroupsService {
         return savedGroup.getId();
     }
 
-    private List<SingleGroupResponse> getGroupsByType(GroupType groupType) {
+    private List<GroupBasicResponse> getGroupsByType(GroupType groupType) {
         return projectGroupRepository.getSingleGroupByGroupType(groupType)
                 .stream()
-                .map(group -> new SingleGroupResponse(group.getId(), group.getName(), groupType))
+                .map(group -> new GroupBasicResponse(group.getId(), group.getName(), groupType))
                 .toList();
     }
 

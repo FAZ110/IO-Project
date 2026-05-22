@@ -34,6 +34,8 @@ export const CreateProjectGroupForm = () => {
         isActive: undefined
     });
 
+    const unassignedProjects = foundProjects.filter(project => !project.group);
+
     const mutation = useCreateProjectGroup();
     const navigate = useNavigate();
 
@@ -57,8 +59,8 @@ export const CreateProjectGroupForm = () => {
     return (
         <FormProvider {...methods}>
             <CreateProjectGroupFormView
-                onSubmit={onSubmit} 
-                foundProjects={foundProjects}
+                onSubmit={onSubmit}
+                foundProjects={unassignedProjects}
                 onSearchProjects={setProjectQuery}
             />
         </FormProvider>

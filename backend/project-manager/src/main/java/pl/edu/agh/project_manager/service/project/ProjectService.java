@@ -39,7 +39,6 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectAssignmentRepository assignmentRepository;
 
-
     @Transactional
     public UUID createProject(ProjectCreationCommand command) {
         User projectManager = userService.getUserEntityOrThrow(command.creatorId());
@@ -63,7 +62,7 @@ public class ProjectService {
         return savedProject.getId();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ProjectResponse getProject(UUID projectId) {
         Project project = projectRepository.findByIdWithManager(projectId)
                 .orElseThrow(() -> new ApplicationException(
@@ -74,6 +73,7 @@ public class ProjectService {
         return ProjectResponse.from(project);
     }
 
+    @Transactional(readOnly = true)
     public ProjectMembersResponse getProjectMembers(UUID projectId) {
         Project project = projectRepository.findByIdWithAllMembers(projectId)
                 .orElseThrow(() -> new ApplicationException(
@@ -183,10 +183,9 @@ public class ProjectService {
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.PROJECT_NOT_FOUND, "Cannot find project: " + projectId));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<ProjectResponse> searchProjects(SearchProjectCommand command) {
-        Specification<Project> spec = Specification
-                .where(buildSearchFilter(command));
+        Specification<Project> spec = Specification.where(buildSearchFilter(command));
 
         return projectRepository.findAll(spec).stream()
                 .map(ProjectResponse::from)
