@@ -115,7 +115,7 @@ public class ProjectGroupsService {
     private List<SingleGroupResponse> getGroupsByType(GroupType groupType) {
         return projectGroupRepository.getSingleGroupByGroupType(groupType)
                 .stream()
-                .map(group -> new SingleGroupResponse(group.getId(), group.getName()))
+                .map(group -> new SingleGroupResponse(group.getId(), group.getName(), groupType))
                 .toList();
     }
 

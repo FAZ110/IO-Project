@@ -1,31 +1,31 @@
 package pl.edu.agh.project_manager.service.project;
 
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.Predicate;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import pl.edu.agh.project_manager.controller.dto.project.ProjectMembersResponse;
-import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
+import org.springframework.transaction.annotation.Transactional;
+import pl.edu.agh.project_manager.controller.dto.milestone.MilestoneResponse;
+import pl.edu.agh.project_manager.controller.dto.project.*;
 import pl.edu.agh.project_manager.domain.entity.project.Project;
+import pl.edu.agh.project_manager.domain.entity.project.ProjectAssignment;
 import pl.edu.agh.project_manager.domain.entity.project.ProjectRisk;
 import pl.edu.agh.project_manager.domain.entity.projectgroup.ProjectGroup;
 import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.entity.project.ProjectMilestone;
-import pl.edu.agh.project_manager.domain.enums.GroupType;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
+import pl.edu.agh.project_manager.repository.project.ProjectAssignmentRepository;
 import pl.edu.agh.project_manager.repository.project.ProjectRepository;
-import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.command.project.MilestoneCommand;
 import pl.edu.agh.project_manager.service.command.project.ProjectCreationCommand;
 import pl.edu.agh.project_manager.service.command.project.RiskCommand;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-import pl.edu.agh.project_manager.domain.enums.UserRole;
+import java.util.stream.Collectors;
+
 import pl.edu.agh.project_manager.service.command.project.SearchProjectCommand;
 import pl.edu.agh.project_manager.service.projectgroup.ProjectGroupsService;
 import pl.edu.agh.project_manager.service.user.UserService;
@@ -37,7 +37,7 @@ public class ProjectService {
     private final UserService userService;
     private final ProjectGroupsService projectGroupService;
     private final ProjectRepository projectRepository;
-
+    private final ProjectAssignmentRepository assignmentRepository;
 
     @Transactional
     public UUID createProject(ProjectCreationCommand command) {
@@ -82,6 +82,44 @@ public class ProjectService {
                 ));
 
         return ProjectMembersResponse.from(project);
+    }
+
+    @Transactional(readOnly = true)
+    public ProjectTimelineResponse getTimelineData(UUID projectId) {
+        Project project = projectRepository.findWithMilestonesById(projectId)
+                .orElseThrow(() -> new ApplicationException(
+                        ApiErrorCode.PROJECT_NOT_FOUND,
+                        "Cannot find provided project - " + projectId
+                ));
+
+        List<ProjectAssignment> assignments = assignmentRepository.findActiveAndPendingByProjectIdOrderByCreatedAtAsc(projectId);
+
+        return new ProjectTimelineResponse(
+                project.getMilestones().stream().map(MilestoneResponse::from).toList(),
+                groupAssignmentsByEmployee(assignments)
+        );
+    }
+
+    private List<AssignmentsByEmployeeResponse> groupAssignmentsByEmployee(List<ProjectAssignment> assignments) {
+        Map<User, List<ProjectAssignment>> assignmentsByUser = assignments.stream()
+                .collect(Collectors.groupingBy(ProjectAssignment::getUser, LinkedHashMap::new, Collectors.toList()));
+
+        return assignmentsByUser.entrySet().stream()
+                .map(entry -> {
+                    User employee = entry.getKey();
+                    List<ProjectAssignment> userAssignments = entry.getValue();
+
+                    return new AssignmentsByEmployeeResponse(
+                            employee.getId(),
+                            employee.getName(),
+                            employee.getSurname(),
+                            employee.getEmail(),
+                            userAssignments.stream()
+                                    .map(ProjectAssignmentResponse::from)
+                                    .toList()
+                    );
+                })
+                .toList();
     }
 
     private Project buildProject(ProjectCreationCommand command, User projectManager) {
@@ -161,6 +199,10 @@ public class ProjectService {
 
         if (command.query() != null && !command.query().isBlank()) {
             spec = spec.and(ProjectSpecification.withSearchPattern(command.query()));
+        }
+
+        if (command.isActive() != null) {
+            spec = spec.and(ProjectSpecification.isActive(command.isActive()));
         }
 
         if (command.groupId() != null) {

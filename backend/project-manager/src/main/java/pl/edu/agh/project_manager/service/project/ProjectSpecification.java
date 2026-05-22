@@ -1,7 +1,7 @@
 package pl.edu.agh.project_manager.service.project;
 
-import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import pl.edu.agh.project_manager.domain.entity.project.Project;
 import pl.edu.agh.project_manager.domain.entity.project.ProjectMember;
@@ -49,4 +49,7 @@ public class ProjectSpecification {
         return (root, query, cb) -> cb.isNull(root.get("projectGroup"));
     }
 
+    public static Specification<Project> isActive(Boolean isActive) {
+        return (root, query, cb) -> cb.equal(root.get("isActive"), isActive);
+    }
 }
