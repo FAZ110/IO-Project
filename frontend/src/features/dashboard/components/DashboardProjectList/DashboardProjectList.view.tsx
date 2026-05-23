@@ -1,63 +1,84 @@
+import { Briefcase, Folder } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 import type { ProjectResponse } from '@/features/project/project.types';
-import { Link } from 'react-router-dom';
-import { PATHS } from '@/routes/paths';
-import { ProjectCardView } from '../ProjectCard/ProjectCard.view';
+import type { ProjectGroupResponse } from '@/features/project_group/project_group.types';
+import { GroupSection } from "@/features/dashboard/components/GroupSection/GroupSection.tsx";
+import { ProjectGrid } from "@/features/dashboard/components/ProjectGrid/ProjectGrid.tsx";
 
-interface DashboardProjectListViewProps {
-  projects: ProjectResponse[];
+export interface DashboardProjectListViewProps {
+  wallets: ProjectGroupResponse[];
+  programs: ProjectGroupResponse[];
+  unassignedProjects: ProjectResponse[];
   isLoading: boolean;
   isError: boolean;
   onRetry: () => void;
 }
+export const DashboardProjectListView = ({
+                                             wallets,
+                                             programs,
+                                             unassignedProjects,
+                                             isLoading,
+                                             isError,
+                                             onRetry
+                                         }: DashboardProjectListViewProps) => {
 
-export const DashboardProjectListView = ({ 
-  projects, 
-  isLoading, 
-  isError, 
-  onRetry 
-}: DashboardProjectListViewProps) => {
-  
-  if (isLoading) {
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center h-64 text-gray-500">
+                <p className="animate-pulse">Ładowanie widoku...</p>
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <div className="p-6 bg-red-50 text-red-600 rounded-lg border border-red-200 flex flex-col items-start gap-4">
+                <p>Nie udało się pobrać danych.</p>
+                <button
+                    onClick={onRetry}
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                >
+                    Spróbuj ponownie
+                </button>
+            </div>
+        );
+    }
+
+    const hasAnyProjectsOrGroups = wallets.length > 0 || programs.length > 0 || unassignedProjects.length > 0;
+
+    if (!hasAnyProjectsOrGroups) {
+        return (
+            <div className="text-center py-12 bg-gray-50 border border-dashed border-gray-300 rounded-xl">
+                <p className="text-gray-500">Brak przypisanych projektów i grup.</p>
+            </div>
+        );
+    }
+
     return (
-      <div className="flex justify-center items-center h-64 text-gray-500">
-        <p className="animate-pulse">Ładowanie projektów...</p>
-      </div>
-    );
-  }
+        <div className="pb-10">
+            <GroupSection
+                title="Twoje Portfele"
+                groups={wallets}
+                icon={Briefcase}
+                badgeVariant="default"
+            />
 
-  if (isError) {
-    return (
-      <div className="p-6 bg-red-50 text-red-600 rounded-lg border border-red-200 flex flex-col items-start gap-4">
-        <p>Nie udało się pobrać listy projektów.</p>
-        <button 
-          onClick={onRetry} 
-          className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-        >
-          Spróbuj ponownie
-        </button>
-      </div>
-    );
-  }
+            <GroupSection
+                title="Twoje Programy"
+                groups={programs}
+                icon={Folder}
+                badgeVariant="secondary"
+            />
 
-  if (projects.length === 0) {
-    return (
-      <div className="text-center py-12 bg-gray-50 border border-dashed border-gray-300 rounded-xl">
-        <p className="text-gray-500">Brak przypisanych projektów.</p>
-      </div>
+            {unassignedProjects.length > 0 && (
+                <div className="mb-10">
+                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-800">
+                        Projekty nieprzypisane do grup
+                    </h3>
+                    <Separator className="mb-6" />
+                    <ProjectGrid projects={unassignedProjects} />
+                </div>
+            )}
+        </div>
     );
-  }
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-    {projects.map((project) => (
-      <Link 
-        key={project.id} 
-        to={PATHS.PROJECT(project.id)} 
-        className="block hover:opacity-90 transition-opacity" 
-      >
-        <ProjectCardView project={project} />
-      </Link>
-    ))}
-  </div>
-  );
 };

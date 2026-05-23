@@ -20,6 +20,13 @@ export const useProjectGroupsWithType = () => {
   });
 };
 
+export const useAllProjectGroups = () => {
+  return useQuery({
+    queryKey: [...PROJECT_GROUP_KEYS.list(), 'all'],
+    queryFn: projectGroupService.getGroupsWithType,
+  });
+};
+
 export const useCreateProjectGroup = () => {
   return useMutation({
     mutationFn: projectGroupService.createGroup,

@@ -22,6 +22,7 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Dashboard',
     path: PATHS.ROOT,
     icon: LayoutDashboard,
+    roles: [UserRole.COMMON, UserRole.PROJECT_MANAGER, UserRole.LINEAR_MANAGER, UserRole.AUTHORITY],
   },
   {
     label: 'Rejestry',
