@@ -26,11 +26,15 @@ public class ProjectRisk {
     @Column(name = "description", nullable = false, length = 500)
     private String description;
 
-    // TODO: Przejscie na model od 1 do 5 w skali prawdopodobienstwa wystapienia i skali ryzyka dla projektu
-    @Column(name = "probability", nullable = false, columnDefinition = "integer check (probability >= 0 and probability <= 100)")
-    @Min(value = 0, message = "Prawdopodobieństwo musi być większe bądź równe 0")
-    @Max(value = 100, message = "Prawdopodobieństwo musi być mniejsze bądź równe 100")
+    @Column(name = "probability", nullable = false, columnDefinition = "integer check (probability >= 1 and probability <= 5)")
+    @Min(value = 1, message = "Prawdopodobieństwo musi być w skali od 1 do 5")
+    @Max(value = 5, message = "Prawdopodobieństwo musi być w skali od 1 do 5")
     private Integer probability;
+
+    @Column(name = "impact", nullable = false, columnDefinition = "integer check (impact >= 1 and impact <= 5)")
+    @Min(value = 1, message = "Wpływ musi być w skali od 1 do 5")
+    @Max(value = 5, message = "Wpływ musi być w skali od 1 do 5")
+    private Integer impact;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "project_id", nullable = false)

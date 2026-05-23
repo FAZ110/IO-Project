@@ -133,7 +133,7 @@ export const StepMilestonesAndRisks = ({
         <div className="flex justify-between items-center mb-4">
           <div className="flex flex-col gap-1">
             <h3 className="text-lg font-semibold text-gray-800">Ryzyka Projektu</h3>
-            <p className="text-sm text-gray-500">Dodaj ryzyka projektu.</p>
+            <p className="text-sm text-gray-500">Dodaj ryzyka na skali 1-5 (Prawdopodobieństwo x Wpływ).</p>
           </div>
           <button
             type="button"
@@ -141,7 +141,8 @@ export const StepMilestonesAndRisks = ({
               appendRisk({
                 name: "",
                 description: "",
-                probability: 0,
+                probability: 1,
+                impact: 1,
               })
             }
             className="bg-gray-800 text-white px-3 py-1 text-sm rounded hover:bg-gray-700 cursor-pointer"
@@ -163,8 +164,8 @@ export const StepMilestonesAndRisks = ({
                 </span>
               </button>
 
-              <div className="grid grid-cols-2 gap-4 mb-3">
-                <div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+                <div className="md:col-span-1">
                   <label className="block text-xs font-medium text-gray-700 mb-1">Nazwa Ryzyka</label>
                   <input
                     {...register(`risks.${index}.name` as const, { required: "Nazwa ryzyka jest wymagana" })}
@@ -175,23 +176,38 @@ export const StepMilestonesAndRisks = ({
                     <span className="text-red-500 text-xs">{errors.risks[index].name.message}</span>
                   )}
                 </div>
+
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Prawdopodobieństwo (%)</label>
-                  <input
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Prawdopodobieństwo (1-5)</label>
+                  <select
                     {...register(`risks.${index}.probability` as const, {
                       valueAsNumber: true,
-                      min: { value: 0, message: "Min 0%" },
-                      max: { value: 100, message: "Max 100%" },
-                      required: true,
                     })}
-                    type="number"
                     className="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-blue-500"
-                  />
+                  >
+                    {[1, 2, 3, 4, 5].map(v => <option key={v} value={v}>{v}</option>)}
+                  </select>
                   {errors.risks?.[index]?.probability && (
                     <span className="text-red-500 text-xs">{errors.risks[index].probability.message}</span>
                   )}
                 </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Wpływ (1-5)</label>
+                  <select
+                    {...register(`risks.${index}.impact` as const, {
+                      valueAsNumber: true,
+                    })}
+                    className="w-full border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-blue-500"
+                  >
+                    {[1, 2, 3, 4, 5].map(v => <option key={v} value={v}>{v}</option>)}
+                  </select>
+                  {errors.risks?.[index]?.impact && (
+                    <span className="text-red-500 text-xs">{errors.risks[index].impact.message}</span>
+                  )}
+                </div>
               </div>
+
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Opis Ryzyka</label>
                 <textarea

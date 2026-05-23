@@ -140,6 +140,7 @@ public class ProjectService {
                     .name(riskRequest.name())
                     .description(riskRequest.description())
                     .probability(riskRequest.probability())
+                    .impact(riskRequest.impact())
                     .build();
 
             project.addRisk(risk);
