@@ -5,10 +5,8 @@ import {
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
-  type PaginationState,
   useReactTable,
 } from "@tanstack/react-table"
-import { useState } from "react"
 
 import {
   Table,
@@ -19,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Button } from "./button"
-import type { DataTableControl } from "./use-data-table-controls"
+import { useDataTableControls, type DataTableControl } from "@/lib/use-data-table-controls"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -40,33 +38,20 @@ export function DataTable<TData, TValue>({
   totalItems,
   onRowClick,
 }: DataTableProps<TData, TValue>) {
-  const [clientPagination, setClientPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
+  const backoffControl = useDataTableControls(10)
+  const activeControl = control ?? backoffControl
+
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    ...(control
+      ? { pageCount: pageCount ?? 0, manualPagination: true }
+      : { getPaginationRowModel: getPaginationRowModel() }
+    ),
+    state: { pagination: activeControl.pagination },
+    onPaginationChange: activeControl.onPaginationChange,
   })
-
-  const isServerSide = !!control
-
-  const table = useReactTable(
-    isServerSide
-      ? {
-          data,
-          columns,
-          pageCount: pageCount ?? 0,
-          manualPagination: true,
-          getCoreRowModel: getCoreRowModel(),
-          state: { pagination: control.pagination },
-          onPaginationChange: control.onPaginationChange,
-        }
-      : {
-          data,
-          columns,
-          getCoreRowModel: getCoreRowModel(),
-          getPaginationRowModel: getPaginationRowModel(),
-          state: { pagination: clientPagination },
-          onPaginationChange: setClientPagination,
-        }
-  )
 
   const displayTotal = totalItems ?? data.length
   const currentPage = table.getState().pagination.pageIndex + 1

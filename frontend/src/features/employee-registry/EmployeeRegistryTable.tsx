@@ -6,7 +6,7 @@ import type { UserResponse } from '@/features/user-management/user-management.ty
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DataTable } from '@/components/ui/data-table';
-import { useDataTableControls } from '@/components/ui/use-data-table-controls';
+import { useDataTableControls } from '@/lib/use-data-table-controls';
 import { getEmployeeColumns } from './employee-registry.columns';
 import { useEmployeeRegistry } from './employee-registry.hooks';
 
@@ -22,11 +22,8 @@ export const EmployeeRegistryTable = () => {
   const navigate = useNavigate();
   const tableControl = useDataTableControls(20);
 
-  const resetPage = () =>
-    tableControl.onPaginationChange((p) => ({ ...p, pageIndex: 0 }));
-
   const { users, isLoading, isError, searchInput, setSearchInput, roleFilter, handleRoleChange } =
-    useEmployeeRegistry(tableControl.pagination, resetPage);
+    useEmployeeRegistry(tableControl.pagination, tableControl.resetPage);
 
   const columns = useMemo(() => getEmployeeColumns(), []);
 
@@ -47,7 +44,7 @@ export const EmployeeRegistryTable = () => {
         />
         <Select
           value={roleFilter ?? 'all'}
-          onValueChange={(value) => handleRoleChange(value === 'all' ? undefined : value as UserRole)}
+          onValueChange={(value) => handleRoleChange(value === 'all' ? null : value as UserRole)}
         >
           <SelectTrigger className="w-50">
             <SelectValue placeholder="Wszystkie role" />

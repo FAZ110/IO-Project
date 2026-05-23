@@ -6,7 +6,7 @@ import { UserStatus } from '@/features/user-management/user-management.types';
 import type { UserRole } from '@/features/auth/auth.types';
 
 export const useEmployeeRegistry = (pagination: PaginationState, resetPage: () => void) => {
-  const [roleFilter, setRoleFilter] = useState<UserRole | undefined>(undefined);
+  const [roleFilter, setRoleFilter] = useState<UserRole | null>(null);
   const [searchInput, setSearchInputState] = useState('');
   const [debouncedSearch] = useDebounce(searchInput, 400);
 
@@ -15,7 +15,7 @@ export const useEmployeeRegistry = (pagination: PaginationState, resetPage: () =
     resetPage();
   };
 
-  const handleRoleChange = (userRole: UserRole | undefined) => {
+  const handleRoleChange = (userRole: UserRole | null) => {
     setRoleFilter(userRole);
     resetPage();
   };
@@ -25,8 +25,8 @@ export const useEmployeeRegistry = (pagination: PaginationState, resetPage: () =
     pagination.pageSize,
     {
       status: UserStatus.ACTIVE,
-      userRole: roleFilter,
-      search: debouncedSearch || undefined,
+      userRole: roleFilter ?? undefined,
+      search: debouncedSearch.length > 0 ? debouncedSearch : undefined,
     }
   );
 
