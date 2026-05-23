@@ -6,6 +6,7 @@ import type { UserResponse } from '@/features/user-management/user-management.ty
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DataTable } from '@/components/ui/data-table';
+import { useDataTableControls } from '@/components/ui/use-data-table-controls';
 import { getEmployeeColumns } from './employee-registry.columns';
 import { useEmployeeRegistry } from './employee-registry.hooks';
 
@@ -19,16 +20,13 @@ const ROLE_OPTIONS: { label: string; value: UserRole | 'all' }[] = [
 
 export const EmployeeRegistryTable = () => {
   const navigate = useNavigate();
-  const {
-    users,
-    isLoading,
-    isError,
-    setPage,
-    searchInput,
-    setSearchInput,
-    roleFilter,
-    handleRoleChange,
-  } = useEmployeeRegistry();
+  const tableControl = useDataTableControls(20);
+
+  const resetPage = () =>
+    tableControl.onPaginationChange((p) => ({ ...p, pageIndex: 0 }));
+
+  const { users, isLoading, isError, searchInput, setSearchInput, roleFilter, handleRoleChange } =
+    useEmployeeRegistry(tableControl.pagination, resetPage);
 
   const columns = useMemo(() => getEmployeeColumns(), []);
 
@@ -66,13 +64,12 @@ export const EmployeeRegistryTable = () => {
         columns={columns}
         data={users?.items ?? []}
         isLoading={isLoading}
-        serverPagination={users ? {
-          pageIndex: users.pageNumber,
-          pageCount: users.totalPages,
-          totalItems: users.totalCount,
-          onPageChange: setPage,
-        } : undefined}
-        onRowClick={(row: UserResponse) => navigate(PATHS.EMPLOYEE_DETAILS(row.id), { state: { user: row } })}
+        control={tableControl}
+        pageCount={users?.totalPages ?? 0}
+        totalItems={users?.totalCount}
+        onRowClick={(row: UserResponse) =>
+          navigate(PATHS.EMPLOYEE_DETAILS(row.id), { state: { user: row } })
+        }
       />
     </div>
   );

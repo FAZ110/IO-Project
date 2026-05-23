@@ -1,7 +1,12 @@
 import type { UserRole } from '@/features/auth/auth.types';
 import type { ChartInterval } from '@/features/employee-assignments/employee-assignments.types';
 
-export type UserStatus = 'PENDING' | 'ACTIVE' | 'EXPIRED';
+export const UserStatus = {
+  PENDING: 'PENDING',
+  ACTIVE: 'ACTIVE',
+  EXPIRED: 'EXPIRED',
+} as const;
+export type UserStatus = typeof UserStatus[keyof typeof UserStatus];
 
 export const AdminAssignableRole = {
   COMMON: 'COMMON',

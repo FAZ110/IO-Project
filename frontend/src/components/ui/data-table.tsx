@@ -8,6 +8,7 @@ import {
   type PaginationState,
   useReactTable,
 } from "@tanstack/react-table"
+import { useState } from "react"
 
 import {
   Table,
@@ -17,21 +18,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { useState } from "react"
 import { Button } from "./button"
-
-interface ServerPagination {
-  pageIndex: number
-  pageCount: number
-  totalItems: number
-  onPageChange: (page: number) => void
-}
+import type { DataTableControl } from "./use-data-table-controls"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   isLoading?: boolean
-  serverPagination?: ServerPagination
+  control?: DataTableControl
+  pageCount?: number
+  totalItems?: number
   onRowClick?: (row: TData) => void
 }
 
@@ -39,60 +35,42 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   isLoading,
-  serverPagination,
+  control,
+  pageCount,
+  totalItems,
   onRowClick,
 }: DataTableProps<TData, TValue>) {
   const [clientPagination, setClientPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
-  });
+  })
 
-  const isServerSide = !!serverPagination;
+  const isServerSide = !!control
 
   const table = useReactTable(
     isServerSide
       ? {
           data,
           columns,
-          getCoreRowModel: getCoreRowModel(),
+          pageCount: pageCount ?? 0,
           manualPagination: true,
-          pageCount: serverPagination.pageCount,
-          state: {
-            pagination: { pageIndex: serverPagination.pageIndex, pageSize: 20 },
-          },
-          onPaginationChange: () => {},
+          getCoreRowModel: getCoreRowModel(),
+          state: { pagination: control.pagination },
+          onPaginationChange: control.onPaginationChange,
         }
       : {
           data,
           columns,
           getCoreRowModel: getCoreRowModel(),
           getPaginationRowModel: getPaginationRowModel(),
-          onPaginationChange: setClientPagination,
           state: { pagination: clientPagination },
+          onPaginationChange: setClientPagination,
         }
   )
 
-  const totalItems = isServerSide ? serverPagination.totalItems : data.length
-  const currentPage = isServerSide
-    ? serverPagination.pageIndex + 1
-    : table.getState().pagination.pageIndex + 1
-  const pageCount = isServerSide ? serverPagination.pageCount : table.getPageCount()
-  const canPrev = isServerSide
-    ? serverPagination.pageIndex > 0
-    : table.getCanPreviousPage()
-  const canNext = isServerSide
-    ? serverPagination.pageIndex < serverPagination.pageCount - 1
-    : table.getCanNextPage()
-
-  const handlePrev = () => {
-    if (isServerSide) serverPagination.onPageChange(serverPagination.pageIndex - 1)
-    else table.previousPage()
-  }
-
-  const handleNext = () => {
-    if (isServerSide) serverPagination.onPageChange(serverPagination.pageIndex + 1)
-    else table.nextPage()
-  }
+  const displayTotal = totalItems ?? data.length
+  const currentPage = table.getState().pagination.pageIndex + 1
+  const totalPages = table.getPageCount()
 
   return (
     <div className="flex-1 flex flex-col w-full">
@@ -152,20 +130,20 @@ export function DataTable<TData, TValue>({
 
       <div className="shrink-0 flex items-center justify-between px-4 py-4 border-t bg-muted/10">
         <div className="text-sm text-muted-foreground font-medium">
-          Łącznie: <span className="text-foreground">{totalItems}</span> pozycji
+          Łącznie: <span className="text-foreground">{displayTotal}</span> pozycji
         </div>
 
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center justify-center text-sm font-medium">
-            Strona {pageCount === 0 ? 0 : currentPage} z {pageCount}
+            Strona {totalPages === 0 ? 0 : currentPage} z {totalPages}
           </div>
 
           <div className="flex items-center space-x-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={handlePrev}
-              disabled={!canPrev}
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
               className="h-8 w-24"
             >
               Poprzednia
@@ -173,8 +151,8 @@ export function DataTable<TData, TValue>({
             <Button
               variant="outline"
               size="sm"
-              onClick={handleNext}
-              disabled={!canNext}
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
               className="h-8 w-24"
             >
               Następna
