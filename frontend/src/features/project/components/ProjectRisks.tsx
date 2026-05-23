@@ -3,37 +3,11 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertTriangle, Activity } from "lucide-react";
 import { useProjectRisks } from "@/features/project/project.hooks.ts";
+import { getRiskDetails } from "@/features/project/project.utils.ts";
 
 interface ProjectRisksProps {
   projectId: string;
 }
-
-const getRiskDetails = (value: number) => {
-  if (value >= 15) return {
-    label: "Krytyczne",
-    borderLine: "bg-rose-500",
-    badge: "bg-rose-100 text-rose-700 border-rose-200 hover:bg-rose-200",
-    barColor: "bg-rose-500"
-  };
-  if (value >= 10) return {
-    label: "Wysokie",
-    borderLine: "bg-orange-500",
-    badge: "bg-orange-100 text-orange-700 border-orange-200 hover:bg-orange-200",
-    barColor: "bg-orange-500"
-  };
-  if (value >= 5) return {
-    label: "Średnie",
-    borderLine: "bg-amber-400",
-    badge: "bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-200",
-    barColor: "bg-amber-400"
-  };
-  return {
-    label: "Niskie",
-    borderLine: "bg-emerald-500",
-    badge: "bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-200",
-    barColor: "bg-emerald-500"
-  };
-};
 
 const MetricBar = ({ label, value, activeColor }: { label: string; value: number; activeColor: string }) => (
   <div className="flex flex-col gap-1.5 w-full sm:w-32 shrink-0">

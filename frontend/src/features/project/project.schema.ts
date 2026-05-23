@@ -10,14 +10,14 @@ export const CreateProjectFormSchema = z.object({
   committee: z.array(z.string()).min(1, "Wymagany min. 1 członek komitetu"),
 
   milestones: z.array(z.object({
-    name: z.string().min(1),
-    date: z.string().min(1),
+    name: z.string().min(1, "Milestone musi mieć nazwe"),
+    date: z.string().min(1, "Milestone musi mieć date"),
     description: z.string().optional()
   })),
 
   risks: z.array(z.object({
-    name: z.string().min(1),
-    description: z.string().min(1),
+    name: z.string().min(1, "Ryzyko musi mieć nazwe"),
+    description: z.string().min(1, "Ryzyko musi mieć opis"),
     probability: z.number().min(1, "Minimum to 1").max(5, "Maksimum to 5"),
     impact: z.number().min(1, "Minimum to 1").max(5, "Maksimum to 5")
   })),
