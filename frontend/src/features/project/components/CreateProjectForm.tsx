@@ -29,7 +29,8 @@ export const CreateProjectForm = () => {
     },
   });
 
-  const { data: groups = [] } = useProjectGroups();
+  const { data: groupsData = [] } = useProjectGroups();
+  const groups = groupsData.map(g => ({ id: g.id, name: g.name }));
 
   const [sponsorsQuery, setSponsorsQuery] = useState("");
   const [sponsorsQueryValue] = useDebounce(sponsorsQuery, 300);
@@ -44,11 +45,7 @@ export const CreateProjectForm = () => {
   const navigate = useNavigate();
 
   const onSubmit = methods.handleSubmit((data) => {
-    const payload = {
-      ...data,
-    };
-
-    mutation.mutate(payload, {
+    mutation.mutate(data, {
       onSuccess: (newProjectId) => {
         methods.reset();
         navigate(PATHS.PROJECT(newProjectId));
