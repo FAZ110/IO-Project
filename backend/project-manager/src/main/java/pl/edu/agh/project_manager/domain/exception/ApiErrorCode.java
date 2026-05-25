@@ -47,6 +47,8 @@ public enum ApiErrorCode {
     INVALID_CURRENT_PASSWORD("USR_003", HttpStatus.UNAUTHORIZED, "Current password is incorrect"),
     PASSWORD_SAME_AS_CURRENT("USR_004", HttpStatus.BAD_REQUEST, "New password must be different from current password"),
 
+    REPORT_GENERATION_ERROR("REP_001", HttpStatus.INTERNAL_SERVER_ERROR, "Wystąpił błąd podczas generowania raportu"),
+
     ACCESS_DENIED("GEN_002", HttpStatus.FORBIDDEN, "Access denied"),
     VALIDATION_FAILED("GEN_998", HttpStatus.BAD_REQUEST, "Validation failed"),
     INTERNAL_SERVER_ERROR("GEN_999", HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected internal server error");

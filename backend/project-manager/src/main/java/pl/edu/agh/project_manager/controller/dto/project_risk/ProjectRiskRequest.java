@@ -1,4 +1,4 @@
-package pl.edu.agh.project_manager.controller.dto.project.projectrisk;
+package pl.edu.agh.project_manager.controller.dto.project_risk;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
