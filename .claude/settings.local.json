@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\jandy\\\\OneDrive\\\\Pulpit\\\\6 sem\\\\IO\\\\IO-Project\" -Directory)"
+    ]
+  }
+}

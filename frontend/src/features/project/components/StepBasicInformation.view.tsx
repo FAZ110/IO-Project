@@ -3,8 +3,9 @@ import type { FieldErrors, UseFormRegister } from "react-hook-form";
 import type { ProjectCreationRequest } from "../project.types";
 import { ChevronDownIcon, CheckIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-// Import Twoich komponentów DropdownMenu
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -18,59 +19,44 @@ interface StepBasicInformationViewProps {
     groups: { id: string; name: string }[];
 }
 
-export const StepBasicInformation = ({ 
-    register, 
-    errors, 
-    groups 
+export const StepBasicInformation = ({
+    register,
+    errors,
+    groups,
 }: StepBasicInformationViewProps) => {
     const { control, setValue } = useFormContext<ProjectCreationRequest>();
 
     return (
         <div className="space-y-4">
-            {/* --- NAZWA PROJEKTU --- */}
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nazwa projektu *
-                </label>
-                <input
+            <div className="space-y-1">
+                <Label htmlFor="title">Nazwa projektu *</Label>
+                <Input
+                    id="title"
                     {...register("title")}
-                    type="text"
                     placeholder="Wpisz nazwę projektu..."
-                    className={cn(
-                        "w-full border rounded p-2 outline-none transition-all focus:ring-2 focus:ring-blue-500",
-                        errors.title ? "border-red-500" : "border-gray-300"
-                    )}
+                    className={errors.title ? "border-destructive" : ""}
                 />
                 {errors.title && (
-                    <span className="text-red-500 text-xs mt-1">{errors.title.message}</span>
+                    <p className="text-destructive text-xs">{errors.title.message}</p>
                 )}
             </div>
 
-            {/* --- OPIS PROJEKTU --- */}
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Opis *
-                </label>
-                <textarea
+            <div className="space-y-1">
+                <Label htmlFor="description">Opis *</Label>
+                <Textarea
+                    id="description"
                     {...register("description")}
                     rows={3}
                     placeholder="Krótki opis celu projektu..."
-                    className={cn(
-                        "w-full border rounded p-2 outline-none transition-all focus:ring-2 focus:ring-blue-500",
-                        errors.description ? "border-red-500" : "border-gray-300"
-                    )}
+                    className={errors.description ? "border-destructive" : ""}
                 />
                 {errors.description && (
-                    <span className="text-red-500 text-xs mt-1">{errors.description.message}</span>
+                    <p className="text-destructive text-xs">{errors.description.message}</p>
                 )}
             </div>
 
-            {/* --- GRUPA PROJEKTOWA --- */}
-            <div className="flex flex-col gap-1">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Grupa Projektowa (portfel/program)
-                </label>
-
+            <div className="space-y-1">
+                <Label>Grupa Projektowa <span className="text-muted-foreground font-normal">(opcjonalnie)</span></Label>
                 <Controller
                     control={control}
                     name="projectGroupId"
@@ -80,9 +66,9 @@ export const StepBasicInformation = ({
                                 <button
                                     type="button"
                                     className={cn(
-                                        "flex w-full items-center justify-between rounded-md border bg-white px-3 py-2 text-sm outline-none transition-all focus:ring-2 focus:ring-blue-500",
-                                        errors.projectGroupId ? "border-red-500" : "border-gray-300",
-                                        !field.value && "text-gray-400"
+                                        "flex w-full items-center justify-between rounded-md border bg-white px-3 py-2 text-sm outline-none transition-all focus:ring-2 focus:ring-ring",
+                                        errors.projectGroupId ? "border-destructive" : "border-input",
+                                        !field.value && "text-muted-foreground"
                                     )}
                                 >
                                     <span className="truncate">
@@ -94,38 +80,36 @@ export const StepBasicInformation = ({
                                 </button>
                             </DropdownMenuTrigger>
 
-                            <DropdownMenuContent 
-                                align="start" 
-                                className="z-50 bg-white"
-                            >
+                            <DropdownMenuContent align="start" className="z-50 bg-white">
                                 {groups.length > 0 ? (
                                     groups.map((group) => (
                                         <DropdownMenuItem
                                             key={group.id}
-                                            onSelect={() => {
-                                                // Aktualizujemy wartość w formularzu
-                                                setValue("projectGroupId", group.id, { shouldValidate: true });
-                                            }}
+                                            onSelect={() =>
+                                                setValue("projectGroupId", group.id, { shouldValidate: true })
+                                            }
                                             className="flex items-center justify-between cursor-pointer"
                                         >
                                             {group.name}
                                             {field.value === group.id && (
-                                                <CheckIcon className="h-4 w-4 text-blue-600" />
+                                                <CheckIcon className="h-4 w-4 text-primary" />
                                             )}
                                         </DropdownMenuItem>
                                     ))
                                 ) : (
-                                    <div className="p-2 text-sm text-gray-400 italic text-center">
+                                    <div className="p-2 text-sm text-muted-foreground italic text-center">
                                         Brak dostępnych grup
                                     </div>
                                 )}
 
                                 {field.value && (
                                     <>
-                                        <div className="my-1 h-px bg-gray-100" />
+                                        <div className="my-1 h-px bg-border" />
                                         <DropdownMenuItem
-                                            onSelect={() => setValue("projectGroupId", null, { shouldValidate: true })}
-                                            className="text-red-600 focus:text-red-700 cursor-pointer"
+                                            onSelect={() =>
+                                                setValue("projectGroupId", null, { shouldValidate: true })
+                                            }
+                                            className="text-destructive focus:text-destructive cursor-pointer"
                                         >
                                             Wyczyść wybór
                                         </DropdownMenuItem>
@@ -135,12 +119,6 @@ export const StepBasicInformation = ({
                         </DropdownMenu>
                     )}
                 />
-                
-                {errors.projectGroupId && (
-                    <span className="text-red-500 text-xs mt-1">
-                        {errors.projectGroupId.message}
-                    </span>
-                )}
             </div>
         </div>
     );
