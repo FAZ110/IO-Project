@@ -12,11 +12,12 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type {GroupBasicResponse} from "@/features/project_group/project_group.types.ts";
 
 interface StepBasicInformationViewProps {
     register: UseFormRegister<ProjectCreationRequest>;
     errors: FieldErrors<ProjectCreationRequest>;
-    groups: { id: string; name: string }[];
+    groups: GroupBasicResponse[];
 }
 
 export const StepBasicInformation = ({
