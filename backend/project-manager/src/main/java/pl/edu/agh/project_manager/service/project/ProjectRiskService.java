@@ -3,7 +3,7 @@ package pl.edu.agh.project_manager.service.project;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.edu.agh.project_manager.controller.dto.project.projectrisk.ProjectRiskResponse;
+import pl.edu.agh.project_manager.controller.dto.project_risk.ProjectRiskResponse;
 import pl.edu.agh.project_manager.domain.entity.project.Project;
 import pl.edu.agh.project_manager.domain.entity.project.ProjectRisk;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;

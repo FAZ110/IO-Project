@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
+import pl.edu.agh.project_manager.controller.dto.project_risk.ProjectRiskResponse;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 
@@ -14,12 +14,12 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class RiskPdfGenerator implements PdfGenerator<List<RiskResponse>> {
+public class RiskPdfGenerator implements PdfGenerator<List<ProjectRiskResponse>> {
 
     private final TemplateEngine templateEngine;
 
     @Override
-    public byte[] generate(List<RiskResponse> data, String templateName) {
+    public byte[] generate(List<ProjectRiskResponse> data, String templateName) {
         Context context = new Context();
         context.setVariable("risks", data);
 

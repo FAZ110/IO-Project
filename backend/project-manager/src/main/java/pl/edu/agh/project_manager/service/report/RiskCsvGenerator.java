@@ -2,7 +2,7 @@ package pl.edu.agh.project_manager.service.report;
 
 import com.opencsv.CSVWriter;
 import org.springframework.stereotype.Component;
-import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
+import pl.edu.agh.project_manager.controller.dto.project_risk.ProjectRiskResponse;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 
@@ -13,13 +13,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
-public class RiskCsvGenerator implements CsvGenerator<RiskResponse> {
+public class RiskCsvGenerator implements CsvGenerator<ProjectRiskResponse> {
 
     private static final byte[] BOM = new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
     private static final String[] HEADERS = {"Nazwa", "Opis", "Prawdopodobieństwo"};
 
     @Override
-    public byte[] generate(List<RiskResponse> data) {
+    public byte[] generate(List<ProjectRiskResponse> data) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             baos.write(BOM);
 
@@ -28,7 +28,7 @@ public class RiskCsvGenerator implements CsvGenerator<RiskResponse> {
 
                 csvWriter.writeNext(HEADERS);
 
-                for (RiskResponse risk : data) {
+                for (ProjectRiskResponse risk : data) {
                     String[] row = {
                             risk.name(),
                             risk.description(),

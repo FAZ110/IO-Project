@@ -32,8 +32,5 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Debug file path and casing
-        run: find src/main/java -name "*Risk*"
-
       - name: Build and Test with Gradle
-        run: ./gradlew clean build
+        run: ./gradlew gbuild

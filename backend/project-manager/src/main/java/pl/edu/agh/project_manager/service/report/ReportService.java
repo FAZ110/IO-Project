@@ -3,7 +3,7 @@ package pl.edu.agh.project_manager.service.report;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
-import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
+import pl.edu.agh.project_manager.controller.dto.project_risk.ProjectRiskResponse;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.security.UserPrincipal;
@@ -30,7 +30,7 @@ public class ReportService {
     public byte[] generateProjectRisksCsv(UUID projectId, UserPrincipal user) {
         checkAccess(projectId, user);
 
-        List<RiskResponse> risks = projectRiskService.getProjectRisks(projectId);
+        List<ProjectRiskResponse> risks = projectRiskService.getProjectRisks(projectId);
         return riskCsvGenerator.generate(risks);
     }
 
@@ -44,7 +44,7 @@ public class ReportService {
     public byte[] generateProjectRisksPdf(UUID projectId, UserPrincipal user) {
         checkAccess(projectId, user);
 
-        List<RiskResponse> risks = projectRiskService.getProjectRisks(projectId);
+        List<ProjectRiskResponse> risks = projectRiskService.getProjectRisks(projectId);
         return riskPdfGenerator.generate(risks, "project-risks-template");
     }
 
