@@ -3,7 +3,7 @@ package pl.edu.agh.project_manager.service.report;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
+import pl.edu.agh.project_manager.controller.dto.project_risk.ProjectRiskResponse;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -24,9 +24,9 @@ class RiskCsvGeneratorTest {
     @DisplayName("Should generate CSV content correctly")
     void generateCsv_Success() {
         // Given
-        RiskResponse risk1 = new RiskResponse(UUID.randomUUID(), "Risk 1", "Description 1", 50);
-        RiskResponse risk2 = new RiskResponse(UUID.randomUUID(), "Risk 2", "Description 2", 80);
-        List<RiskResponse> risks = List.of(risk1, risk2);
+        ProjectRiskResponse risk1 = new ProjectRiskResponse(UUID.randomUUID(), "Risk 1", "Description 1", 50,21,2);
+        ProjectRiskResponse risk2 = new ProjectRiskResponse(UUID.randomUUID(), "Risk 2", "Description 2", 80,21,3);
+        List<ProjectRiskResponse> risks = List.of(risk1, risk2);
 
         // When
         byte[] resultBytes = riskCsvGenerator.generate(risks);
@@ -54,7 +54,7 @@ class RiskCsvGeneratorTest {
     @DisplayName("Should generate empty CSV with headers when list is empty")
     void generateCsv_EmptyList() {
         // Given
-        List<RiskResponse> risks = List.of();
+        List<ProjectRiskResponse> risks = List.of();
 
         // When
         byte[] resultBytes = riskCsvGenerator.generate(risks);

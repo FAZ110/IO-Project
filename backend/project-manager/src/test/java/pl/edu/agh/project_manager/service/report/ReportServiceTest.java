@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
-import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
+import pl.edu.agh.project_manager.controller.dto.project_risk.ProjectRiskResponse;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.security.UserPrincipal;
@@ -69,7 +69,7 @@ class ReportServiceTest {
     void generateProjectRisksCsv_HasAccess() {
         // Given
         when(projectAccess.canAccessProject(projectId, normalUser)).thenReturn(true);
-        List<RiskResponse> risks = List.of(new RiskResponse(UUID.randomUUID(), "R1", "D1", 50));
+        List<ProjectRiskResponse> risks = List.of(new ProjectRiskResponse(UUID.randomUUID(), "R1", "D1", 50,21,2));
         when(projectRiskService.getProjectRisks(projectId)).thenReturn(risks);
         byte[] expectedCsv = "test-csv".getBytes();
         when(riskCsvGenerator.generate(risks)).thenReturn(expectedCsv);
@@ -87,7 +87,7 @@ class ReportServiceTest {
     @DisplayName("Should generate risks CSV for admin without explicit project access")
     void generateProjectRisksCsv_Admin() {
         // Given
-        List<RiskResponse> risks = List.of();
+        List<ProjectRiskResponse> risks = List.of();
         when(projectRiskService.getProjectRisks(projectId)).thenReturn(risks);
         when(riskCsvGenerator.generate(risks)).thenReturn(new byte[0]);
 
@@ -135,7 +135,7 @@ class ReportServiceTest {
     void generateProjectRisksPdf_HasAccess() {
         // Given
         when(projectAccess.canAccessProject(projectId, normalUser)).thenReturn(true);
-        List<RiskResponse> risks = List.of(new RiskResponse(UUID.randomUUID(), "R1", "D1", 50));
+        List<ProjectRiskResponse> risks = List.of(new ProjectRiskResponse(UUID.randomUUID(), "R1", "D1", 50,27,2));
         when(projectRiskService.getProjectRisks(projectId)).thenReturn(risks);
         byte[] expectedPdf = "test-pdf".getBytes();
         when(riskPdfGenerator.generate(risks, "project-risks-template")).thenReturn(expectedPdf);
