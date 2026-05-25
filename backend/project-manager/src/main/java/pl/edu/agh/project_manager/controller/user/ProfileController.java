@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.project_manager.controller.dto.auth.ChangePasswordRequest;
+import pl.edu.agh.project_manager.controller.dto.user.UserResponse;
 import pl.edu.agh.project_manager.security.UserPrincipal;
 import pl.edu.agh.project_manager.service.user.UserService;
 
@@ -16,6 +17,12 @@ import pl.edu.agh.project_manager.service.user.UserService;
 public class ProfileController {
 
     private final UserService userService;
+
+    @GetMapping
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserResponse> getMyProfile(@AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(userService.getUser(principal.userId()));
+    }
 
     @PostMapping("/password")
     @PreAuthorize("isAuthenticated()")

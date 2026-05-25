@@ -30,4 +30,6 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
 
     @Query("SELECT u FROM User u WHERE LOWER(CONCAT(u.name, ' ', u.surname)) LIKE LOWER(CONCAT('%', :query, '%')) AND u.userRole = :role")
     List<User> searchUserByFullNameAndRole(@Param("query") String query, @Param("role") UserRole role);
+
+    List<User> findAllBySupervisor_Id(UUID supervisorId);
 }

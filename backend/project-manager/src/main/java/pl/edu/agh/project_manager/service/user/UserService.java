@@ -11,21 +11,33 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.project_manager.controller.dto.PagedResponse;
 import pl.edu.agh.project_manager.controller.dto.project.ProjectAssignmentUserWorkloadResponse;
+import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
+import pl.edu.agh.project_manager.controller.dto.project.UserProjectMembershipResponse;
+import pl.edu.agh.project_manager.controller.dto.project_group.OwnedGroupResponse;
 import pl.edu.agh.project_manager.controller.dto.user.SimpleUserResponse;
 import pl.edu.agh.project_manager.controller.dto.user.UserResponse;
+import pl.edu.agh.project_manager.domain.entity.project.Project;
 import pl.edu.agh.project_manager.domain.entity.project.ProjectAssignment;
 import pl.edu.agh.project_manager.domain.entity.user.User;
+import pl.edu.agh.project_manager.domain.enums.AssignmentStatus;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
+import pl.edu.agh.project_manager.repository.project.ProjectAssignmentRepository;
 import pl.edu.agh.project_manager.repository.project.ProjectRepository;
+import pl.edu.agh.project_manager.repository.projectgroup.ProjectGroupRepository;
 import pl.edu.agh.project_manager.repository.user.UserRepository;
 import pl.edu.agh.project_manager.util.assignments.AssignmentsUtil;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +45,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
+    private final ProjectAssignmentRepository projectAssignmentRepository;
+    private final ProjectGroupRepository projectGroupRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -109,6 +123,77 @@ public class UserService {
     public User getUserEntityOrThrow(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find user: " + userId));
+    }
+
+    @Transactional(readOnly = true)
+    public UserResponse getUser(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find user: " + userId));
+        return UserResponse.from(user);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserResponse> getSubordinates(UUID supervisorId) {
+        if (!userRepository.existsById(supervisorId)) {
+            throw new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find user: " + supervisorId);
+        }
+        return userRepository.findAllBySupervisor_Id(supervisorId).stream()
+                .map(UserResponse::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProjectResponse> getManagedProjects(UUID managerId) {
+        if (!userRepository.existsById(managerId)) {
+            throw new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find user: " + managerId);
+        }
+        return projectRepository.findAllByProjectManagerId(managerId).stream()
+                .map(ProjectResponse::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<OwnedGroupResponse> getRelatedProjectGroups(UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find user: " + userId);
+        }
+
+        List<pl.edu.agh.project_manager.domain.entity.projectgroup.ProjectGroup> owned =
+                projectGroupRepository.findAllByOwner_IdOrderByNameAsc(userId);
+
+        Map<UUID, pl.edu.agh.project_manager.domain.entity.projectgroup.ProjectGroup> related =
+                new LinkedHashMap<>();
+        owned.forEach(g -> related.put(g.getId(), g));
+
+        projectRepository.findAllByProjectManagerId(userId).stream()
+                .map(p -> p.getProjectGroup())
+                .filter(g -> g != null)
+                .forEach(g -> related.putIfAbsent(g.getId(), g));
+
+        Set<UUID> ownedIds = owned.stream().map(g -> g.getId()).collect(Collectors.toSet());
+
+        return related.values().stream()
+                .map(g -> OwnedGroupResponse.from(g, ownedIds.contains(g.getId())))
+                .sorted(Comparator
+                        .comparing(OwnedGroupResponse::isOwner).reversed()
+                        .thenComparing(OwnedGroupResponse::name))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserProjectMembershipResponse> getProjectMemberships(UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new ApplicationException(ApiErrorCode.USER_NOT_FOUND, "Cannot find user: " + userId);
+        }
+        List<ProjectAssignment> assignments = projectAssignmentRepository
+                .findAllByUserIdAndStatus(userId, AssignmentStatus.ACCEPTED);
+
+        Map<Project, List<ProjectAssignment>> byProject = assignments.stream()
+                .collect(Collectors.groupingBy(ProjectAssignment::getProject, LinkedHashMap::new, Collectors.toList()));
+
+        return byProject.entrySet().stream()
+                .map(e -> UserProjectMembershipResponse.from(e.getKey(), e.getValue()))
+                .toList();
     }
 
     public List<User> getUsersByIdsOrThrow(List<UUID> userIds, String errorMessage) {
