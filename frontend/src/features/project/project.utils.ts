@@ -55,3 +55,30 @@ export const buildProjectSearchParams = (request: SearchProjectsRequest): Record
     ...(normalized.isActive !== undefined ? { isActive: normalized.isActive } : {}),
   };
 };
+
+export const getRiskDetails = (value: number) => {
+  if (value >= 15) return {
+    label: "Krytyczne",
+    borderLine: "bg-rose-500",
+    badge: "bg-rose-100 text-rose-700 border-rose-200 hover:bg-rose-200",
+    barColor: "bg-rose-500"
+  };
+  if (value >= 10) return {
+    label: "Wysokie",
+    borderLine: "bg-orange-500",
+    badge: "bg-orange-100 text-orange-700 border-orange-200 hover:bg-orange-200",
+    barColor: "bg-orange-500"
+  };
+  if (value >= 5) return {
+    label: "Średnie",
+    borderLine: "bg-amber-400",
+    badge: "bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-200",
+    barColor: "bg-amber-400"
+  };
+  return {
+    label: "Niskie",
+    borderLine: "bg-emerald-500",
+    badge: "bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-200",
+    barColor: "bg-emerald-500"
+  };
+};

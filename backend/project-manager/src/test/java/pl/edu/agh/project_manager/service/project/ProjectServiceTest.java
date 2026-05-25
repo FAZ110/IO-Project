@@ -56,7 +56,7 @@ class ProjectServiceTest {
                 LocalDate.now(),
                 null,
                 null,
-                new ArrayList<>(List.of(new RiskCommand("Risk", "Desc", 50))),
+                new ArrayList<>(List.of(new RiskCommand("Risk", "Desc", 5, 3))),
                 new ArrayList<>(List.of(new MilestoneCommand("Start", "Start desc", LocalDate.now()))),
                 new ArrayList<>(), // Sponsors
                 new ArrayList<>()  // Committee

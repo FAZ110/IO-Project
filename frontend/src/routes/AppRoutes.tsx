@@ -19,6 +19,8 @@ import { QualificationRequestsPage } from '@/pages/QualificationRequestsPage';
 import { CreateProjectGroupPage } from '@/pages/CreateProjectGroupPage';
 import { ProjectRegistryPage } from '@/pages/ProjectRegistryPage';
 import { useAuth } from '@/providers/AuthContext';
+import { EmployeeRegistryPage } from '@/pages/EmployeeRegistryPage';
+import { EmployeeDetailsPage } from '@/pages/EmployeeDetailsPage';
 
 export const AppRoutes = () => {
   const { user } = useAuth();
@@ -39,7 +41,9 @@ export const AppRoutes = () => {
           <Route path={PATHS.ROOT} element={isAdmin ? <Navigate to={PATHS.ADMIN_USERS} replace /> : <DashboardPage />} />
           <Route path={PATHS.PROFILE} element={<ProfilePage />} />
           <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
-          <Route path={PATHS.PROJECTS_REGISTRY} element={<ProjectRegistryPage />} /> {/* <-- Przywrócone z developa */}
+          <Route path={PATHS.PROJECTS_REGISTRY} element={<ProjectRegistryPage />} />
+          <Route path={PATHS.EMPLOYEES_REGISTRY} element={<EmployeeRegistryPage />} />
+          <Route path={PATHS.EMPLOYEE_DETAILS(`:${ROUTE_PARAMS.USER_ID}`)} element={<EmployeeDetailsPage />} />
           <Route path={PATHS.NOTIFICATION} element={<NotificationPage />} />
 
           {/* LINEAR MANAGER ROUTES */}

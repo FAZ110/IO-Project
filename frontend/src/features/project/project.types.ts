@@ -24,10 +24,12 @@ export interface Risk {
   name: string;
   description: string;
   probability: number;
+  impact: number;
 }
 
 export interface RiskResponse extends Risk {
   id: string;
+  value: number;
 }
 
 export interface ProjectResponse {

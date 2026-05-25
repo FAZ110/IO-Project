@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
+import pl.edu.agh.project_manager.controller.dto.project.projectrisk.ProjectRiskResponse;
 import pl.edu.agh.project_manager.domain.entity.project.Project;
 import pl.edu.agh.project_manager.domain.entity.project.ProjectRisk;
 import pl.edu.agh.project_manager.repository.project.RiskRepository;
@@ -57,24 +57,28 @@ public class ProjectRiskServiceTest {
         // Given
         UUID projectId = UUID.randomUUID();
         UUID riskId = UUID.randomUUID();
-        RiskCommand command = new RiskCommand("New Name", "New Desc", 90);
+        RiskCommand command = new RiskCommand("New Name", "New Desc", 4, 5);
 
         Project project = Project.builder().id(projectId).build();
         ProjectRisk risk = ProjectRisk.builder()
                 .id(riskId)
                 .name("Old")
                 .project(project)
+                .probability(1)
+                .impact(1)
                 .build();
 
         when(riskRepository.findById(riskId)).thenReturn(Optional.of(risk));
 
         // When
-        RiskResponse response = riskService.updateProjectRisk(projectId, riskId, command);
+        ProjectRiskResponse response = riskService.updateProjectRisk(projectId, riskId, command);
 
         // Then
         assertThat(response.name()).isEqualTo("New Name");
         assertThat(risk.getName()).isEqualTo("New Name");
-        assertThat(risk.getProbability()).isEqualTo(90);
+        assertThat(risk.getProbability()).isEqualTo(4);
+        assertThat(risk.getImpact()).isEqualTo(5);
+        assertThat(response.value()).isEqualTo(20);
     }
 
     @Test
@@ -82,12 +86,15 @@ public class ProjectRiskServiceTest {
     void createProjectRisk_Success() {
         // Given
         UUID projectId = UUID.randomUUID();
-        RiskCommand command = new RiskCommand("Title", "Desc", 50);
+        RiskCommand command = new RiskCommand("Title", "Desc", 3, 4);
 
         Project project = Project.builder().id(projectId).build();
         ProjectRisk savedRisk = ProjectRisk.builder()
                 .id(UUID.randomUUID())
                 .name("Title")
+                .description("Desc")
+                .probability(3)
+                .impact(4)
                 .project(project)
                 .build();
 
@@ -95,10 +102,11 @@ public class ProjectRiskServiceTest {
         when(riskRepository.save(any(ProjectRisk.class))).thenReturn(savedRisk);
 
         // When
-        RiskResponse response = riskService.createProjectRisk(command, projectId);
+        ProjectRiskResponse response = riskService.createProjectRisk(command, projectId);
 
         // Then
         assertThat(response.id()).isEqualTo(savedRisk.getId());
+        assertThat(response.value()).isEqualTo(12);
         verify(riskRepository).save(any(ProjectRisk.class));
     }
 }

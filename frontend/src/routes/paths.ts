@@ -24,4 +24,6 @@ export const PATHS = {
   CREATE_PROJECT_GROUP: `/create-project-group`,
   NOTIFICATION: `notifications`,
   PROJECTS_REGISTRY: "/projects-registry",
+  EMPLOYEES_REGISTRY: "/employees-registry",
+  EMPLOYEE_DETAILS: (userId: string) => `/employees/${userId}`,
 } as const;
