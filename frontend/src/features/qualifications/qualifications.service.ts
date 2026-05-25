@@ -8,6 +8,11 @@ export const qualificationsService = {
     return res.data;
   },
 
+  getUserQualifications: async (userId: string): Promise<QualificationResponse[]> => {
+    const res = await api.get<QualificationResponse[]>(ENDPOINTS.USERS.QUALIFICATIONS(userId));
+    return res.data;
+  },
+
   addQualifications: async (data: AddQualificationRequest): Promise<QualificationResponse[]> => {
     const res = await api.post<QualificationResponse[]>(ENDPOINTS.ME.QUALIFICATIONS, data);
     return res.data;
