@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
-import api from '@/api/client';
+import { reportService } from './report.service';
 
 export const useReportDownload = () => {
     const [isDownloading, setIsDownloading] = useState(false);
@@ -8,9 +8,7 @@ export const useReportDownload = () => {
     const downloadReport = async (url: string, filename: string) => {
         setIsDownloading(true);
         try {
-            const response = await api.get(url, {
-                responseType: 'blob',
-            });
+            const response = await reportService.getReportFile(url);
 
             const disposition = response.headers['content-disposition'] as string | undefined;
             let finalFilename = filename;

@@ -5,10 +5,10 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ProjectGroupType } from "@/features/project_group/project_group.types.ts";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useReportDownload } from "@/features/report/report.hooks";
 
@@ -19,20 +19,8 @@ interface ProjectHeaderProps {
 export const ProjectHeader = ({ details }: ProjectHeaderProps) => {
     const groupName = details.group?.name;
     const isWallet = details.group?.groupType === ProjectGroupType.WALLET;
-    
+
     const { downloadReport, isDownloading } = useReportDownload();
-
-    const handleDownloadCardPdf = () => {
-        downloadReport(`/projects/${details.id}/reports/card/pdf`, 'karta_projektu.pdf');
-    };
-
-    const handleDownloadRisksCsv = () => {
-        downloadReport(`/projects/${details.id}/reports/risks/csv`, 'ryzyka.csv');
-    };
-
-    const handleDownloadRisksPdf = () => {
-        downloadReport(`/projects/${details.id}/reports/risks/pdf`, 'ryzyka.pdf');
-    };
 
     return (
         <div className="flex flex-col gap-6 mb-8 md:flex-row md:items-start md:justify-between">
@@ -65,6 +53,7 @@ export const ProjectHeader = ({ details }: ProjectHeaderProps) => {
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="gap-2 shrink-0" disabled={isDownloading}>
@@ -72,16 +61,28 @@ export const ProjectHeader = ({ details }: ProjectHeaderProps) => {
                             Eksportuj
                         </Button>
                     </DropdownMenuTrigger>
+
                     <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem onClick={handleDownloadCardPdf} className="cursor-pointer">
+                        <DropdownMenuItem
+                            onClick={() => downloadReport(`/reports/${details.id}?type=PROJECT_CARD_PDF`, 'karta_projektu.pdf')}
+                            className="cursor-pointer"
+                        >
                             <FileText className="w-4 h-4 mr-2 text-red-500" />
                             Karta Projektu (PDF)
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleDownloadRisksCsv} className="cursor-pointer">
+
+                        <DropdownMenuItem
+                            onClick={() => downloadReport(`/reports/${details.id}?type=PROJECT_RISKS_CSV`, 'ryzyka.csv')}
+                            className="cursor-pointer"
+                        >
                             <FileSpreadsheet className="w-4 h-4 mr-2 text-green-600" />
                             Rejestr Ryzyk (CSV)
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleDownloadRisksPdf} className="cursor-pointer">
+
+                        <DropdownMenuItem
+                            onClick={() => downloadReport(`/reports/${details.id}?type=PROJECT_RISKS_PDF`, 'ryzyka.pdf')}
+                            className="cursor-pointer"
+                        >
                             <FileText className="w-4 h-4 mr-2 text-red-500" />
                             Rejestr Ryzyk (PDF)
                         </DropdownMenuItem>
