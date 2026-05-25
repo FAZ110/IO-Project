@@ -50,4 +50,5 @@ class PortfolioCsvGeneratorTest {
         assertThat(lines[1]).contains("\"Projekt A\",\"Opis A\",\"2024-01-01\",\"2024-12-31\",\"Aktywny\"");
         assertThat(lines[2]).contains("\"Projekt B\",\"Opis B\",\"2023-05-10\",\"2025-05-09\",\"Zakończony\"");
     }
+    
 }
