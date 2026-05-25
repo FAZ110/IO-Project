@@ -20,7 +20,12 @@ export const ProjectHeader = ({ details }: ProjectHeaderProps) => {
     const groupName = details.group?.name;
     const isWallet = details.group?.groupType === ProjectGroupType.WALLET;
 
-    const { downloadReport, isDownloading } = useReportDownload();
+    const {
+        isDownloading,
+        downloadProjectCardPdf,
+        downloadProjectRisksCsv,
+        downloadProjectRisksPdf
+    } = useReportDownload();
 
     return (
         <div className="flex flex-col gap-6 mb-8 md:flex-row md:items-start md:justify-between">
@@ -64,7 +69,7 @@ export const ProjectHeader = ({ details }: ProjectHeaderProps) => {
 
                     <DropdownMenuContent align="end" className="w-48">
                         <DropdownMenuItem
-                            onClick={() => downloadReport(`/reports/${details.id}?type=PROJECT_CARD_PDF`, 'karta_projektu.pdf')}
+                            onClick={() => downloadProjectCardPdf(details.id)}
                             className="cursor-pointer"
                         >
                             <FileText className="w-4 h-4 mr-2 text-red-500" />
@@ -72,7 +77,7 @@ export const ProjectHeader = ({ details }: ProjectHeaderProps) => {
                         </DropdownMenuItem>
 
                         <DropdownMenuItem
-                            onClick={() => downloadReport(`/reports/${details.id}?type=PROJECT_RISKS_CSV`, 'ryzyka.csv')}
+                            onClick={() => downloadProjectRisksCsv(details.id)}
                             className="cursor-pointer"
                         >
                             <FileSpreadsheet className="w-4 h-4 mr-2 text-green-600" />
@@ -80,7 +85,7 @@ export const ProjectHeader = ({ details }: ProjectHeaderProps) => {
                         </DropdownMenuItem>
 
                         <DropdownMenuItem
-                            onClick={() => downloadReport(`/reports/${details.id}?type=PROJECT_RISKS_PDF`, 'ryzyka.pdf')}
+                            onClick={() => downloadProjectRisksPdf(details.id)}
                             className="cursor-pointer"
                         >
                             <FileText className="w-4 h-4 mr-2 text-red-500" />

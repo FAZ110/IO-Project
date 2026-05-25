@@ -5,6 +5,7 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.project_manager.security.UserPrincipal;
@@ -19,8 +20,11 @@ public class ReportController {
 
     private final ReportService reportService;
 
+    @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or " +
+            "(#type.name().startsWith('PROJECT_') and @projectAccess.canAccessProject(#resourceId, principal)) or " +
+            "(#type.name().startsWith('GROUP_') and @groupAccess.canAccessGroup(#resourceId, principal))")
     @GetMapping("/{resourceId}")
-    public ResponseEntity<byte[]> downloadRisksCsv(
+    public ResponseEntity<byte[]> downloadReport(
             @PathVariable UUID resourceId,
             @RequestParam ReportType type,
             @AuthenticationPrincipal UserPrincipal user

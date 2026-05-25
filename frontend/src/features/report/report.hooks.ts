@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { reportService } from './report.service';
 
 export const useReportDownload = () => {
     const [isDownloading, setIsDownloading] = useState(false);
 
-    const downloadReport = async (url: string, filename: string) => {
+    const downloadReport = useCallback(async (url: string, filename: string) => {
         setIsDownloading(true);
         try {
             const response = await reportService.getReportFile(url);
@@ -43,7 +43,30 @@ export const useReportDownload = () => {
         } finally {
             setIsDownloading(false);
         }
-    };
+    }, []);
 
-    return { downloadReport, isDownloading };
+    const downloadProjectCardPdf = useCallback((projectId: string) => {
+        downloadReport(`/reports/${projectId}?type=PROJECT_CARD_PDF`, 'karta_projektu.pdf');
+    }, [downloadReport]);
+
+    const downloadProjectRisksCsv = useCallback((projectId: string) => {
+        downloadReport(`/reports/${projectId}?type=PROJECT_RISKS_CSV`, 'ryzyka.csv');
+    }, [downloadReport]);
+
+    const downloadProjectRisksPdf = useCallback((projectId: string) => {
+        downloadReport(`/reports/${projectId}?type=PROJECT_RISKS_PDF`, 'ryzyka.pdf');
+    }, [downloadReport]);
+
+    const downloadGroupProjectsCsv = useCallback((groupId: string, groupName: string) => {
+        const filename = `zestawienie_${groupName.toLowerCase().replace(/\s+/g, '_')}.csv`;
+        downloadReport(`/reports/${groupId}?type=GROUP_PROJECTS_CSV`, filename);
+    }, [downloadReport]);
+
+    return {
+        isDownloading,
+        downloadProjectCardPdf,
+        downloadProjectRisksCsv,
+        downloadProjectRisksPdf,
+        downloadGroupProjectsCsv
+    };
 };
