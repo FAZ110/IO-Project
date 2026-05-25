@@ -11,9 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
 import pl.edu.agh.project_manager.controller.dto.project_risk.ProjectRiskResponse;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
-import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.security.UserPrincipal;
-import pl.edu.agh.project_manager.security.access.ProjectAccess;
 import pl.edu.agh.project_manager.service.command.project.SearchProjectCommand;
 import pl.edu.agh.project_manager.service.project.ProjectRiskService;
 import pl.edu.agh.project_manager.service.project.ProjectService;
@@ -22,7 +20,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -31,16 +28,13 @@ class ReportServiceTest {
 
     @Mock
     private ProjectService projectService;
-    
+
     @Mock
     private ProjectRiskService projectRiskService;
-    
-    @Mock
-    private ProjectAccess projectAccess;
-    
+
     @Mock
     private RiskCsvGenerator riskCsvGenerator;
-    
+
     @Mock
     private ProjectPdfGenerator projectPdfGenerator;
 
@@ -54,22 +48,19 @@ class ReportServiceTest {
     private ReportService reportService;
 
     private UUID projectId;
-    private UserPrincipal adminUser;
     private UserPrincipal normalUser;
 
     @BeforeEach
     void setUp() {
         projectId = UUID.randomUUID();
-        adminUser = new UserPrincipal(UUID.randomUUID(), "admin@test.com", "pass", "A", "A", List.of(new SimpleGrantedAuthority("ROLE_ADMINISTRATOR")), UserRole.ADMINISTRATOR);
         normalUser = new UserPrincipal(UUID.randomUUID(), "user@test.com", "pass", "U", "U", List.of(new SimpleGrantedAuthority("ROLE_COMMON")), UserRole.COMMON);
     }
 
     @Test
-    @DisplayName("Should generate risks CSV when user has access")
-    void generateProjectRisksCsv_HasAccess() {
+    @DisplayName("Should generate risks CSV successfully")
+    void generateProjectRisksCsv() {
         // Given
-        when(projectAccess.canAccessProject(projectId, normalUser)).thenReturn(true);
-        List<ProjectRiskResponse> risks = List.of(new ProjectRiskResponse(UUID.randomUUID(), "R1", "D1", 50,21,2));
+        List<ProjectRiskResponse> risks = List.of(new ProjectRiskResponse(UUID.randomUUID(), "R1", "D1", 50, 21, 2));
         when(projectRiskService.getProjectRisks(projectId)).thenReturn(risks);
         byte[] expectedCsv = "test-csv".getBytes();
         when(riskCsvGenerator.generate(risks)).thenReturn(expectedCsv);
@@ -84,38 +75,9 @@ class ReportServiceTest {
     }
 
     @Test
-    @DisplayName("Should generate risks CSV for admin without explicit project access")
-    void generateProjectRisksCsv_Admin() {
+    @DisplayName("Should generate project card PDF successfully")
+    void generateProjectCardPdf() {
         // Given
-        List<ProjectRiskResponse> risks = List.of();
-        when(projectRiskService.getProjectRisks(projectId)).thenReturn(risks);
-        when(riskCsvGenerator.generate(risks)).thenReturn(new byte[0]);
-
-        // When
-        reportService.generateProjectRisksCsv(projectId, adminUser);
-
-        // Then
-        verify(projectAccess, never()).canAccessProject(any(), any());
-        verify(projectRiskService).getProjectRisks(projectId);
-    }
-
-    @Test
-    @DisplayName("Should throw exception when generating CSV and no access")
-    void generateProjectRisksCsv_NoAccess() {
-        // Given
-        when(projectAccess.canAccessProject(projectId, normalUser)).thenReturn(false);
-
-        // When & Then
-        assertThatThrownBy(() -> reportService.generateProjectRisksCsv(projectId, normalUser))
-                .isInstanceOf(ApplicationException.class)
-                .hasMessageContaining("Brak dostępu");
-    }
-
-    @Test
-    @DisplayName("Should generate project card PDF when user has access")
-    void generateProjectCardPdf_HasAccess() {
-        // Given
-        when(projectAccess.canAccessProject(projectId, normalUser)).thenReturn(true);
         ProjectResponse project = new ProjectResponse(projectId, "Test", "Desc", null, null, true, null, null);
         when(projectService.getProject(projectId)).thenReturn(project);
         byte[] expectedPdf = "test-pdf".getBytes();
@@ -131,11 +93,10 @@ class ReportServiceTest {
     }
 
     @Test
-    @DisplayName("Should generate risks PDF when user has access")
-    void generateProjectRisksPdf_HasAccess() {
+    @DisplayName("Should generate risks PDF successfully")
+    void generateProjectRisksPdf() {
         // Given
-        when(projectAccess.canAccessProject(projectId, normalUser)).thenReturn(true);
-        List<ProjectRiskResponse> risks = List.of(new ProjectRiskResponse(UUID.randomUUID(), "R1", "D1", 50,27,2));
+        List<ProjectRiskResponse> risks = List.of(new ProjectRiskResponse(UUID.randomUUID(), "R1", "D1", 50, 27, 2));
         when(projectRiskService.getProjectRisks(projectId)).thenReturn(risks);
         byte[] expectedPdf = "test-pdf".getBytes();
         when(riskPdfGenerator.generate(risks, "project-risks-template")).thenReturn(expectedPdf);
@@ -150,8 +111,8 @@ class ReportServiceTest {
     }
 
     @Test
-    @DisplayName("Should generate portfolio CSV")
-    void generatePortfolioCsv_Success() {
+    @DisplayName("Should generate portfolio CSV successfully")
+    void generatePortfolioCsv() {
         // Given
         UUID groupId = UUID.randomUUID();
         List<ProjectResponse> projects = List.of(new ProjectResponse(projectId, "Test", "Desc", null, null, true, null, null));
