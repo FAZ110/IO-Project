@@ -22,7 +22,7 @@ export const CreateProjectFormSchema = z.object({
     impact: z.number().min(1, "Minimum to 1").max(5, "Maksimum to 5")
   })),
 }).refine(
-  (data) => !data.startDate || !data.endDate || data.endDate >= data.startDate,
+  (data) => data.endDate >= data.startDate,
   { message: "Data zakończenia musi być po dacie rozpoczęcia", path: ["endDate"] }
 );
 
