@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Karta Projektu</title>
+    <style>
+        body { font-family: sans-serif; color: #333; padding: 20px; }
+        h1 { color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 10px; }
+        h2 { color: #475569; margin-top: 30px; }
+        .section { margin-bottom: 20px; }
+        .label { font-weight: bold; color: #64748b; display: inline-block; width: 150px; }
+        .value { color: #0f172a; font-weight: 500; }
+        .manager-box { background-color: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body>
+
+<h1 th:text="${project.title}">Nazwa projektu (placeholder)</h1>
+
+<div class="section">
+    <p><span class="label">Opis:</span> <span class="value" th:text="${project.description}">...</span></p>
+    <p>
+        <span class="label">Status:</span>
+        <span class="value" th:text="${project.isActive ? 'Aktywny' : 'Zakończony'}">...</span>
+    </p>
+    <p><span class="label">Data rozpoczęcia:</span> <span class="value" th:text="${project.startDate}">...</span></p>
+    <p><span class="label">Data zakończenia:</span> <span class="value" th:text="${project.endDate}">...</span></p>
+</div>
+
+<div class="section manager-box">
+    <h2>Kierownik Projektu</h2>
+    <p><span class="label">Imię i nazwisko:</span> <span class="value" th:text="${project.manager.name + ' ' + project.manager.surname}">...</span></p>
+    <p><span class="label">Email:</span> <span class="value" th:text="${project.manager.email}">...</span></p>
+</div>
+
+</body>
+</html>
