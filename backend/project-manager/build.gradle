@@ -75,3 +75,8 @@ tasks.named('test') {
 jar {
 	enabled = false
 }
+
+
+repositories {
+    mavenCentral()
+}
