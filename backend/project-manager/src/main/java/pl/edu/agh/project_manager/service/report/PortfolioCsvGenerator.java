@@ -44,7 +44,7 @@ public class PortfolioCsvGenerator implements CsvGenerator<ProjectResponse> {
             
             return baos.toByteArray();
         } catch (IOException e) {
-            throw new ApplicationException(ApiErrorCode.INTERNAL_SERVER_ERROR, "Błąd podczas generowania pliku CSV portfela: " + e.getMessage());
+            throw new ApplicationException(ApiErrorCode.REPORT_GENERATION_ERROR, "Błąd podczas generowania pliku CSV portfela: " + e.getMessage());
         }
     }
 }

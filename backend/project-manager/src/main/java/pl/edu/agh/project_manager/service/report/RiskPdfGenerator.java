@@ -34,7 +34,7 @@ public class RiskPdfGenerator implements PdfGenerator<List<ProjectRiskResponse>>
 
             return os.toByteArray();
         } catch (Exception e) {
-            throw new ApplicationException(ApiErrorCode.INTERNAL_SERVER_ERROR, "Błąd podczas generowania pliku PDF z ryzykami: " + e.getMessage());
+            throw new ApplicationException(ApiErrorCode.REPORT_GENERATION_ERROR, "Błąd podczas generowania pliku PDF z ryzykami: " + e.getMessage());
         }
     }
 }
