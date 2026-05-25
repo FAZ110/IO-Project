@@ -1,5 +1,5 @@
 import type { SimpleUserResponse } from "@/features/user-management";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { type Control, type UseFormSetValue, useWatch } from "react-hook-form";
 import type { ProjectCreationRequest } from "../project.types";
 import { Input } from "@/components/ui/input";
@@ -51,7 +51,7 @@ export const UserAutocomplete = ({
         [selectedUserIds, mergedUsersById]
     );
 
-    const handleAddUser = (user: SimpleUserResponse) => {
+    const handleAddUser = useCallback((user: SimpleUserResponse) => {
         if (!selectedUserIds.includes(user.id)) {
             setValue(roles, [...selectedUserIds, user.id], { shouldValidate: true, shouldDirty: true });
         }
@@ -59,15 +59,15 @@ export const UserAutocomplete = ({
         setSearchInput("");
         onSearch("");
         setIsDropdownOpen(false);
-    };
+    }, [selectedUserIds, setValue, roles, onSearch]);
 
-    const handleRemoveUser = (userId: string) => {
+    const handleRemoveUser = useCallback((userId: string) => {
         setValue(
             roles,
             selectedUserIds.filter((id) => id !== userId),
             { shouldValidate: true, shouldDirty: true }
         );
-    };
+    }, [selectedUserIds, setValue, roles]);
 
     return (
         <div className="relative">

@@ -69,7 +69,7 @@ export const StepMilestonesAndRisks = ({
 
                 <div className="space-y-3">
                     {milestonesFields.map((field, index) => {
-                        const lastMilestone = milestones[index - 1];
+                        const lastMilestone = milestones?.[index - 1];
                         const minDate = lastMilestone?.date ?? getNextDateFromToday(0);
 
                         return (
