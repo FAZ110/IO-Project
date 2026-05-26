@@ -39,7 +39,6 @@ export const CreateProjectView = ({
     setValue,
   } = useFormContext<ProjectCreationRequest>();
 
-  const milestones = watch("milestones");
   const startDate = watch("startDate");
   const endDate = watch("endDate");
   const today = getNextDateFromToday(0);
@@ -80,7 +79,6 @@ export const CreateProjectView = ({
                   <FormItem>
                     <FormLabel>Data rozpoczęcia *</FormLabel>
                     <FormControl>
-                      {/* BLOKADA Z PRZESZŁOŚCI: min={today} */}
                       <Input type="date" min={today} {...field} />
                     </FormControl>
                     <FormMessage />
@@ -95,7 +93,6 @@ export const CreateProjectView = ({
                   <FormItem>
                     <FormLabel>Data zakończenia *</FormLabel>
                     <FormControl>
-                      {/* BLOKADA: Koniec nie może być przed startem (ani przed dzisiaj) */}
                       <Input type="date" min={startDate || today} {...field} />
                     </FormControl>
                     <FormMessage />
