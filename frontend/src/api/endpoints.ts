@@ -10,9 +10,15 @@ export const ENDPOINTS = {
         DETAIL: (id: string) => `/users/${id}`,
         RESEND_INVITATION: '/users/invitation',
         WORKLOAD: (id?: string) => `/users/${id}/workload`,
-        SEARCH_USERS: '/users/search'
+        SEARCH_USERS: '/users/search',
+        QUALIFICATIONS: (id: string) => `/users/${id}/qualifications`,
+        SUBORDINATES: (id: string) => `/users/${id}/subordinates`,
+        PROJECTS: (id: string) => `/users/${id}/projects`,
+        MEMBERSHIPS: (id: string) => `/users/${id}/memberships`,
+        GROUPS: (id: string) => `/users/${id}/groups`,
     },
     ME: {
+        PROFILE: '/me',
         QUALIFICATIONS: '/me/qualifications',
         QUALIFICATION: (id: string) => `/me/qualifications/${id}`,
         PASSWORD: '/me/password',

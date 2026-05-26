@@ -16,6 +16,7 @@ public record UserResponse(
         UserRole role,
         UserStatus status,
         String supervisorEmail,
+        SimpleUserResponse supervisor,
         List<QualificationResponse> qualifications
 ) {
     public static UserResponse from(User user) {
@@ -27,6 +28,7 @@ public record UserResponse(
                 user.getUserRole(),
                 user.getUserStatus(),
                 user.getSupervisor() != null ? user.getSupervisor().getEmail() : null,
+                user.getSupervisor() != null ? SimpleUserResponse.fromUser(user.getSupervisor()) : null,
 
                 user.getQualifications() != null ?
                         user.getQualifications().stream()

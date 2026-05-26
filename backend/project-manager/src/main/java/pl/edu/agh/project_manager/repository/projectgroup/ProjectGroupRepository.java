@@ -10,4 +10,6 @@ import java.util.UUID;
 public interface ProjectGroupRepository extends JpaRepository<ProjectGroup, UUID> {
 
     List<ProjectGroup> getSingleGroupByGroupType(GroupType groupType);
+
+    List<ProjectGroup> findAllByOwner_IdOrderByNameAsc(UUID ownerId);
 }

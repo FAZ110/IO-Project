@@ -7,7 +7,6 @@ export const getNotificationUrl = (type: NotificationType, referenceId: string):
       return `${PATHS.PROJECT_REQUESTS}?${QUERY_PARAMS.REQUEST_ID}=${referenceId}`;
 
     case 'ASSIGNMENT_ACCEPTED':
-      return PATHS.PROJECT(referenceId);
     case 'ASSIGNMENT_REJECTED':
       return PATHS.PROJECT(referenceId);
 
@@ -19,7 +18,7 @@ export const getNotificationUrl = (type: NotificationType, referenceId: string):
       return PATHS.PROFILE;
 
     case 'SYSTEM_NEW_EMPLOYEE':
-      return PATHS.PROFILE; // TODO: Powinno przenosic na profil pracownika, ale nie ma obecnie takiej mozliwosci
+      return PATHS.EMPLOYEE_DETAILS(referenceId);
 
     default:
       return PATHS.ROOT;

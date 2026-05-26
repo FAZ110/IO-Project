@@ -10,11 +10,16 @@ import pl.edu.agh.project_manager.controller.dto.PagedResponse;
 import pl.edu.agh.project_manager.controller.dto.invitation.AdminUserInvitationRequest;
 import pl.edu.agh.project_manager.controller.dto.invitation.ResendInvitationRequest;
 import pl.edu.agh.project_manager.controller.dto.project.ProjectAssignmentUserWorkloadResponse;
+import pl.edu.agh.project_manager.controller.dto.project.ProjectResponse;
+import pl.edu.agh.project_manager.controller.dto.project.UserProjectMembershipResponse;
+import pl.edu.agh.project_manager.controller.dto.project_group.OwnedGroupResponse;
+import pl.edu.agh.project_manager.controller.dto.qualification.QualificationResponse;
 import pl.edu.agh.project_manager.controller.dto.user.SimpleUserResponse;
 import pl.edu.agh.project_manager.controller.dto.user.UserResponse;
 import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
 import pl.edu.agh.project_manager.service.approval.AssignmentManagementService;
+import pl.edu.agh.project_manager.service.user.QualificationService;
 import pl.edu.agh.project_manager.service.user.UserInvitationService;
 import pl.edu.agh.project_manager.service.user.UserService;
 import pl.edu.agh.project_manager.service.command.invitation.AdminInviteUserCommand;
@@ -30,6 +35,7 @@ class UserController {
     private final UserInvitationService invitationService;
     private final UserService userService;
     private final AssignmentManagementService assignmentManagementService;
+    private final QualificationService qualificationService;
 
     @GetMapping("/users")
     @PreAuthorize("isAuthenticated()")
@@ -94,5 +100,41 @@ class UserController {
     @GetMapping("/users/{userId}/workload")
     public ResponseEntity<ProjectAssignmentUserWorkloadResponse> getUserWorkload(@PathVariable UUID userId) {
         return ResponseEntity.ok(assignmentManagementService.getUserWorkload(userId));
+    }
+
+    @GetMapping("/users/{userId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserResponse> getUser(@PathVariable UUID userId) {
+        return ResponseEntity.ok(userService.getUser(userId));
+    }
+
+    @GetMapping("/users/{userId}/qualifications")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<QualificationResponse>> getUserQualifications(@PathVariable UUID userId) {
+        return ResponseEntity.ok(qualificationService.getUserQualifications(userId));
+    }
+
+    @GetMapping("/users/{userId}/subordinates")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<UserResponse>> getSubordinates(@PathVariable UUID userId) {
+        return ResponseEntity.ok(userService.getSubordinates(userId));
+    }
+
+    @GetMapping("/users/{userId}/projects")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<ProjectResponse>> getManagedProjects(@PathVariable UUID userId) {
+        return ResponseEntity.ok(userService.getManagedProjects(userId));
+    }
+
+    @GetMapping("/users/{userId}/memberships")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<UserProjectMembershipResponse>> getProjectMemberships(@PathVariable UUID userId) {
+        return ResponseEntity.ok(userService.getProjectMemberships(userId));
+    }
+
+    @GetMapping("/users/{userId}/groups")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<OwnedGroupResponse>> getRelatedGroups(@PathVariable UUID userId) {
+        return ResponseEntity.ok(userService.getRelatedProjectGroups(userId));
     }
 }

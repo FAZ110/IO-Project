@@ -67,6 +67,53 @@ export const useUserWorkload = (userId?: string) => {
   };
 }
 
+export const useMyProfileQuery = () => {
+  return useQuery({
+    queryKey: usersKeys.me.queryKey,
+    queryFn: () => userManagementService.getMyProfile(),
+  });
+};
+
+export const useUserQuery = (userId?: string) => {
+  return useQuery({
+    queryKey: usersKeys.detail(userId ?? '').queryKey,
+    queryFn: () => userManagementService.getUser(userId as string),
+    enabled: !!userId,
+  });
+};
+
+export const useUserSubordinatesQuery = (userId?: string) => {
+  return useQuery({
+    queryKey: usersKeys.subordinates(userId ?? '').queryKey,
+    queryFn: () => userManagementService.getSubordinates(userId as string),
+    enabled: !!userId,
+  });
+};
+
+export const useUserManagedProjectsQuery = (userId?: string) => {
+  return useQuery({
+    queryKey: usersKeys.projects(userId ?? '').queryKey,
+    queryFn: () => userManagementService.getManagedProjects(userId as string),
+    enabled: !!userId,
+  });
+};
+
+export const useUserProjectMembershipsQuery = (userId?: string) => {
+  return useQuery({
+    queryKey: usersKeys.memberships(userId ?? '').queryKey,
+    queryFn: () => userManagementService.getProjectMemberships(userId as string),
+    enabled: !!userId,
+  });
+};
+
+export const useUserOwnedGroupsQuery = (userId?: string) => {
+  return useQuery({
+    queryKey: usersKeys.groups(userId ?? '').queryKey,
+    queryFn: () => userManagementService.getOwnedGroups(userId as string),
+    enabled: !!userId,
+  });
+};
+
 export const usePotentialSupervisors = (searchTerm: string) => {
   const linearManagersQuery = useQuery({
     queryKey: usersKeys.search(searchTerm, UserSearchableRole.LINEAR_MANAGER).queryKey,

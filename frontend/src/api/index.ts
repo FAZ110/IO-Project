@@ -6,7 +6,8 @@ export const employeeAssignmentsKeys = createQueryKeys('employee-assignments', {
 })
 
 export const qualificationsKeys = createQueryKeys('qualifications', {
-  mine: null, // me/qualifications
+  mine: null,
+  byUser: (userId: string) => [userId],
   suggestions: (query: string) => [query],
 });
 

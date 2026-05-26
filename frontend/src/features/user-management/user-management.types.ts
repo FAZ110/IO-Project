@@ -33,6 +33,7 @@ export interface UserResponse {
   role: UserRole;
   status: UserStatus;
   supervisorEmail: string | null;
+  supervisor: SimpleUserResponse | null;
 }
 
 export interface SimpleUserResponse {
@@ -56,4 +57,32 @@ export interface UserListParams {
 
 export interface UserWorkloadResponse {
   workload: ChartInterval[];
+}
+
+export interface UserProjectRoleResponse {
+  roleName: string;
+  startDate: string;
+  endDate: string;
+  utilizationPercentage: number;
+}
+
+export interface OwnedGroupResponse {
+  id: string;
+  name: string;
+  description: string;
+  groupType: import('@/features/project_group/project_group.types').ProjectGroupType;
+  projectCount: number;
+  activeProjectCount: number;
+  isOwner: boolean;
+}
+
+export interface UserProjectMembershipResponse {
+  id: string;
+  title: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  group: import('@/features/project_group/project_group.types').GroupBasicResponse | null;
+  roles: UserProjectRoleResponse[];
 }
