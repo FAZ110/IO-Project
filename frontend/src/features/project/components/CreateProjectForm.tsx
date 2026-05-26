@@ -1,4 +1,4 @@
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { CreateProjectView } from "./CreateProjectForm.view.tsx";
 import type { ProjectCreationRequest } from "../project.types.ts";
 import { useCreateProject } from "../project.hooks.ts";
@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CreateProjectFormSchema } from "../project.schema.ts";
 import { getNextDateFromToday } from "../project.utils.ts";
+import { Form } from "@/components/ui/form";
 
 export const CreateProjectForm = () => {
   const methods = useForm<ProjectCreationRequest>({
@@ -29,8 +30,7 @@ export const CreateProjectForm = () => {
     },
   });
 
-  const { data: groupsData = [] } = useProjectGroups();
-  const groups = groupsData.map(g => ({ id: g.id, name: g.name }));
+  const { data: groups = [] } = useProjectGroups();
 
   const [sponsorsQuery, setSponsorsQuery] = useState("");
   const [sponsorsQueryValue] = useDebounce(sponsorsQuery, 300);
@@ -54,7 +54,7 @@ export const CreateProjectForm = () => {
   });
 
   return (
-    <FormProvider {...methods}>
+    <Form {...methods}>
       <CreateProjectView
         onSubmitProject={onSubmit}
         isPending={mutation.isPending}
@@ -64,7 +64,7 @@ export const CreateProjectForm = () => {
         onSponsorSearch={setSponsorsQuery}
         onCommitteeSearch={setCommitteeQuery}
       />
-    </FormProvider>
+    </Form>
   );
 };
 

@@ -6,8 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.agh.project_manager.controller.dto.project.projectrisk.ProjectRiskRequest;
-import pl.edu.agh.project_manager.controller.dto.project.projectrisk.ProjectRiskResponse;
+import pl.edu.agh.project_manager.controller.dto.project_risk.ProjectRiskRequest;
+import pl.edu.agh.project_manager.controller.dto.project_risk.ProjectRiskResponse;
 import pl.edu.agh.project_manager.service.project.ProjectRiskService;
 
 import java.util.List;
