@@ -8,16 +8,17 @@ import java.util.UUID;
 public record SystemNewEmployeeEvent(
         UUID employeeId,
         User recipient,
-        String message
+        String employeeFullName
 ) implements NotificationEvent {
 
     @Override
-    public UUID referenceId() {
-        return employeeId;
-    }
+    public UUID referenceId() { return employeeId; }
 
     @Override
-    public NotificationType type() {
-        return NotificationType.SYSTEM_NEW_EMPLOYEE;
+    public NotificationType type() { return NotificationType.SYSTEM_NEW_EMPLOYEE; }
+
+    @Override
+    public String buildMessage() {
+        return String.format("Nowy pracownik %s aktywował swoje konto i dołączył do Twojego zespołu.", employeeFullName);
     }
 }

@@ -3,11 +3,18 @@ import { userManagementService } from './user-management.service';
 import { UserSearchableRole, type InviteUserRequest, type UserListParams } from './user-management.types';
 import { usersKeys } from './query-keys';
 
-export const useUsersQuery = (page: number, size: number, filters: UserListParams = {}) =>
-  useQuery({
+export const useUsersQuery = (page: number, size: number, filters: UserListParams = {}) => {
+  const usersQuery = useQuery({
     queryKey: usersKeys.list(page, size, filters).queryKey,
     queryFn: () => userManagementService.getUsers({ pageNumber: page, pageSize: size, ...filters }),
   });
+
+  return {
+    users: usersQuery.data,
+    isLoading: usersQuery.isLoading,
+    isError: usersQuery.isError,
+  }
+}
 
 export const useInviteUserMutation = () => {
   const queryClient = useQueryClient();
@@ -33,17 +40,101 @@ export const useResendInvitationMutation = () =>
   });
 
 export const useSearchUsers = (searchTerm: string) => {
-    return useQuery({
-        queryKey: usersKeys.search(searchTerm).queryKey,
-        queryFn: () => userManagementService.searchUsers(searchTerm),
-        enabled: searchTerm.length >= 2
-    });
+  const usersQuery = useQuery({
+    queryKey: usersKeys.search(searchTerm).queryKey,
+    queryFn: () => userManagementService.searchUsers(searchTerm),
+    enabled: searchTerm.length >= 2
+  });
+
+  return {
+    users: usersQuery.data,
+    isLoadingUsers: usersQuery.isLoading,
+    isErrorUsers: usersQuery.isError,
+  }
 }
 
-export const useSearchLinearManagers = (searchTerm: string) => {
-    return useQuery({
-        queryKey: usersKeys.search(searchTerm, UserSearchableRole.LINEAR_MANAGER).queryKey,
-        queryFn: () => userManagementService.searchUsers(searchTerm, UserSearchableRole.LINEAR_MANAGER),
-        enabled: searchTerm.length >= 2
-    });
+export const useUserWorkload = (userId?: string) => {
+  const workloadQuery = useQuery({
+    queryKey: usersKeys.workload(userId).queryKey,
+    queryFn: () => userManagementService.getUserWorkload(userId),
+    enabled: !!userId
+  });
+
+  return {
+    userWorkload: workloadQuery.data?.workload,
+    isLoadingWorkload: workloadQuery.isLoading,
+    isErrorWorkload: workloadQuery.isError,
+  };
+}
+
+export const useMyProfileQuery = () => {
+  return useQuery({
+    queryKey: usersKeys.me.queryKey,
+    queryFn: () => userManagementService.getMyProfile(),
+  });
+};
+
+export const useUserQuery = (userId?: string) => {
+  return useQuery({
+    queryKey: usersKeys.detail(userId ?? '').queryKey,
+    queryFn: () => userManagementService.getUser(userId as string),
+    enabled: !!userId,
+  });
+};
+
+export const useUserSubordinatesQuery = (userId?: string) => {
+  return useQuery({
+    queryKey: usersKeys.subordinates(userId ?? '').queryKey,
+    queryFn: () => userManagementService.getSubordinates(userId as string),
+    enabled: !!userId,
+  });
+};
+
+export const useUserManagedProjectsQuery = (userId?: string) => {
+  return useQuery({
+    queryKey: usersKeys.projects(userId ?? '').queryKey,
+    queryFn: () => userManagementService.getManagedProjects(userId as string),
+    enabled: !!userId,
+  });
+};
+
+export const useUserProjectMembershipsQuery = (userId?: string) => {
+  return useQuery({
+    queryKey: usersKeys.memberships(userId ?? '').queryKey,
+    queryFn: () => userManagementService.getProjectMemberships(userId as string),
+    enabled: !!userId,
+  });
+};
+
+export const useUserOwnedGroupsQuery = (userId?: string) => {
+  return useQuery({
+    queryKey: usersKeys.groups(userId ?? '').queryKey,
+    queryFn: () => userManagementService.getOwnedGroups(userId as string),
+    enabled: !!userId,
+  });
+};
+
+export const usePotentialSupervisors = (searchTerm: string) => {
+  const linearManagersQuery = useQuery({
+    queryKey: usersKeys.search(searchTerm, UserSearchableRole.LINEAR_MANAGER).queryKey,
+    queryFn: () => userManagementService.searchUsers(searchTerm, UserSearchableRole.LINEAR_MANAGER),
+    enabled: searchTerm.length >= 2
+  });
+
+  const authorityQuery = useQuery({
+    queryKey: usersKeys.search(searchTerm, UserSearchableRole.AUTHORITY).queryKey,
+    queryFn: () => userManagementService.searchUsers(searchTerm, UserSearchableRole.AUTHORITY),
+    enabled: searchTerm.length >= 2
+  });
+
+  const combinedData = [
+    ...(linearManagersQuery.data || []),
+    ...(authorityQuery.data || [])
+  ];
+
+  return {
+    data: combinedData,
+    isLoading: linearManagersQuery.isLoading || authorityQuery.isLoading,
+    isError: linearManagersQuery.isError || authorityQuery.isError
+  };
 }

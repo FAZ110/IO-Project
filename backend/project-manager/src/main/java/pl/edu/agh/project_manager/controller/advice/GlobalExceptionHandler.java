@@ -5,10 +5,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
+
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
@@ -58,6 +62,21 @@ public class GlobalExceptionHandler {
         var error = ApiErrorCode.INTERNAL_SERVER_ERROR;
 
         var body = new ApiErrorResponse(error.getCode(), error.getMessage());
+
+        return ResponseEntity
+                .status(error.getHttpStatus())
+                .body(body);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+
+        var error = ApiErrorCode.VALIDATION_FAILED;
+
+        var body = new ApiErrorResponse(error.getCode(), message);
 
         return ResponseEntity
                 .status(error.getHttpStatus())

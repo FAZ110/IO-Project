@@ -6,17 +6,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import pl.edu.agh.project_manager.controller.dto.project_group.AllGroupsResponse;
 import pl.edu.agh.project_manager.controller.dto.project_group.SingleGroupDetailsResponse;
+import pl.edu.agh.project_manager.domain.entity.project.Project;
 import pl.edu.agh.project_manager.domain.entity.projectgroup.ProjectGroup;
 import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.enums.GroupType;
+import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.project.ProjectRepository;
 import pl.edu.agh.project_manager.repository.projectgroup.ProjectGroupRepository;
 import pl.edu.agh.project_manager.repository.user.UserRepository;
 import pl.edu.agh.project_manager.service.command.project.ProjectGroupCreationCommand;
+import pl.edu.agh.project_manager.security.UserPrincipal;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,11 +75,40 @@ class ProjectGroupServiceTest {
     }
 
     @Test
-    @DisplayName("Should corect group types to WALLET and PROGRAMS")
+    @DisplayName("Should correct group types and filter projects by access, including unassigned")
+    @SuppressWarnings("unchecked")
     void getGroupTypes_Success() {
         UUID walletId = UUID.randomUUID();
         UUID programId = UUID.randomUUID();
+        UUID projectId1 = UUID.randomUUID();
+        UUID projectId2 = UUID.randomUUID();
+        UUID projectId3 = UUID.randomUUID();
         User owner = User.builder().name("John").surname("Doe").email("john@doe.com").build();
+        
+        UserPrincipal userPrincipal = new UserPrincipal(
+                UUID.randomUUID(), 
+                "test@test.com", 
+                "password", 
+                "John", 
+                "Doe", 
+                List.of(new SimpleGrantedAuthority("ROLE_COMMON")), 
+                UserRole.COMMON
+        );
+
+        Project project1 = new Project();
+        project1.setId(projectId1);
+        project1.setTitle("P1");
+        project1.setProjectManager(owner);
+
+        Project project2 = new Project();
+        project2.setId(projectId2);
+        project2.setTitle("P2");
+        project2.setProjectManager(owner);
+
+        Project project3 = new Project();
+        project3.setId(projectId3);
+        project3.setTitle("P3");
+        project3.setProjectManager(owner);
 
         ProjectGroup wallet = ProjectGroup.builder()
                 .id(walletId)
@@ -82,7 +116,10 @@ class ProjectGroupServiceTest {
                 .description("Description")
                 .owner(owner)
                 .groupType(GroupType.WALLET)
+                .projects(new ArrayList<>(List.of(project1, project2)))
                 .build();
+        project1.setProjectGroup(wallet);
+        project2.setProjectGroup(wallet);
 
         ProjectGroup program = ProjectGroup.builder()
                 .id(programId)
@@ -90,19 +127,28 @@ class ProjectGroupServiceTest {
                 .description("Description")
                 .owner(owner)
                 .groupType(GroupType.PROGRAM)
+                .projects(new ArrayList<>(List.of(project2)))
                 .build();
+        project2.setProjectGroup(program);
 
-        when(projectGroupRepository.getSingleGroupByGroupType(GroupType.WALLET)).thenReturn(List.of(wallet));
-        when(projectGroupRepository.getSingleGroupByGroupType(GroupType.PROGRAM)).thenReturn(List.of(program));
+        when(projectRepository.findAll(any(Specification.class))).thenReturn(List.of(project1, project2, project3));
 
         // When
-        AllGroupsResponse  response = projectGroupsService.getAllGroups();
+        AllGroupsResponse response = projectGroupsService.getAllGroups(userPrincipal);
 
         // Then
         assertThat(response.wallets()).hasSize(1);
-        assertThat(response.programs()).hasSize(1);
         assertThat(response.wallets().getFirst().id()).isEqualTo(wallet.getId());
+        assertThat(response.wallets().getFirst().projects()).hasSize(1);
+        assertThat(response.wallets().getFirst().projects().getFirst().id()).isEqualTo(projectId1);
+
+        assertThat(response.programs()).hasSize(1);
         assertThat(response.programs().getFirst().id()).isEqualTo(program.getId());
+        assertThat(response.programs().getFirst().projects()).hasSize(1);
+        assertThat(response.programs().getFirst().projects().getFirst().id()).isEqualTo(projectId2);
+        
+        assertThat(response.unassigned()).hasSize(1);
+        assertThat(response.unassigned().getFirst().id()).isEqualTo(projectId3);
     }
 
     @Test

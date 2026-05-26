@@ -37,7 +37,7 @@ export const UserTable = () => {
     setPage(0);
   };
 
-  const { data, isLoading, isError } = useUsersQuery(page, PAGE_SIZE, filters);
+  const { users, isLoading, isError } = useUsersQuery(page, PAGE_SIZE, filters);
   const deleteMutation = useDeleteUserMutation();
   const resendMutation = useResendInvitationMutation();
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -67,7 +67,7 @@ export const UserTable = () => {
         onStatusChange={handleStatusChange}
       />
       <UserTableView
-        users={data?.items ?? []}
+        users={users?.items ?? []}
         onDelete={handleDelete}
         onResend={handleResend}
         isDeleting={deleteMutation.isPending}
@@ -75,7 +75,7 @@ export const UserTable = () => {
         isResending={resendMutation.isPending}
         resendingId={resendingId}
       />
-      {data && data.totalPages > 1 && (
+      {users && users.totalPages > 1 && (
         <Pagination className="mt-4">
           <PaginationContent>
 
@@ -84,15 +84,15 @@ export const UserTable = () => {
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  if (data?.hasPreviousPage) setPage(p => p - 1);
+                  if (users?.hasPreviousPage) setPage(p => p - 1);
                 }}
-                className={!data.hasPreviousPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                className={!users.hasPreviousPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
               />
             </PaginationItem>
 
 ont            <PaginationItem>
               <span className="text-sm font-medium text-slate-600 px-4">
-                Strona {data.pageNumber + 1} z {data.totalPages}
+                Strona {users.pageNumber + 1} z {users.totalPages}
               </span>
             </PaginationItem>
 
@@ -101,9 +101,9 @@ ont            <PaginationItem>
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  if (data?.hasNextPage) setPage(p => p + 1);
+                  if (users?.hasNextPage) setPage(p => p + 1);
                 }}
-                className={!data.hasNextPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                className={!users.hasNextPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
               />
             </PaginationItem>
 

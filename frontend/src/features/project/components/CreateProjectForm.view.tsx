@@ -1,188 +1,158 @@
 import { useFieldArray, useFormContext } from "react-hook-form";
 import type { ProjectCreationRequest } from "../project.types.ts";
-import { useState, useCallback } from "react";
 import type { SimpleUserResponse } from "@/features/user-management";
+import type { GroupBasicResponse } from "@/features/project_group/project_group.types.ts";
 import { UserAutocomplete } from "./UserAutocomplete.tsx";
-import { StepProgressTracker } from "./StepProgressTracker.tsx";
 import { StepBasicInformation } from "./StepBasicInformation.view.tsx";
 import { StepMilestonesAndRisks } from "./StepMilestoneAndRisk.tsx";
-import { StepNavigation } from "./StepNavigation.tsx";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { getNextDateFromToday } from "../project.utils.ts";
 
 interface CreateProjectViewProps {
   onSubmitProject: () => Promise<void>;
   isPending: boolean;
-  groups: { id: string; name: string }[];
+  groups: GroupBasicResponse[];
   foundSponsors: SimpleUserResponse[];
   foundCommittee: SimpleUserResponse[];
   onSponsorSearch: (query: string) => void;
   onCommitteeSearch: (query: string) => void;
-  message?: string;
 }
 
-export const CreateProjectView = ({ onSubmitProject, isPending, groups, foundSponsors, foundCommittee, onSponsorSearch, onCommitteeSearch, message }: CreateProjectViewProps) => {
+export const CreateProjectView = ({
+                                    onSubmitProject,
+                                    isPending,
+                                    groups,
+                                    foundSponsors,
+                                    foundCommittee,
+                                    onSponsorSearch,
+                                    onCommitteeSearch,
+                                  }: CreateProjectViewProps) => {
   const {
     register,
     control,
-    formState: { errors },
-    clearErrors,
+    formState: { errors, isValid },
     watch,
     setValue,
-    getValues,
-    trigger,
   } = useFormContext<ProjectCreationRequest>();
 
-  const milestones = watch("milestones");
+  const startDate = watch("startDate");
+  const endDate = watch("endDate");
+  const today = getNextDateFromToday(0);
+
   const {
     fields: riskFields,
     append: appendRisk,
     remove: removeRisk,
-  } = useFieldArray({
-    control,
-    name: "risks",
-  });
+  } = useFieldArray({ control, name: "risks" });
+
   const {
     fields: milestonesFields,
     append: appendMilestone,
     remove: removeMilestone,
-  } = useFieldArray({
-    control,
-    name: "milestones",
-  });
-
-
-  // const {
-  //   fields: roleFields,
-  //   append: appendRole,
-  //   remove: removeRole,
-  // } = useFieldArray({
-  //   control,
-  //   name: "roles",
-  // });
-
-  const [usersById, setUsersById] = useState<Record<string, SimpleUserResponse>>({});
-
-  const rememberUser = useCallback((user: SimpleUserResponse) => {
-    setUsersById((prev) => ({ ...prev, [user.id]: user }));
-  }, []);
-
-  const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 2;
-
-  const handleNextStep = async () => {
-    if (currentStep !== 1) return;
-
-    const isValid = await trigger(["title", "description", "startDate", "endDate", "sponsors", "committee", "milestones"]);
-
-    if (isValid) {
-      setCurrentStep((prev) => prev + 1);
-    }
-  };
-
-  const handlePrevStep = () => {
-    setCurrentStep((prev) => prev - 1);
-  };
+  } = useFieldArray({ control, name: "milestones" });
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Utwórz Nowy Projekt</h2>
-
-      {message && (
-        <div className={`p-4 mb-4 rounded ${message.includes("Błąd") ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
-          {message}
-        </div>
-      )}
-
-      <StepProgressTracker currentStep={currentStep} steps={["Podstawowe informacje", "Role i alokacja czasu"]} />
-
-      <form className="space-y-6 text-left">
-        {currentStep === 1 && (
-          <>
+    <div className="max-w-3xl mx-auto p-6 mt-10">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl text-center">Utwórz Nowy Projekt</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form
+            className="space-y-6"
+            onSubmit={(e) => {
+              e.preventDefault();
+              onSubmitProject();
+            }}
+          >
             <StepBasicInformation register={register} errors={errors} groups={groups} />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Data rozpoczęcia</label>
-                <input
-                  type="date"
-                  {...register("startDate")}
-                  className={`w-full border rounded px-3 py-2 ${errors.startDate ? "border-red-500" : "border-gray-300"}`}
-                />
-                {errors.startDate?.message && <p className="text-red-500 text-sm mt-1">{errors.startDate.message as string}</p>}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Data zakończenia</label>
-                <input
-                  type="date"
-                  {...register("endDate")}
-                  className={`w-full border rounded px-3 py-2 ${errors.endDate ? "border-red-500" : "border-gray-300"}`}
-                />
-                {errors.endDate?.message && <p className="text-red-500 text-sm mt-1">{errors.endDate.message as string}</p>}
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={control}
+                name="startDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Data rozpoczęcia *</FormLabel>
+                    <FormControl>
+                      <Input type="date" min={today} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={control}
+                name="endDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Data zakończenia *</FormLabel>
+                    <FormControl>
+                      <Input type="date" min={startDate || today} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
-            <UserAutocomplete
-              label="Sponsorzy"
-              foundUsers={foundSponsors}
-              onSearch={onSponsorSearch}
-              setValue={setValue}
-              getValues={getValues}
-              roles="sponsors"
-              clearErrors={clearErrors}
-              usersById={usersById}
-              onRememberUser={rememberUser}
-            />
+            <Separator />
 
-            {errors.sponsors?.message && <p className="text-red-500 text-sm mt-2">{errors.sponsors.message}</p>}
+            <div className="space-y-4">
+              <h3 className="text-base font-semibold">Uczestnicy Główni</h3>
+              <UserAutocomplete
+                label="Sponsorzy"
+                foundUsers={foundSponsors}
+                onSearch={onSponsorSearch}
+                control={control}
+                setValue={setValue}
+                roles="sponsors"
+              />
+              <UserAutocomplete
+                label="Komitet Sterujący"
+                foundUsers={foundCommittee}
+                onSearch={onCommitteeSearch}
+                control={control}
+                setValue={setValue}
+                roles="committee"
+              />
+            </div>
 
-            <UserAutocomplete
-              label="Komitet Sterujący"
-              foundUsers={foundCommittee}
-              onSearch={onCommitteeSearch}
-              setValue={setValue}
-              getValues={getValues}
-              roles="committee"
-              clearErrors={clearErrors}
-              usersById={usersById}
-              onRememberUser={rememberUser}
-            />
+            <Separator />
 
-            {errors.committee?.message && <p className="text-red-500 text-sm mt-2">{errors.committee.message}</p>}
+            <div className="space-y-6">
+              <StepMilestonesAndRisks
+                register={register}
+                control={control}
+                errors={errors}
+                riskFields={riskFields}
+                appendRisk={appendRisk}
+                removeRisk={removeRisk}
+                milestonesFields={milestonesFields}
+                appendMilestone={appendMilestone}
+                removeMilestone={removeMilestone}
+                projectStartDate={startDate}
+                projectEndDate={endDate}
+              />
+            </div>
 
-            <StepMilestonesAndRisks
-              register={register}
-              errors={errors}
-              riskFields={riskFields}
-              appendRisk={appendRisk}
-              removeRisk={removeRisk}
-              milestones={milestones}
-              milestonesFields={milestonesFields}
-              appendMilestone={appendMilestone}
-              removeMilestone={removeMilestone}
-            />
-          </>
-        )}
-
-        {currentStep === 2 && (
-          <div className="py-12 text-center bg-gray-50 rounded-lg border border-gray-200 border-dashed">
-            <h3 className="text-lg font-medium text-gray-700">Role i alokacja czasu (Wkrótce)</h3>
-            <p className="text-gray-500 mt-2">
-              Moduł składania wniosków i doboru ról zostanie uruchomiony w późniejszym etapie.
-              Możesz zapisać projekt bez przypisywania zasobów.
-            </p>
-            {/* Wyciszony komponent - zakomentowany na wszelki wypadek */}
-            {/* <StepRoleUtilization roleFields={roleFields} appendRole={appendRole} removeRole={removeRole} /> */}
-          </div>
-        )}
-
-        <StepNavigation
-          isPending={isPending}
-          currentStep={currentStep}
-          totalSteps={totalSteps}
-          handleNextStep={handleNextStep}
-          handlePrevStep={handlePrevStep}
-          handleSubmitProject={onSubmitProject}
-        />
-      </form>
+            <div className="flex justify-end pt-2">
+              <Button
+                type="submit"
+                disabled={isPending || !isValid}
+                className="w-full sm:w-auto px-8"
+              >
+                {isPending ? "Tworzenie..." : "Zapisz i utwórz projekt"}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };

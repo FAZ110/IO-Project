@@ -5,7 +5,7 @@ import { QualificationStatusBadge } from './QualificationStatusBadge';
 
 interface QualificationItemProps {
   qualification: QualificationResponse;
-  onDelete: (id: string) => void;
+  onDelete?: (id: string) => void;
   isDeleting: boolean;
 }
 
@@ -17,15 +17,17 @@ export const QualificationItem = ({ qualification, onDelete, isDeleting }: Quali
 
     <QualificationStatusBadge status={qualification.status} />
 
-    <Button
-      variant="ghost"
-      size="icon-sm"
-      onClick={() => onDelete(qualification.id)}
-      disabled={isDeleting}
-      aria-label={`Usuń kompetencję ${qualification.name}`}
-      className="text-muted-foreground hover:text-destructive cursor-pointer"
-    >
-      <Trash2 className="size-4" />
-    </Button>
+    {onDelete && (
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        onClick={() => onDelete(qualification.id)}
+        disabled={isDeleting}
+        aria-label={`Usuń kompetencję ${qualification.name}`}
+        className="text-muted-foreground hover:text-destructive cursor-pointer"
+      >
+        <Trash2 className="size-4" />
+      </Button>
+    )}
   </li>
 );

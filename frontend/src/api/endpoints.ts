@@ -9,9 +9,16 @@ export const ENDPOINTS = {
         LIST: '/users',
         DETAIL: (id: string) => `/users/${id}`,
         RESEND_INVITATION: '/users/invitation',
-        SEARCH_USERS: '/users/search'
+        WORKLOAD: (id?: string) => `/users/${id}/workload`,
+        SEARCH_USERS: '/users/search',
+        QUALIFICATIONS: (id: string) => `/users/${id}/qualifications`,
+        SUBORDINATES: (id: string) => `/users/${id}/subordinates`,
+        PROJECTS: (id: string) => `/users/${id}/projects`,
+        MEMBERSHIPS: (id: string) => `/users/${id}/memberships`,
+        GROUPS: (id: string) => `/users/${id}/groups`,
     },
     ME: {
+        PROFILE: '/me',
         QUALIFICATIONS: '/me/qualifications',
         QUALIFICATION: (id: string) => `/me/qualifications/${id}`,
         PASSWORD: '/me/password',
@@ -22,15 +29,13 @@ export const ENDPOINTS = {
     },
     PROJECT: {
         BASE: '/projects',
-        DETAIL: (id: string) => `/projects/${id}`,
-        RISK: {
-            LIST: (projectId: string) => `/projects/${projectId}/risks`
-        },
-        MEMBERS: (projectId: string) => `/projects/${projectId}/members`,
-        ROLES: {
-            STATUS_LIST: (projectId: string) => `/projects/${projectId}/roles/status`,
-            ALLOCATE: (roleId: string) => `/roles/${roleId}/allocation-requests`
-        }
+        DETAILS: (id: string) => ({
+            BASE: `/projects/${id}`,
+            RISKS: `/projects/${id}/risks`,
+            MEMBERS: `/projects/${id}/members`,
+            ASSIGNMENTS: `/projects/${id}/assignments`,
+            TIMELINE: `/projects/${id}/timeline`
+        }),
     },
     PROJECT_GROUP: {
         LIST_ALL: '/groups',
@@ -47,5 +52,12 @@ export const ENDPOINTS = {
         QUALIFICATIONS: '/approvals/qualifications',
         QUALIFICATION_DETAILS: '/approvals/qualifications/details',
         QUALIFICATIONS_BULK_UPDATE: '/approvals/qualifications/bulk-update'
+    },
+    NOTIFICATIONS: {
+      BASE: '/notifications',
+      STREAM: '/notifications/stream',
+      UNREAD_COUNT: 'notifications/unread-count',
+      MARK_READ: (id: string) => `/notifications/${id}/mark-as-read`,
+      MARK_ALL_READ: '/notifications/mark-all-as-read',
     }
 } as const;

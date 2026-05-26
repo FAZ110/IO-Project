@@ -11,7 +11,7 @@ export interface EmployeeAssignment {
     id: string;
     projectName: string;
     projectId: string;
-    projectRoleName: string;
+    roleName: string;
     employeeName: string;
     employeeSurname: string;
     status: EmployeeAssignmentStatus;

@@ -1,6 +1,12 @@
 import type { UserRole } from '@/features/auth/auth.types';
+import type { ChartInterval } from '@/features/employee-assignments/employee-assignments.types';
 
-export type UserStatus = 'PENDING' | 'ACTIVE' | 'EXPIRED';
+export const UserStatus = {
+  PENDING: 'PENDING',
+  ACTIVE: 'ACTIVE',
+  EXPIRED: 'EXPIRED',
+} as const;
+export type UserStatus = typeof UserStatus[keyof typeof UserStatus];
 
 export const AdminAssignableRole = {
   COMMON: 'COMMON',
@@ -27,19 +33,14 @@ export interface UserResponse {
   role: UserRole;
   status: UserStatus;
   supervisorEmail: string | null;
+  supervisor: SimpleUserResponse | null;
 }
 
 export interface SimpleUserResponse {
   id: string,
   name: string,
   surname: string
-}
-
-export interface BasicUserResponse {
-  id: string,
-  email: string,
-  name: string,
-  surname: string
+  email: string
 }
 
 export interface InviteUserRequest {
@@ -52,4 +53,36 @@ export interface UserListParams {
   userRole?: UserRole;
   status?: UserStatus;
   search?: string;
+}
+
+export interface UserWorkloadResponse {
+  workload: ChartInterval[];
+}
+
+export interface UserProjectRoleResponse {
+  roleName: string;
+  startDate: string;
+  endDate: string;
+  utilizationPercentage: number;
+}
+
+export interface OwnedGroupResponse {
+  id: string;
+  name: string;
+  description: string;
+  groupType: import('@/features/project_group/project_group.types').ProjectGroupType;
+  projectCount: number;
+  activeProjectCount: number;
+  isOwner: boolean;
+}
+
+export interface UserProjectMembershipResponse {
+  id: string;
+  title: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  group: import('@/features/project_group/project_group.types').GroupBasicResponse | null;
+  roles: UserProjectRoleResponse[];
 }

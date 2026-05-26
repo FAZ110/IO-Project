@@ -1,6 +1,7 @@
 package pl.edu.agh.project_manager.service.approval;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.project_manager.controller.dto.approvals.QualificationDetailsResponse;
@@ -11,13 +12,16 @@ import pl.edu.agh.project_manager.domain.entity.user.Qualification;
 import pl.edu.agh.project_manager.domain.entity.user.Skill;
 import pl.edu.agh.project_manager.domain.entity.user.User;
 import pl.edu.agh.project_manager.domain.enums.QualificationStatus;
+import pl.edu.agh.project_manager.domain.event.NotificationEvent;
+import pl.edu.agh.project_manager.domain.event.QualificationAcceptedEvent;
+import pl.edu.agh.project_manager.domain.event.QualificationRejectedEvent;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.user.QualificationRepository;
 import pl.edu.agh.project_manager.repository.user.UserRepository;
+import pl.edu.agh.project_manager.service.notification.NotificationSender;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +29,7 @@ import java.util.stream.Collectors;
 public class QualificationManagementService {
     private final QualificationRepository qualificationRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public List<QualificationRequestResponse> getRecordsForManager(UUID managerId) {
@@ -62,16 +67,43 @@ public class QualificationManagementService {
             throw new ApplicationException(ApiErrorCode.QUALIFICATION_OWNER_NOT_SUBORDINATE);
         }
 
+        Map<User, List<String>> acceptedSkillsByUser = new HashMap<>();
+        Map<User, List<String>> rejectedSkillsByUser = new HashMap<>();
+
         for (Qualification qualification : allowedQualifications) {
             validateWaitingStatus(qualification);
 
+            User owner = qualification.getUser();
             var action = activeRequestsMap.get(qualification.getId()).action();
+            String skillName = qualification.getSkill().getName();
 
             switch (action) {
-                case QualificationUpdateAction.ACCEPT -> qualification.accept();
-                case QualificationUpdateAction.REJECT -> qualification.reject();
+                case ACCEPT -> {
+                    qualification.accept();
+                    acceptedSkillsByUser.computeIfAbsent(owner, k -> new ArrayList<>()).add(skillName);
+                }
+                case REJECT -> {
+                    qualification.reject();
+                    rejectedSkillsByUser.computeIfAbsent(owner, k -> new ArrayList<>()).add(skillName);
+                }
             }
         }
+
+        acceptedSkillsByUser.forEach((user, skills) -> {
+            eventPublisher.publishEvent(new QualificationAcceptedEvent(
+                    user.getId(),
+                    user,
+                    skills
+            ));
+        });
+
+        rejectedSkillsByUser.forEach((user, skills) -> {
+            eventPublisher.publishEvent(new QualificationRejectedEvent(
+                    user.getId(),
+                    user,
+                    skills
+            ));
+        });
     }
 
     @Transactional(readOnly = true)

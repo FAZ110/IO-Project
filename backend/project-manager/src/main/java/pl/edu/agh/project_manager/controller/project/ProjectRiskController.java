@@ -6,8 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.agh.project_manager.controller.dto.project.RiskRequest;
-import pl.edu.agh.project_manager.controller.dto.project.RiskResponse;
+import pl.edu.agh.project_manager.controller.dto.project_risk.ProjectRiskRequest;
+import pl.edu.agh.project_manager.controller.dto.project_risk.ProjectRiskResponse;
 import pl.edu.agh.project_manager.service.project.ProjectRiskService;
 
 import java.util.List;
@@ -21,11 +21,11 @@ public class ProjectRiskController {
 
     @PostMapping
     @PreAuthorize("@projectAccess.isProjectManagerForProject(#projectId, authentication.principal)")
-    public ResponseEntity<RiskResponse> createProjectRisk(
+    public ResponseEntity<ProjectRiskResponse> createProjectRisk(
             @PathVariable UUID projectId,
-            @Valid @RequestBody RiskRequest riskRequest
+            @Valid @RequestBody ProjectRiskRequest riskRequest
     ) {
-        RiskResponse createdRisk = riskService.createProjectRisk(
+        ProjectRiskResponse createdRisk = riskService.createProjectRisk(
                 riskRequest.toCommand(), projectId
         );
 
@@ -33,22 +33,22 @@ public class ProjectRiskController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMINISTRATOR', 'AUTHORITY') or @projectAccess.canAccessProject(#projectId, authentication.principal)")
-    public ResponseEntity<List<RiskResponse>> getRisks(
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR', 'AUTHORITY') or @projectAccess.canAccessProject(#projectId, authentication.principal)")
+    public ResponseEntity<List<ProjectRiskResponse>> getRisks(
             @PathVariable UUID projectId
     ) {
-        List<RiskResponse> risks = riskService.getProjectRisks(projectId);
+        List<ProjectRiskResponse> risks = riskService.getProjectRisks(projectId);
         return ResponseEntity.ok(risks);
     }
 
     @PatchMapping("/{riskId}")
     @PreAuthorize("@projectAccess.isProjectManagerForProject(#projectId, authentication.principal)")
-    public ResponseEntity<RiskResponse> updateProjectRisk(
+    public ResponseEntity<ProjectRiskResponse> updateProjectRisk(
             @PathVariable UUID projectId,
             @PathVariable UUID riskId,
-            @Valid @RequestBody RiskRequest riskRequest
+            @Valid @RequestBody ProjectRiskRequest riskRequest
     ) {
-        RiskResponse updatedRisk = riskService.updateProjectRisk(
+        ProjectRiskResponse updatedRisk = riskService.updateProjectRisk(
                 projectId,
                 riskId,
                 riskRequest.toCommand()

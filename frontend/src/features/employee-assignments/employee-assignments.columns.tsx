@@ -26,7 +26,7 @@ export const getColumns = ({ onVerify, onReject }: ColumnActions): ColumnDef<Emp
     header: "Imię i nazwisko",
   },
   {
-    accessorKey: "projectRoleName",
+    accessorKey: "roleName",
     header: "Rola",
   },
   {

@@ -6,7 +6,8 @@ export const employeeAssignmentsKeys = createQueryKeys('employee-assignments', {
 })
 
 export const qualificationsKeys = createQueryKeys('qualifications', {
-  mine: null, // me/qualifications
+  mine: null,
+  byUser: (userId: string) => [userId],
   suggestions: (query: string) => [query],
 });
 
@@ -15,5 +16,10 @@ export const approvalsKeys = createQueryKeys('approvals', {
   details: (userId: string) => [userId],
 });
 
+export const notificationsKeys = createQueryKeys('notifications', {
+  feed: (unreadOnly: boolean, page: number) => [{ unreadOnly, page }],
+  unreadCount: () => ['count'],
+  infinite: (unreadOnly: boolean) => [{ unreadOnly, type: 'infinite' }],
+});
 
-export const queryKeys = mergeQueryKeys(employeeAssignmentsKeys, qualificationsKeys, approvalsKeys);
+export const queryKeys = mergeQueryKeys(employeeAssignmentsKeys, qualificationsKeys, approvalsKeys, notificationsKeys)

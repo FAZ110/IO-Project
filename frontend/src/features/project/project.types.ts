@@ -1,86 +1,98 @@
-import type { BasicUserResponse, UserResponse } from "@/features/user-management";
+import type { SimpleUserResponse, UserResponse } from "@/features/user-management";
+import type { EmployeeAssignmentStatus } from "@/features/employee-assignments/employee-assignments.types";
+import type { GroupBasicResponse } from '@/features/project_group/project_group.types';
 
 export interface ProjectCreationRequest {
-    title: string;
-    description: string;
-    projectGroupId?: string | null;
-    startDate: string;
-    endDate: string;
-    sponsors: string[];
-    committee: string[];
-    milestones: Milestone[];
-    risks: Risk[];
-    roles: ProjectRole[]; // TODO: do usuniecia
+  title: string;
+  description: string;
+  projectGroupId?: string | null;
+  startDate: string;
+  endDate: string;
+  sponsors: string[];
+  committee: string[];
+  milestones: Milestone[];
+  risks: Risk[];
 }
 
 export interface ProjectMembersResponse {
-    sponsors: BasicUserResponse[];
-    committees: BasicUserResponse[];
-    employees: BasicUserResponse[];
+  sponsors: SimpleUserResponse[];
+  committees: SimpleUserResponse[];
+  employees: SimpleUserResponse[];
 }
 
 export interface Risk {
-    name: string;
-    description: string;
-    probability: number;
+  name: string;
+  description: string;
+  probability: number;
+  impact: number;
 }
 
 export interface RiskResponse extends Risk {
-    id: string;
-}
-
-export interface SingleGroupResponse {
-    id: string;
-    name: string;
+  id: string;
+  value: number;
 }
 
 export interface ProjectResponse {
-    id: string;
-    title: string;
-    description: string;
-    isActive: boolean;
-    startDate: string;
-    endDate: string;
+  id: string;
+  title: string;
+  description: string;
+  isActive: boolean;
+  startDate: string;
+  endDate: string;
+  group?: GroupBasicResponse | null;
 }
 
 export interface Milestone {
-    date: string;
-    name: string;
-    description?: string;
+  date: string;
+  name: string;
+  description?: string;
 }
 
 export interface ProjectDetailsResponse {
-    id: string;
-    title: string;
-    description: string;
-    startDate: string;
-    endDate: string;
-    isActive: boolean;
-    manager: UserResponse;
+  id: string;
+  title: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  manager: UserResponse;
+  group?: GroupBasicResponse | null;
 }
 
-export interface ProjectRole {
-    name: string;
-    utilizationPercentages: number[];
+export interface ProjectTimelineResponse {
+  milestones: Milestone[];
+  assignments: EmployeeWithAssignmentsResponse[];
 }
 
-export const ProjectRoleStatus = {
-    OPEN: 'OPEN',
-    PENDING: 'PENDING',
-    FILLED: 'FILLED'
-} as const;
-
-export type ProjectRoleStatus = typeof ProjectRoleStatus[keyof typeof ProjectRoleStatus];
-
-export interface ProjectRoleStatusResponse {
-    id: string;
-    roleName: string;
-    status: ProjectRoleStatus;
-    utilizationPercentages: number[];
+export interface EmployeeWithAssignmentsResponse {
+  userId: string;
+  name: string;
+  surname: string;
+  email: string;
+  assignments: ProjectAssignmentResponse[];
 }
 
-export interface EmployeeAssignmentRequest {
-    userId: string;
-    projectId: string;
-    roleId: string;
+export interface ProjectAssignmentResponse {
+  id: string;
+  roleName: string;
+  startDate: string;
+  endDate: string;
+  utilizationPercentage: number;
+  status: EmployeeAssignmentStatus;
+}
+
+export interface CreateEmployeeAssignmentRequest {
+  projectId: string;
+  userId: string;
+  startDate: string;
+  endDate: string;
+  utilizationPercentage: number;
+  roleName: string;
+}
+
+export interface SearchProjectsRequest {
+  query?: string;
+  unassignedOnly?: boolean;
+  groupId?: string;
+  isActive?: boolean;
 }

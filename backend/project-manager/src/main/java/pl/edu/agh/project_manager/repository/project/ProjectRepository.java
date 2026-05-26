@@ -43,6 +43,9 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     @Query("SELECT DISTINCT p FROM Project p JOIN p.members m WHERE m.user.id = :userId")
     List<Project> findAllByMemberId(@Param("userId") UUID userId);
 
-    @EntityGraph(attributePaths = {"projectManager"})
+    @EntityGraph(attributePaths = {"projectManager", "projectGroup"})
     List<Project> findAll(Specification<Project> spec);
+
+    @EntityGraph(attributePaths = {"milestones"})
+    Optional<Project> findWithMilestonesById(UUID id);
 }

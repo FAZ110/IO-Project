@@ -56,7 +56,7 @@ class ProjectServiceTest {
                 LocalDate.now(),
                 null,
                 null,
-                new ArrayList<>(List.of(new RiskCommand("Risk", "Desc", 50))),
+                new ArrayList<>(List.of(new RiskCommand("Risk", "Desc", 5, 3))),
                 new ArrayList<>(List.of(new MilestoneCommand("Start", "Start desc", LocalDate.now()))),
                 new ArrayList<>(), // Sponsors
                 new ArrayList<>()  // Committee
@@ -101,7 +101,7 @@ class ProjectServiceTest {
         // Given
         UUID adminId = UUID.randomUUID();
         UserPrincipal principal = createPrincipal(adminId, UserRole.ADMINISTRATOR);
-        SearchProjectCommand searchCommand = new SearchProjectCommand(principal, null, null, false);
+        SearchProjectCommand searchCommand = new SearchProjectCommand(principal, null, null, true, false);
 
         when(projectRepository.findAll(any(Specification.class))).thenReturn(List.of(
                 createTestProject(UUID.randomUUID(), "Projekt A"),
@@ -120,7 +120,7 @@ class ProjectServiceTest {
         // Given
         UUID pmId = UUID.randomUUID();
         UserPrincipal principal = createPrincipal(pmId, UserRole.PROJECT_MANAGER);
-        SearchProjectCommand searchCommand = new SearchProjectCommand(principal, null, null, false);
+        SearchProjectCommand searchCommand = new SearchProjectCommand(principal, null, null, true, false);
 
         when(projectRepository.findAll(any(Specification.class))).thenReturn(List.of(
                 createTestProject(UUID.randomUUID(), "Projekt A")
@@ -139,7 +139,7 @@ class ProjectServiceTest {
         // Given
         UUID userId = UUID.randomUUID();
         UserPrincipal principal = createPrincipal(userId, UserRole.COMMON);
-        SearchProjectCommand searchCommand = new SearchProjectCommand(principal, null, null, false);
+        SearchProjectCommand searchCommand = new SearchProjectCommand(principal, null, null, true, false);
 
         when(projectRepository.findAll(any(Specification.class))).thenReturn(List.of(
                 createTestProject(UUID.randomUUID(), "Projekt A")

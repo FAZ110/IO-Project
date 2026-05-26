@@ -5,7 +5,6 @@ import {
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
-  type PaginationState,
   useReactTable,
 } from "@tanstack/react-table"
 
@@ -17,33 +16,46 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { useState } from "react"
 import { Button } from "./button"
+import { useDataTableControls, type DataTableControl } from "@/lib/use-data-table-controls"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  isLoading?: boolean
+  control?: DataTableControl
+  pageCount?: number
+  totalItems?: number
+  onRowClick?: (row: TData) => void
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isLoading,
+  control,
+  pageCount,
+  totalItems,
+  onRowClick,
 }: DataTableProps<TData, TValue>) {
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
+  const backoffControl = useDataTableControls(10)
+  const activeControl = control ?? backoffControl
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    onPaginationChange: setPagination,
-    state: {
-      pagination,
-    },
+    ...(control
+      ? { pageCount: pageCount ?? 0, manualPagination: true }
+      : { getPaginationRowModel: getPaginationRowModel() }
+    ),
+    state: { pagination: activeControl.pagination },
+    onPaginationChange: activeControl.onPaginationChange,
   })
+
+  const displayTotal = totalItems ?? data.length
+  const currentPage = table.getState().pagination.pageIndex + 1
+  const totalPages = table.getPageCount()
 
   return (
     <div className="flex-1 flex flex-col w-full">
@@ -53,28 +65,38 @@ export function DataTable<TData, TValue>({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} style={{
+                    maxWidth: header.column.columnDef.size,
+                    minWidth: header.column.columnDef.size,
+                  }}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                      : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground animate-pulse">
+                  Ładowanie...
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="even:bg-muted/50 hover:bg-muted/80 transition-colors"
+                  onClick={() => onRowClick?.(row.original)}
+                  className={`even:bg-muted/50 hover:bg-muted/80 transition-colors ${onRowClick ? "cursor-pointer" : ""}`}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} style={{
+                      maxWidth: cell.column.columnDef.size,
+                      minWidth: cell.column.columnDef.size,
+                    }}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -93,13 +115,12 @@ export function DataTable<TData, TValue>({
 
       <div className="shrink-0 flex items-center justify-between px-4 py-4 border-t bg-muted/10">
         <div className="text-sm text-muted-foreground font-medium">
-          Łącznie: <span className="text-foreground">{data.length}</span> pozycji
+          Łącznie: <span className="text-foreground">{displayTotal}</span> pozycji
         </div>
 
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center justify-center text-sm font-medium">
-            Strona {table.getPageCount() === 0 ? 0 : table.getState().pagination.pageIndex + 1} z{" "}
-            {table.getPageCount()}
+            Strona {totalPages === 0 ? 0 : currentPage} z {totalPages}
           </div>
 
           <div className="flex items-center space-x-2">

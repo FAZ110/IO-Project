@@ -1,19 +1,20 @@
-import { 
+import {
   LayoutDashboard,
   ClipboardList,
   FolderPlus,
   ShieldAlert,
-  GraduationCap
+  GraduationCap, PlusSquare, FolderOpen, Briefcase, Users
 } from 'lucide-react';
 import { UserRole } from '@/features/auth/auth.types';
 import { PATHS } from '@/routes/paths';
 
 export interface NavItem {
   label: string;
-  path: string;
+  path?: string;
   icon: React.ElementType;
   roles?: UserRole[];
   isCritical?: boolean;
+  children?: NavItem[];
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -21,24 +22,34 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Dashboard',
     path: PATHS.ROOT,
     icon: LayoutDashboard,
+    roles: [UserRole.COMMON, UserRole.PROJECT_MANAGER, UserRole.LINEAR_MANAGER, UserRole.AUTHORITY],
   },
   {
-    label: 'Wnioski projektowe',
-    path: PATHS.PROJECT_REQUESTS,
+    label: 'Rejestry',
+    icon: FolderOpen,
+    roles: [UserRole.AUTHORITY, UserRole.LINEAR_MANAGER, UserRole.PROJECT_MANAGER, UserRole.COMMON],
+    children: [
+      { label: 'Rejestr projektów', path: PATHS.PROJECTS_REGISTRY, icon: Briefcase },
+      { label: 'Rejestr pracowników', path: PATHS.EMPLOYEES_REGISTRY, icon: Users },
+    ]
+  },
+  {
+    label: 'Wnioski',
     icon: ClipboardList,
-    roles: [UserRole.LINEAR_MANAGER],
-  },
-    {
-    label: 'Wnioski kwalifikacyjne',
-    path: PATHS.QUALIFICATION_REQUESTS,
-    icon: GraduationCap,
-    roles: [UserRole.LINEAR_MANAGER],
+    roles: [UserRole.LINEAR_MANAGER, UserRole.AUTHORITY],
+    children: [
+      { label: 'Projektowe', path: PATHS.PROJECT_REQUESTS, icon: ClipboardList },
+      { label: 'Kwalifikacyjne', path: PATHS.QUALIFICATION_REQUESTS, icon: GraduationCap },
+    ]
   },
   {
-    label: 'Nowy projekt',
-    path: PATHS.CREATE_PROJECT,
+    label: 'Utwórz',
     icon: FolderPlus,
-    roles: [UserRole.PROJECT_MANAGER],
+    roles: [UserRole.PROJECT_MANAGER, UserRole.AUTHORITY],
+    children: [
+      { label: 'Nowy projekt', path: PATHS.CREATE_PROJECT, icon: PlusSquare },
+      { label: 'Nowy portfel/program', path: PATHS.CREATE_PROJECT_GROUP, icon: FolderPlus },
+    ]
   },
   {
     label: 'Panel Admina',
@@ -46,11 +57,5 @@ export const NAV_ITEMS: NavItem[] = [
     icon: ShieldAlert,
     roles: [UserRole.ADMINISTRATOR],
     isCritical: true,
-  },
-  {
-    label: "Nowy portfel/program",
-    path: PATHS.CREATE_PROJECT_GROUP,
-    icon: FolderPlus,
-    roles: [UserRole.PROJECT_MANAGER, UserRole.AUTHORITY]
   }
 ];

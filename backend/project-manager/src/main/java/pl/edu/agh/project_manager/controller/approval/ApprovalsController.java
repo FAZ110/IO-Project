@@ -29,7 +29,7 @@ public class ApprovalsController {
     private final QualificationManagementService qualificationService;
 
     @GetMapping("/assignments/pending")
-    @PreAuthorize("hasRole('LINEAR_MANAGER')")
+    @PreAuthorize("hasAnyRole('LINEAR_MANAGER', 'AUTHORITY')")
     public ResponseEntity<List<AssignmentResponse>> getPendingAssignments(
             @AuthenticationPrincipal UserPrincipal principal
     ) {
@@ -38,7 +38,7 @@ public class ApprovalsController {
     }
 
     @PostMapping("/assignments/{assignmentId}/accept")
-    @PreAuthorize("hasRole('LINEAR_MANAGER') and @assignmentAccess.canManageAssignment(#assignmentId, authentication.principal)")
+    @PreAuthorize("hasAnyRole('LINEAR_MANAGER', 'AUTHORITY') and @assignmentAccess.canManageAssignment(#assignmentId, authentication.principal)")
     public ResponseEntity<Void> acceptAssignment(
             @PathVariable UUID assignmentId,
             @AuthenticationPrincipal UserPrincipal principal
@@ -48,7 +48,7 @@ public class ApprovalsController {
     }
 
     @PostMapping("/assignments/{assignmentId}/reject")
-    @PreAuthorize("hasRole('LINEAR_MANAGER') and @assignmentAccess.canManageAssignment(#assignmentId, authentication.principal)")
+    @PreAuthorize("hasAnyRole('LINEAR_MANAGER', 'AUTHORITY') and @assignmentAccess.canManageAssignment(#assignmentId, authentication.principal)")
     public ResponseEntity<Void> rejectAssignment(
             @PathVariable UUID assignmentId,
             @AuthenticationPrincipal UserPrincipal principal
@@ -58,7 +58,7 @@ public class ApprovalsController {
     }
 
     @GetMapping("/assignments/{assignmentId}/details")
-    @PreAuthorize("hasRole('LINEAR_MANAGER') and @assignmentAccess.canManageAssignment(#assignmentId, authentication.principal)")
+    @PreAuthorize("hasAnyRole('LINEAR_MANAGER', 'AUTHORITY') and @assignmentAccess.canManageAssignment(#assignmentId, authentication.principal)")
     public ResponseEntity<EmployeeAssignmentDetailsResponse> getAssignmentDetails(
             @PathVariable UUID assignmentId,
             @AuthenticationPrincipal UserPrincipal principal
@@ -68,19 +68,19 @@ public class ApprovalsController {
     }
 
     @GetMapping("/qualifications")
-    @PreAuthorize("hasRole('LINEAR_MANAGER')")
+    @PreAuthorize("hasAnyRole('LINEAR_MANAGER', 'AUTHORITY')")
     public ResponseEntity<List<QualificationRequestResponse>> getUsersWithWaitingQualifications(@AuthenticationPrincipal UserPrincipal principal) {
         return ResponseEntity.ok(qualificationService.getRecordsForManager(principal.userId()));
     }
 
     @GetMapping("/qualifications/details")
-    @PreAuthorize("hasRole('LINEAR_MANAGER') and @qualificationSecurity.isManagerForUser(principal.userId(), #userId)")
+    @PreAuthorize("hasAnyRole('LINEAR_MANAGER', 'AUTHORITY') and @qualificationSecurity.isManagerForUser(principal.userId(), #userId)")
     public ResponseEntity<List<QualificationDetailsResponse>> getQualificationRequestDetails(@RequestParam UUID userId) {
         return ResponseEntity.ok(qualificationService.getPendingForUser(userId));
     }
 
     @PostMapping("/qualifications/bulk-update")
-    @PreAuthorize("hasRole('LINEAR_MANAGER')")
+    @PreAuthorize("hasAnyRole('LINEAR_MANAGER', 'AUTHORITY')")
     public ResponseEntity<Void> updateQualificationRequests(
             @Valid @RequestBody List<QualificationUpdateRequest> requests,
             @AuthenticationPrincipal UserPrincipal principal

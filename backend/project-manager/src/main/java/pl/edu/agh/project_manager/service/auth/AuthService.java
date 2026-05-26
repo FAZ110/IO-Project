@@ -1,6 +1,7 @@
 package pl.edu.agh.project_manager.service.auth;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.project_manager.domain.entity.user.ActivationToken;
 import pl.edu.agh.project_manager.domain.entity.user.User;
+import pl.edu.agh.project_manager.domain.enums.UserRole;
 import pl.edu.agh.project_manager.domain.enums.UserStatus;
+import pl.edu.agh.project_manager.domain.event.SystemNewEmployeeEvent;
 import pl.edu.agh.project_manager.domain.exception.ApiErrorCode;
 import pl.edu.agh.project_manager.domain.exception.ApplicationException;
 import pl.edu.agh.project_manager.repository.user.ActivationTokenRepository;
@@ -34,6 +37,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public TokenPair register(RegisterCommand command) {
@@ -55,6 +59,14 @@ public class AuthService {
         userRepository.save(user);
 
         tokenRepository.delete(activationToken);
+
+        if (user.getUserRole() == UserRole.COMMON && user.getSupervisor() != null) {
+            eventPublisher.publishEvent(new SystemNewEmployeeEvent(
+                    user.getId(),
+                    user.getSupervisor(),
+                    user.getFullName()
+            ));
+        }
 
         UserDetails userDetails = new UserPrincipal(
                 user.getId(),

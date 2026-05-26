@@ -1,123 +1,127 @@
 import type { SimpleUserResponse } from "@/features/user-management";
-import { useState, useMemo } from "react";
-import { type UseFormGetValues, type UseFormSetValue } from "react-hook-form";
+import { useState, useMemo, useCallback } from "react";
+import { type Control, type UseFormSetValue, useWatch } from "react-hook-form";
 import type { ProjectCreationRequest } from "../project.types";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
 
 interface UserAutocompleteProps {
     label: string;
     foundUsers: SimpleUserResponse[];
     onSearch: (query: string) => void;
+    control: Control<ProjectCreationRequest>;
     setValue: UseFormSetValue<ProjectCreationRequest>;
-    getValues: UseFormGetValues<ProjectCreationRequest>;
-    clearErrors: (name: keyof ProjectCreationRequest) => void;
     roles: "committee" | "sponsors";
-    usersById: Record<string, SimpleUserResponse>;
-    onRememberUser: (user: SimpleUserResponse) => void; 
 }
 
 export const UserAutocomplete = ({
     label,
     foundUsers,
     onSearch,
+    control,
     setValue,
-    getValues,
-    clearErrors,
     roles,
-    usersById,
-    onRememberUser,
-
 }: UserAutocompleteProps) => {
-
-    const [searchInput, setSearchInput] = useState('');
+    const [searchInput, setSearchInput] = useState("");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const mergedUsersById = useMemo(() => {
-      const next = { ...usersById };
-      for (const user of foundUsers) {
-      next[user.id] = user;
-      }
-      return next;
-    }, [usersById, foundUsers]);
+    const selectedUserIds = useWatch({ control, name: roles }) ?? [];
 
-    const selectedUserIds = getValues(roles);
+    const foundUsersById = useMemo(() => {
+        const map: Record<string, SimpleUserResponse> = {};
+        for (const user of foundUsers) map[user.id] = user;
+        return map;
+    }, [foundUsers]);
 
-    const selectedUsers = useMemo(() => {
-        return selectedUserIds
-            .map((id) => {
-                const known = mergedUsersById[id];
-                if (known) return known;
-                return { id, name: "Wybrany", surname: "użytkownik" } as SimpleUserResponse;
-            });
-    }, [selectedUserIds, mergedUsersById]);
+    const [knownUsersById, setKnownUsersById] = useState<Record<string, SimpleUserResponse>>({});
 
-    const handleAddUser = (user: SimpleUserResponse) => {
-        const currentIds = getValues(roles);
+    const mergedUsersById = useMemo(
+        () => ({ ...knownUsersById, ...foundUsersById }),
+        [knownUsersById, foundUsersById]
+    );
 
-        if (!currentIds.includes(user.id)) {
-            setValue(roles, [...currentIds, user.id], {
-                shouldValidate: true,
-                shouldDirty: true,
-            });
-            clearErrors(roles);
+    const selectedUsers = useMemo(
+        () =>
+            selectedUserIds.map(
+                (id) =>
+                    mergedUsersById[id] ?? ({ id, name: "Wybrany", surname: "użytkownik" } as SimpleUserResponse)
+            ),
+        [selectedUserIds, mergedUsersById]
+    );
+
+    const handleAddUser = useCallback((user: SimpleUserResponse) => {
+        if (!selectedUserIds.includes(user.id)) {
+            setValue(roles, [...selectedUserIds, user.id], { shouldValidate: true, shouldDirty: true });
         }
-
-        onRememberUser(user);
+        setKnownUsersById((prev) => ({ ...prev, [user.id]: user }));
         setSearchInput("");
         onSearch("");
         setIsDropdownOpen(false);
-    };
+    }, [selectedUserIds, setValue, roles, onSearch]);
 
-    const handleRemoveUser = (userId: string) => {
-        const currentIds = getValues(roles);
-        const nextIds = currentIds.filter((id) => id !== userId);
-
-        setValue(roles, nextIds, {
-            shouldValidate: true,
-            shouldDirty: true,
-        });
-        clearErrors(roles);
-    };
+    const handleRemoveUser = useCallback((userId: string) => {
+        setValue(
+            roles,
+            selectedUserIds.filter((id) => id !== userId),
+            { shouldValidate: true, shouldDirty: true }
+        );
+    }, [selectedUserIds, setValue, roles]);
 
     return (
         <div className="relative">
-          <label className="block text-sm font-medium text-gray-700 mb-1">{label} *</label>
-          <input
-              placeholder={`Wyszukaj (${label.toLocaleLowerCase()})...`}
-              value={searchInput}
-              onChange={(e) => {
-                setSearchInput(e.target.value);
-                onSearch(e.target.value);
-                setIsDropdownOpen(true);
-              }}
-              onFocus={() => setIsDropdownOpen(true)}
-              onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)}
-              className="w-full border border-gray-300 rounded p-2 focus:ring-blue-500"
-          />
+            <Label className="mb-1">
+                {label} <span className="text-muted-foreground font-normal">(opcjonalnie)</span>
+            </Label>
+            <Input
+                placeholder={`Wyszukaj ${label.toLowerCase()}...`}
+                value={searchInput}
+                onChange={(e) => {
+                    setSearchInput(e.target.value);
+                    onSearch(e.target.value);
+                    setIsDropdownOpen(true);
+                }}
+                onFocus={() => setIsDropdownOpen(true)}
+                onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)}
+            />
 
-          {isDropdownOpen && searchInput && (
-              <ul className="absolute z-50 w-full bg-white border border-gray-300 mt-1 rounded shadow-lg max-h-48 overflow-y-auto">
-                {foundUsers.length > 0 ?
-                  foundUsers.map(user => (
-                    <li key={user.id} className="p-2 hover:bg-blue-100 cursor-pointer text-sm"
-                        onMouseDown={() => handleAddUser(user)}>
-                      {user.name} {user.surname}
-                    </li>
-                )) : (
-                  <li className="p-2 text-gray-400 text-sm italic">Brak wyników...</li>
-                )}
-              </ul>
-          )}
-          
-          <div className="flex flex-wrap gap-2 mt-2">
-            {selectedUsers.map(user => (
-                <span key={user.id} className="flex items-center bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">
-                  {user.name} {user.surname}
-                  <button type="button" onClick={() => handleRemoveUser(user.id)} className="ml-1 text-blue-500 hover:text-blue-800 cursor-pointer">
-                    <span aria-hidden="true" className="text-sm leading-none">×</span>
-                  </button>
-                </span>
-            ))}
-          </div>
+            {isDropdownOpen && searchInput && (
+                <ul className="absolute z-50 w-full bg-popover border border-border mt-1 rounded-lg shadow-md max-h-48 overflow-y-auto">
+                    {foundUsers.length > 0 ? (
+                        foundUsers.map((user) => (
+                            <li
+                                key={user.id}
+                                className="px-3 py-2 hover:bg-accent cursor-pointer text-sm"
+                                onMouseDown={() => handleAddUser(user)}
+                            >
+                                {user.name} {user.surname}
+                                <span className="text-muted-foreground ml-1 text-xs">({user.email})</span>
+                            </li>
+                        ))
+                    ) : (
+                        <li className="px-3 py-2 text-muted-foreground text-sm italic">Brak wyników...</li>
+                    )}
+                </ul>
+            )}
+
+            {selectedUsers.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                    {selectedUsers.map((user) => (
+                        <Badge key={user.id} variant="secondary" className="h-auto py-1 px-2 gap-1">
+                            {user.name} {user.surname}
+                            <button
+                                type="button"
+                                onClick={() => handleRemoveUser(user.id)}
+                                className="ml-0.5 rounded-full hover:bg-muted-foreground/20 p-0.5 cursor-pointer"
+                                aria-label={`Usuń ${user.name} ${user.surname}`}
+                            >
+                                <X className="size-3" />
+                            </button>
+                        </Badge>
+                    ))}
+                </div>
+            )}
         </div>
-    )
-}
+    );
+};

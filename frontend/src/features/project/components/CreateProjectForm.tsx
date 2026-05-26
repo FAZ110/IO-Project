@@ -1,4 +1,4 @@
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { CreateProjectView } from "./CreateProjectForm.view.tsx";
 import type { ProjectCreationRequest } from "../project.types.ts";
 import { useCreateProject } from "../project.hooks.ts";
@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CreateProjectFormSchema } from "../project.schema.ts";
 import { getNextDateFromToday } from "../project.utils.ts";
+import { Form } from "@/components/ui/form";
 
 export const CreateProjectForm = () => {
   const methods = useForm<ProjectCreationRequest>({
@@ -25,8 +26,7 @@ export const CreateProjectForm = () => {
       sponsors: [],
       committee: [],
       milestones: [],
-      risks: [],
-      roles: [],
+      risks: []
     },
   });
 
@@ -38,18 +38,14 @@ export const CreateProjectForm = () => {
   const [committeeQuery, setCommitteeQuery] = useState("");
   const [committeeQueryValue] = useDebounce(committeeQuery, 300);
 
-  const { data: foundSponsors = [] } = useSearchUsers(sponsorsQueryValue);
-  const { data: foundCommittee = [] } = useSearchUsers(committeeQueryValue);
+  const { users: foundSponsors = [] } = useSearchUsers(sponsorsQueryValue);
+  const { users: foundCommittee = [] } = useSearchUsers(committeeQueryValue);
 
   const mutation = useCreateProject();
   const navigate = useNavigate();
 
   const onSubmit = methods.handleSubmit((data) => {
-    const payload = {
-      ...data,
-    };
-
-    mutation.mutate(payload, {
+    mutation.mutate(data, {
       onSuccess: (newProjectId) => {
         methods.reset();
         navigate(PATHS.PROJECT(newProjectId));
@@ -58,7 +54,7 @@ export const CreateProjectForm = () => {
   });
 
   return (
-    <FormProvider {...methods}>
+    <Form {...methods}>
       <CreateProjectView
         onSubmitProject={onSubmit}
         isPending={mutation.isPending}
@@ -68,7 +64,7 @@ export const CreateProjectForm = () => {
         onSponsorSearch={setSponsorsQuery}
         onCommitteeSearch={setCommitteeQuery}
       />
-    </FormProvider>
+    </Form>
   );
 };
 

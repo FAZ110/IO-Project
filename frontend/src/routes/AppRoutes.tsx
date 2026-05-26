@@ -1,13 +1,13 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { GuestRoute } from './GuestRoute';
-import { PATHS } from './paths';
+import { PATHS, ROUTE_PARAMS } from './paths';
 import { RegisterPage } from '../pages/RegisterPage';
 import { LoginPage } from '../pages/LoginPage';
 import { CreateProjectPage } from '@/pages/CreateProjectPage';
 import { ProjectDetailsPage } from '@/pages/ProjectDetailsPage.tsx';
 import { AdminUsersPage } from '../pages/AdminUsersPage';
 import { AdminUserDetailsPage } from '../pages/AdminUserDetailsPage';
-import { ROUTE_PARAMS } from './paths';
+import { NotificationPage } from "@/pages/NotificationPage.tsx";
 import { UserRole } from '@/features/auth/auth.types';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ProfilePage } from "@/pages/ProfilePage";
@@ -17,8 +17,15 @@ import { AuthorizedRoute } from '@/routes/AuthorizedRoute';
 import { EmployeeAssignmentsPage } from '@/pages/EmployeeAssignmentsPage';
 import { QualificationRequestsPage } from '@/pages/QualificationRequestsPage';
 import { CreateProjectGroupPage } from '@/pages/CreateProjectGroupPage';
+import { ProjectRegistryPage } from '@/pages/ProjectRegistryPage';
+import { useAuth } from '@/providers/AuthContext';
+import { EmployeeRegistryPage } from '@/pages/EmployeeRegistryPage';
+import { EmployeeDetailsPage } from '@/pages/EmployeeDetailsPage';
 
 export const AppRoutes = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === UserRole.ADMINISTRATOR;
+
   return (
     <Routes>
       {/* PUBLIC ROUTES */}
@@ -31,20 +38,24 @@ export const AppRoutes = () => {
       <Route element={<AuthenticatedRoute />}>
         <Route element={<MainLayout/>}>
           {/* GLOBAL ROUTES */}
-          <Route path={PATHS.ROOT} element={<DashboardPage />} />
+          <Route path={PATHS.ROOT} element={isAdmin ? <Navigate to={PATHS.ADMIN_USERS} replace /> : <DashboardPage />} />
           <Route path={PATHS.PROFILE} element={<ProfilePage />} />
           <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
+          <Route path={PATHS.PROJECTS_REGISTRY} element={<ProjectRegistryPage />} />
+          <Route path={PATHS.EMPLOYEES_REGISTRY} element={<EmployeeRegistryPage />} />
+          <Route path={PATHS.EMPLOYEE_DETAILS(`:${ROUTE_PARAMS.USER_ID}`)} element={<EmployeeDetailsPage />} />
+          <Route path={PATHS.NOTIFICATION} element={<NotificationPage />} />
 
           {/* LINEAR MANAGER ROUTES */}
-          <Route element={<AuthorizedRoute allowedRoles={[UserRole.LINEAR_MANAGER]} />}>
+          <Route element={<AuthorizedRoute allowedRoles={[UserRole.LINEAR_MANAGER, UserRole.AUTHORITY]} />}>
             <Route path={PATHS.PROJECT_REQUESTS} element={<EmployeeAssignmentsPage />} />
             <Route path={PATHS.QUALIFICATION_REQUESTS} element={<QualificationRequestsPage />} />
           </Route>
 
           {/* PROJECT MANAGER ROUTES */}
-          <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER]} />}>
-              <Route path={PATHS.CREATE_PROJECT} element={<CreateProjectPage />} />
-              <Route path={PATHS.PROJECT(`:${ROUTE_PARAMS.PROJECT_ID}`)} element={<ProjectDetailsPage />} />
+          <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER, UserRole.AUTHORITY]} />}>
+            <Route path={PATHS.CREATE_PROJECT} element={<CreateProjectPage />} />
+            <Route path={PATHS.CREATE_PROJECT_GROUP} element={<CreateProjectGroupPage />} />
           </Route>
 
           {/* ADMIN ROUTES */}
@@ -53,9 +64,6 @@ export const AppRoutes = () => {
             <Route path={PATHS.ADMIN_USER_DETAILS(`:${ROUTE_PARAMS.USER_ID}`)} element={<AdminUserDetailsPage />} />
           </Route>
 
-          <Route element={<AuthorizedRoute allowedRoles={[UserRole.PROJECT_MANAGER, UserRole.AUTHORITY]} />}>
-            <Route path={PATHS.CREATE_PROJECT_GROUP} element={<CreateProjectGroupPage />} />
-          </Route>
         </Route>
       </Route>
 

@@ -1,4 +1,4 @@
-package pl.edu.agh.project_manager.controller.dto.employee_requests;
+package pl.edu.agh.project_manager.controller.dto.common;
 
 import java.time.LocalDate;
 

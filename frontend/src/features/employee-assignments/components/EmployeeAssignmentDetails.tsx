@@ -45,7 +45,7 @@ export const EmployeeAssignmentDetails = ({ assignment, onClose }: EmployeeAssig
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold">{assignment.employeeName} {assignment.employeeSurname}</h3>
-          <p className="text-sm text-muted-foreground">{assignment.projectRoleName} — {assignment.projectName}</p>
+          <p className="text-sm text-muted-foreground">{assignment.roleName} — {assignment.projectName}</p>
           <p className="mt-2 text-sm text-muted-foreground">Zgłoszono: {fmtDate(assignment.createdAt)}</p>
         </div>
         <div className="flex items-center gap-3">

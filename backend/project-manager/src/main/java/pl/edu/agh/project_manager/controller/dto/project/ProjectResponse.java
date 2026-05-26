@@ -2,6 +2,7 @@ package pl.edu.agh.project_manager.controller.dto.project;
 
 import pl.edu.agh.project_manager.controller.dto.user.UserResponse;
 import pl.edu.agh.project_manager.domain.entity.project.Project;
+import pl.edu.agh.project_manager.controller.dto.project_group.GroupBasicResponse;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -13,7 +14,8 @@ public record ProjectResponse(
         LocalDate startDate,
         LocalDate endDate,
         Boolean isActive,
-        UserResponse manager
+        UserResponse manager,
+        GroupBasicResponse group
 ) {
     public static ProjectResponse from(Project project) {
         return new ProjectResponse(
@@ -23,7 +25,8 @@ public record ProjectResponse(
                 project.getStartDate(),
                 project.getEndDate(),
                 project.getIsActive(),
-                UserResponse.from(project.getProjectManager())
+                UserResponse.from(project.getProjectManager()),
+                GroupBasicResponse.from(project.getProjectGroup())
         );
     }
 }

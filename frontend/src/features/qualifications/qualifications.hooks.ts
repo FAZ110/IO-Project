@@ -9,6 +9,13 @@ export const useMyQualificationsQuery = () =>
     queryFn: qualificationsService.getMyQualifications,
   });
 
+export const useUserQualificationsQuery = (userId?: string) =>
+  useQuery({
+    queryKey: queryKeys.qualifications.byUser(userId ?? '').queryKey,
+    queryFn: () => qualificationsService.getUserQualifications(userId as string),
+    enabled: !!userId,
+  });
+
 export const useAddQualificationsMutation = () => {
   const queryClient = useQueryClient();
 
