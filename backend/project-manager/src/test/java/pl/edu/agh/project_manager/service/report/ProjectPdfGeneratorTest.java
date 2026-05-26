@@ -34,7 +34,16 @@ class ProjectPdfGeneratorTest {
 
     @BeforeEach
     void setUp() {
-        UserResponse manager = new UserResponse(UUID.randomUUID(),"john.doe@example.com", "John",  "Doe", null,null, null, List.of()
+        UserResponse manager = new UserResponse(
+                UUID.randomUUID(),
+                "john.doe@example.com",
+                "John",
+                "Doe",
+                null,
+                null,
+                null,
+                null,
+                List.of()
         );
         projectData = new ProjectResponse(UUID.randomUUID(), "Test Project", "Description", LocalDate.now(), LocalDate.now().plusMonths(6), true, manager, null);
     }
