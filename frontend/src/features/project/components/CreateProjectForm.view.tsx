@@ -136,7 +136,6 @@ export const CreateProjectView = ({
                 riskFields={riskFields}
                 appendRisk={appendRisk}
                 removeRisk={removeRisk}
-                milestones={milestones}
                 milestonesFields={milestonesFields}
                 appendMilestone={appendMilestone}
                 removeMilestone={removeMilestone}

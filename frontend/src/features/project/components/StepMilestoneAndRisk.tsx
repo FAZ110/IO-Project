@@ -26,7 +26,6 @@ interface StepMilestonesAndRisksProps {
   register: UseFormRegister<ProjectCreationRequest>;
   control: Control<ProjectCreationRequest>;
   errors: FieldErrors<ProjectCreationRequest>;
-  milestones: ProjectCreationRequest["milestones"];
 
   milestonesFields: FieldArrayWithId<ProjectCreationRequest, "milestones", "id">[];
   appendMilestone: UseFieldArrayAppend<ProjectCreationRequest, "milestones">;
@@ -44,7 +43,6 @@ export const StepMilestonesAndRisks = ({
                                          register,
                                          control,
                                          errors,
-                                         milestones,
                                          milestonesFields,
                                          appendMilestone,
                                          removeMilestone,
