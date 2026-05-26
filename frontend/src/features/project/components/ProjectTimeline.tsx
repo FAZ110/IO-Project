@@ -124,8 +124,7 @@ export const ProjectTimeline = ({ project, children }: ProjectTimelineProps) => 
                         <TooltipTrigger asChild>
                           <button
                             type="button"
-                            // todo: do zmiany dla kogos kto robi profile uzytkownikow
-                            onClick={() => navigate(PATHS.ADMIN_USER_DETAILS(employee.userId))}
+                            onClick={() => navigate(PATHS.EMPLOYEE_DETAILS(employee.userId))}
                             className="group rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 transition-transform hover:scale-105"
                           >
                             <Avatar className="h-8 w-8 ring-2 ring-white shadow-sm transition-colors group-hover:ring-indigo-300 group-hover:shadow-md">
